@@ -1,0 +1,76 @@
+# WebXR - Hit-test Explainer
+
+
+# Overview
+
+A common AR use-case on the web will involve placing virtual objects in the real world. In order to place an object in a user-picked location that corresponds to real-world geometry, the most common approach is a raycast into the AR system's understanding of the real world. AR systems can have a wide variety of world understanding elements such as planes, point clouds, and meshes, all of which would potentially need to be considered by such a raycast. 
+
+There are two basic options for providing placement of virtual objects in the real world using a raycasting approach:
+
+1.  Expose _all_ the world understanding elements calculated by the underlying AR system to the app and then the app could implement its own raycast against those elements. This approach has the following problems:
+    * It requires an extremely complex API - one that could vary from AR system to AR system and user agent to user agent depending on technology - in order to provide all the world understanding data, which could include diverse elements such as planes, point clouds, meshes, etc., to the app.
+    * It demands that each developer produce their own raycasting algorithm, which both decreases the consistency of AR experiences and puts a lot of burden on the developer to either write their own logic or to include a third-party raycasting library.
+    * The privacy problem of needing to serve "the world" to content rather than answering a question that hit tests solve: "is there real-world geometry along this ray?" The simpler hit-test API should have reduced privacy concerns and lends itself to mitigation strategies, e.g. throttling.
+
+2.  Provide a single API for doing a raycast against world-understanding elements calculated by the underlying AR system. This approach is what this explainer advocates for it has the following advantages:
+    * Provides the same basic functionality that apps need to place virtual objects without having to expose the world understanding directly. 
+    * Provides consistency / performance advantages over external raycasting algorithms as the underlying AR system can leverage complex data structures such as k-d trees in order to perform fast hit-tests without having to expose those structures or force the developer to recreate them. 
+    * Because it abstracts the world understanding of the AR system behind a single API, it means different AR systems with diverse conceptualizations of the real world can be abstracted into a common API.
+
+# Use-cases
+
+Use-cases enabled by such an API include:
+
+*   Show a reticle that appears to track the real world surfaces at which the device or controller is pointed.
+    *   Often, AR apps want to show a reticle that appears to stick to real-world surfaces. In order to do this, the app could perform a hit-test every frame, usually based on a ray that emanates from the center of the user's perspective. This would allow the developer to render the reticle appropriately on real-world surfaces as the scene changes. 
+    *   Frequency: this action is done every single frame.
+*   Place a virtual object in the real world
+    *   The most common form of real-world geometry is horizontal surfaces on which virtual objects could be placed. In order for those virtual objects to appear to be anchored in the real world, they must be placed at the same height as the real world objects (the floor, a table, …). Usually the placement is in response to a user gesture such as a tap. On tap, the app casts a ray into the world emanating from the touch location and gets a hit result with a pose that represents the location in the real world that ray would intersect and has an representing the normal of the surface that was hit so the object can be placed realistically. A hit-test API would allow the developer to detect geometry in response to a user gesture and use the results to determine where to place/render the virtual object. 
+    *   Frequency: this action is usually done sparsely - once every several seconds or even minutes in response to user input.
+    *   An app may want to ensure that there is enough room for an object before allowing it to be placed. This kind of test likely requires a more sophisticated API, probably exposing the world understanding elements directly, however in the interim the app could make use of the hit-test API by doing a handful of tests. For example, doing a test at each corner of the object's 2d footprint bounding box and making sure that each has a valid result and are coplanar would be a simple approach to take.
+    *   The app might want to present feedback on the reticle as to whether the object could be placed at the current location as the user moves around. In this case, especially combined with the previous point of doing multiple hit-tests to ensure the object fits, the system might be required to be able to handle several hit-tests per frame under a normal load.
+    *   An app may want to cast a ray (or a set of them) and directly assume that if the normal vector that comes with the hit results are inside certain range, a horizontal or vertical surface is detected (even more than one sample could be used for more accuracy/certainty) and then show to the user that the whole surface is a plane with infinite surface to place objects on. This is a pretty common practice in the current generation of AR technologies that only detect horizontal or vertical planes.
+    *   The more hit-testing that is performed in service of the above use-cases, the more an app could derive the world understanding by mapping it using raycasts. This may create privacy risks and require throttling to mitigate.
+*   Tap vs. Controller-driven
+    *   Hit-test requests can come from multiple different contexts. For example, an object might want to be placed on a tap using a smartphone. Alternatively, we might want to show a reticle where the controller ray is pointing and then place an object on a controller button event. These are very different timing-wise with respect to the WebXR spec - a controller event happens completely out-of-band from the frame logic, while a tap could be done at the next frame.
+    *   There must be support for the case where a hit-test must be done out-of-band from the frame-to-frame business logic.
+
+# Details
+
+A discussion of hit-testing wouldn't be complete without talking about what kinds of things will be hit and how the results will be returned. The following are proposed:
+
+## Inputs
+
+The API should accept as input an origin and direction for the raycast as well as a frame-of-reference to which the ray is relative.
+
+The initial API may not include an options parameter, a dictionary of options that allows customization of the hit-test. Such a structure would allow the caller to specify things such as which types of world understanding elements should be considered valid (planes, meshes, point-clouds, etc.) We can safely leave this off for now since we can add parameters to the function without disrupting existing calls. In order to clarify this support, the API should throw an error if there are additional parameters included.
+
+## Outputs
+
+The basic return type of the hit-test API will likely be a sorted array of objects containing the hit results. Returning an object makes it easy to extend the functionality of the hit-test API in the future without re-architecting the basic structure of the API for existing apps.
+
+Early API implementations may choose to return only location and orientation information as results. However, it is very likely that apps will, in the future, want to know what object was hit, especially as more sophisticated APIs are introduced that expose the actual world understanding elements - after all, knowing what was hit could be an important aspect of connecting world understanding to the placement of virtual objects. For example, you might not want to allow placement of an object near the edge of a table or if it is a large object, maybe the table surface isn't even large enough for the object at all. 
+
+This explainer does not address Anchors (see [<span style="background-color:#ffff00;">anchors](https://github.com/immersive-web/anchors<span style="background-color:#ffff00;">)</span>, however hit results and anchors are related topics.</span>
+
+## Timing
+
+This API should be asynchronous in order to avoid main thread blocking calls. This also allows more flexibility in the underlying implementation.
+
+Timing is important for hit testing. For example, can we make a guarantee that the API will return values prior to the next frame? Ideally, yes - it should be possible to resolve all outstanding hit-test calls as part of calculating the next frame. So, to illustrate by example:
+
+*   A hit-test that was called during frame 1 will result prior to frame 2
+*   A hit-test that was called between frame 1 and frame 2 will resolve prior to frame 2 (this is important especially for making hit-test calls as part of event handlers such as input events from a controller).
+
+The likely method of asynchronously returning results is a Promise. Promises have good ergonomics for developers and make it easy to write code that deals with the async nature of the API. Since the inputs and outputs of the test are effectively in world-space (modulo frame-of-reference), the result should be usable at the time when the promise resolves even though the question was asked earlier.
+
+One potential issue with the timing of the API is if the object hit by the raycast is updated or even deleted in between the time when the hit-test calculation was done and when the results are used. This feeds back into the discussion about regarding resolving the hit-test prior to the next frame, as hopefully it can be guaranteed that the results will be valid at least for the duration of the upcoming frame.
+
+# Privacy and Security
+
+Creating an API that provides information about the real world has privacy implications. Real world geometry data can be used for both fingerprinting and identification of users and location. For example:
+*   The geometry of a user's room may be used to fingerprint between sessions and/or across users
+*   The user's facial geometry may allow a site to identify the user
+*   The geometry of a known location may allow a site to identify the user's location
+
+In many ways these privacy implications are similar to video (camera) inputs and should be considered to have similar privacy implications. However, the implications are not necessarily equivalent. For example, users may consider their image to be more private than the layout of their room while a mesh of one's face may allow easier fingerprinting than RGB image processing.
