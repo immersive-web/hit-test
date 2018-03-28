@@ -51,7 +51,7 @@ The basic return type of the hit-test API will likely be a sorted array of objec
 
 Early API implementations may choose to return only location and orientation information as results. However, it is very likely that apps will, in the future, want to know what object was hit, especially as more sophisticated APIs are introduced that expose the actual world understanding elements - after all, knowing what was hit could be an important aspect of connecting world understanding to the placement of virtual objects. For example, you might not want to allow placement of an object near the edge of a table or if it is a large object, maybe the table surface isn't even large enough for the object at all. 
 
-This explainer does not address Anchors (see [anchors](https://github.com/immersive-web/anchors), however hit results and anchors are related topics.
+This explainer does not address Anchors (see [anchors](https://github.com/immersive-web/anchors)), however hit results and anchors are related topics.
 
 ## Timing
 
