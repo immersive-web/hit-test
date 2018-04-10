@@ -55,16 +55,35 @@ This explainer does not address Anchors (see [anchors](https://github.com/immers
 
 ## Timing
 
-This API should be asynchronous in order to avoid main thread blocking calls. This also allows more flexibility in the underlying implementation.
+This API should be asynchronous in order to avoid main thread blocking calls. This also allows more flexibility in the underlying implementation. It is important to note that, due to the asynchronous nature of the API, hit results will always have at least 1 frame of latency.
 
-Timing is important for hit testing. For example, can we make a guarantee that the API will return values prior to the next frame? Ideally, yes - it should be possible to resolve all outstanding hit-test calls as part of calculating the next frame. So, to illustrate by example:
+### Latency
 
-*   A hit-test that was called during frame 1 will result prior to frame 2
-*   A hit-test that was called between frame 1 and frame 2 will resolve prior to frame 2 (this is important especially for making hit-test calls as part of event handlers such as input events from a controller).
+Can we make a guarantee that the promise will resolve prior to the next frame? This may not be possible on all systems, so speed of resolution is left as a quality-of-implementation issue for the UA. Ideally, the system would resolve hit-tests before the next frame as long as they were called prior to the request for that frame (i.e. `xrSession.requestAnimationFrame(...)`).
 
-The likely method of asynchronously returning results is a Promise. Promises have good ergonomics for developers and make it easy to write code that deals with the async nature of the API. Since the inputs and outputs of the test are effectively in world-space (modulo frame-of-reference), the result should be usable at the time when the promise resolves even though the question was asked earlier.
+### Frame Context
 
-One potential issue with the timing of the API is if the object hit by the raycast is updated or even deleted in between the time when the hit-test calculation was done and when the results are used. This feeds back into the discussion about regarding resolving the hit-test prior to the next frame, as hopefully it can be guaranteed that the results will be valid at least for the duration of the upcoming frame.
+Regardless of how long it takes for the hit-test to resolve, it needs to be guaranteed that the result is valid for the subsequent frame. This is critical to provide accurate hit-testing that can be used, for example, by an app to place an object on a surface. If the object is placed in response to the promise resolution and then the RAF for the subsequent frame is called and the object is rendered for the first time, it must be rendered in a location consistent with the state of the world for that frame in order to avoid inaccuracies in placement due to moved or deleted world elements.
+
+Note: there is not a strong connection between the hit-test and the device pose at a given frame. It is important that the hit-test resolves as quickly as possible so that, if the ray was generated based on the pose of the device, the results feel accurate and responsive. However, the hit results are really based on the world transform of the world understanding elements, such as planes, and thus will be valid regardless of the device pose.
+
+The resolution of the hit-test is also the appropriate time to create an anchor at the point of the hit if an object will be placed there. This means that the anchor will be created connected to the world state of the correct frame - the frame immediately following that resolution - and any updates that happen to the underlying world understanding elements, such as the plane that was hit, will trigger an update to the object's transform. Just like hit-test timing, the anchor updated callback should happen with a new pose that matches the world understanding of the frame immediately following that callback.
+
+For pass-through clients, this timing guarantee may not be technically possible since the view of the world is real-time. Some amount of latency of the hit-test results may be unavoidable unless a prediction model can be implemented.
+
+This sequence illustrates basic timing:
+*   request hit-test
+*   frame 1..(n-1) (could be any number of frames here)
+*   hit-test resolves (for frame n) - place object at hit location
+*   frame n - object is rendered in location accurate to the world state at frame n
+
+If we add anchors and the anchors API can't guarantee that anchors can be resolved within one frame, then the best practice to avoid floating or embedded objects would be:
+*   request hit-test
+*   frame 1..(n-1) (could be any number of frames here)
+*   hit-test resolves (for frame n) - request anchor
+*   frame n..(m-1) (could be any number of frames here)
+*   anchor resolves (for frame m) - place object at anchor location
+*   frame m - object is rendered in location appropriate to the world state and its pose will be updated continuously such that its location remains accurate to the world state at each frame
 
 # Privacy and Security
 
@@ -74,3 +93,27 @@ Creating an API that provides information about the real world has privacy impli
 *   The geometry of a known location may allow a site to identify the user's location
 
 In many ways these privacy implications are similar to video (camera) inputs and should be considered to have similar privacy implications. However, the implications are not necessarily equivalent. For example, users may consider their image to be more private than the layout of their room while a mesh of one's face may allow easier fingerprinting than RGB image processing.
+
+# API IDL
+```
+[SecureContext, Exposed=Window] interface XRHitResult {
+  readonly attribute Float32Array poseModelMatrix;
+};
+
+partial interface XRSession {
+  Promise<FrozenArray<XRHitResult>> requestHitTest(Float32Array origin, Float32Array direction, XRCoordinateSystem coordinateSystem);
+}
+```
+
+## API Details
+
+`hitTest` parameters
+*   origin - the origin of the ray as [x, y, z]
+*   direction - the direction of the ray as [x, y, z] - any non-zero-length direction vectors that are passed to the API will automatically be normalized
+    *   Note: We'll start with an  origin-direction pair instead of a pose as a pose overspecifies a ray and has the danger of the developer creating a malformed matrix
+*   coordinateSystem - the coordinate system the ray origin/direction and hit results should be relative to.
+*   To enable feature detection of possible future versions of the API with  additional parameters, an error is thrown if additional arguments are given to the function.
+
+`hitTest` return value
+*   The hit results are returned in sorted order with the nearest intersection to the origin of the ray at the beginning of the array and the furthest intersection from the origin of the ray at the end of the array.
+*   XRHitResult.poseModelMatrix is a 4x4 matrix where the translation represents the position where the ray hit the object and the orientation has a Y-axis that corresponds with the normal of the object at that location.
