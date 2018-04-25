@@ -97,7 +97,7 @@ In many ways these privacy implications are similar to video (camera) inputs and
 # API IDL
 ```
 [SecureContext, Exposed=Window] interface XRHitResult {
-  readonly attribute Float32Array poseModelMatrix;
+  readonly attribute Float32Array hitMatrix;
 };
 
 partial interface XRSession {
@@ -116,4 +116,4 @@ partial interface XRSession {
 
 `hitTest` return value
 *   The hit results are returned in sorted order with the nearest intersection to the origin of the ray at the beginning of the array and the furthest intersection from the origin of the ray at the end of the array.
-*   XRHitResult.poseModelMatrix is a 4x4 matrix where the translation represents the position where the ray hit the object and the orientation has a Y-axis that corresponds with the normal of the object at that location.
+*   XRHitResult.hitMatrix is a 4x4 matrix where the translation represents the position where the ray hit the object and the orientation has a Y-axis that corresponds with the normal of the object at that location.
