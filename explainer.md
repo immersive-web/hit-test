@@ -59,7 +59,7 @@ This API should be asynchronous in order to avoid main thread blocking calls. Th
 
 ### Latency
 
-Can we make a guarantee that the promise will resolve prior to the next frame? This may not be possible on all systems, so speed of resolution is left as a quality-of-implementation issue for the UA. Ideally, the system would resolve hit-tests before the next frame as long as they were called prior to the request for that frame (i.e. `xrSession.requestAnimationFrame(...)`).
+Can we make a guarantee that the promise will resolve prior to the next frame? This may not be possible on all systems, so speed of resolution is left as a quality-of-implementation issue for the UA. Ideally, the system would resolve hit-tests before the next frame as long as they were called within the RAF of that frame. It shouldn't matter whether this call is made before or after calling `xrSession.requestAnimationFrame(...)` within the RAF, as it is common practice to make that call at the beginning of the RAF in case there are exceptions later on in the function.
 
 ### Frame Context
 
