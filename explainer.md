@@ -117,3 +117,19 @@ partial interface XRSession {
 `hitTest` return value
 *   The hit results are returned in sorted order with the nearest intersection to the origin of the ray at the beginning of the array and the furthest intersection from the origin of the ray at the end of the array.
 *   XRHitResult.hitMatrix is a 4x4 matrix where the translation represents the position where the ray hit the object and the orientation has a Y-axis that corresponds with the normal of the object at that location.
+
+# Capability Detection
+Developers will need to be able to detect whether the hit-test capability (and AR in general) is available so they can display appropriate UX, such as a button. They will also need to be able to request this capability at session creation since implementations may need to select from multiple runtimes or runtime configurations.
+
+The Session Creation and Configuration Explainer [discusses](https://github.com/immersive-web/webxr/blob/session-creation/session-creation-explainer.md#possible-session-options) both AR capabilities in general and Hit-test specifically. It proposes that (effectively) a new option be added to `XRSessionCreationOptions` for AR or real world integration. It also proposes that Hit-test support might be implied by this option.
+
+While there are still questions to answer, it seems reasonable to assume that there will be a new option for AR in `XRSessionCreationOptions` or its equivalent and that this will need to be defined before or as part of this effort.
+
+The following is an example for discussion. **DO NOT IMPLEMENT**
+```
+partial dictionary XRSessionCreationOptions {
+  boolean environmentIntegration = false;
+};
+```
+
+AR capabilities and the capabilities defined in this API would be available if and only if `environmentIntegration: true` was included in the `requestSession()` call. Applications could also query for support using `supportsSession()`.
