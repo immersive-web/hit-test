@@ -133,3 +133,8 @@ partial dictionary XRSessionCreationOptions {
 ```
 
 AR capabilities and the capabilities defined in this API would be available if and only if `environmentIntegration: true` was included in the `requestSession()` call. Applications could also query for support using `supportsSession()`.
+
+Requesting such a session requires user activation.
+Thus, the [`requestSession()` algorithm](https://immersive-web.github.io/webxr/#dom-xrdevice-requestsession) is modified to add a user activation check step like the one for `immersive`:
+
+>If _environmentIntegration_ is `true` and the algorithm is not [triggered by user activation](https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation), [reject](https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise) _promise_ with a [`SecurityError`](https://heycam.github.io/webidl/#securityerror) and abort these steps.
