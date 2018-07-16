@@ -22,7 +22,7 @@ There are two basic options for providing placement of virtual objects in the re
 Use-cases enabled by such an API include:
 
 *   Show a reticle that appears to track the real world surfaces at which the device or controller is pointed.
-    *   Often, AR apps want to show a reticle that appears to stick to real-world surfaces. In order to do this, the app could perform a hit-test every frame, usually based on a ray that emanates from the center of the user's perspective. This would allow the developer to render the reticle appropriately on real-world surfaces as the scene changes. 
+    *   Often, AR apps want to show a reticle that appears to stick to real-world surfaces. In order to do this, the app could perform a hit-test every frame, usually based on a ray that emanates from the center of the user's perspective. This would allow the developer to render the reticle appropriately on real-world surfaces as the scene changes. This use-case is made accurate by using the the coordinate system for an XRDevice or XRInputSource as the frameOfReference parameter and a relative ray. 
     *   Frequency: this action is done every single frame.
 *   Place a virtual object in the real world
     *   The most common form of real-world geometry is horizontal surfaces on which virtual objects could be placed. In order for those virtual objects to appear to be anchored in the real world, they must be placed at the same height as the real world objects (the floor, a table, …). Usually the placement is in response to a user gesture such as a tap. On tap, the app casts a ray into the world emanating from the touch location and gets a hit result with a pose that represents the location in the real world that ray would intersect and has an representing the normal of the surface that was hit so the object can be placed realistically. A hit-test API would allow the developer to detect geometry in response to a user gesture and use the results to determine where to place/render the virtual object. 
@@ -41,7 +41,7 @@ A discussion of hit-testing wouldn't be complete without talking about what kind
 
 ## Inputs
 
-The API should accept as input an origin and direction for the raycast as well as a frame-of-reference to which the ray is relative.
+The API should accept as input an origin and direction for the raycast as well as a frame-of-reference to which the ray is relative. The coordinate system for an XRDevice or XRInputSource can be used as the frame-of-reference to enable accurate hit-tests based on relative rays to a device/input-source which gives frame-accurate results based on the device's pose on the frame subsequent to the hit-test resolving.
 
 The initial API may not include an options parameter, a dictionary of options that allows customization of the hit-test. Such a structure would allow the caller to specify things such as which types of world understanding elements should be considered valid (planes, meshes, point-clouds, etc.) We can safely leave this off for now since we can add parameters to the function without disrupting existing calls. In order to clarify this support, the API should throw an error if there are additional parameters included.
 
@@ -65,7 +65,11 @@ Can we make a guarantee that the promise will resolve prior to the next frame? T
 
 Regardless of how long it takes for the hit-test to resolve, it needs to be guaranteed that the result is valid for the subsequent frame. This is critical to provide accurate hit-testing that can be used, for example, by an app to place an object on a surface. If the object is placed in response to the promise resolution and then the RAF for the subsequent frame is called and the object is rendered for the first time, it must be rendered in a location consistent with the state of the world for that frame in order to avoid inaccuracies in placement due to moved or deleted world elements.
 
-Note: there is not a strong connection between the hit-test and the device pose at a given frame. It is important that the hit-test resolves as quickly as possible so that, if the ray was generated based on the pose of the device, the results feel accurate and responsive. However, the hit results are really based on the world transform of the world understanding elements, such as planes, and thus will be valid regardless of the device pose.
+If the hit-test is being used to place a continuously-updating object like a reticle that tracks a device or controller, the coordinate system of that object should be used as the frame-of-reference to avoid using an out-of-date ray that is generated from the pose on the current frame when the results come in for a future frame.
+
+If the hit-test is being used in response to a touch/controller event to place an object, an absolute ray should be used along with a global "eye-level" coordinate system since the object should be placed at the location that the user expected at the time of their click, not based on an updated pose for the frame on which the test resolves.
+
+Note: It is important that the hit-test resolves as quickly as possible so that, if the ray was generated based on the pose of the device, the results feel accurate and responsive.
 
 The resolution of the hit-test is also the appropriate time to create an anchor at the point of the hit if an object will be placed there. This means that the anchor will be created connected to the world state of the correct frame - the frame immediately following that resolution - and any updates that happen to the underlying world understanding elements, such as the plane that was hit, will trigger an update to the object's transform. Just like hit-test timing, the anchor updated callback should happen with a new pose that matches the world understanding of the frame immediately following that callback.
 
@@ -111,7 +115,7 @@ partial interface XRSession {
 *   origin - the origin of the ray as [x, y, z]
 *   direction - the direction of the ray as [x, y, z] - any non-zero-length direction vectors that are passed to the API will automatically be normalized
     *   Note: We'll start with an  origin-direction pair instead of a pose as a pose overspecifies a ray and has the danger of the developer creating a malformed matrix
-*   coordinateSystem - the coordinate system the ray origin/direction and hit results should be relative to.
+*   coordinateSystem - the coordinate system the ray origin/direction and hit results should be relative to. In order to get a pixel-perfect hit-test relative to an XRDevice or XRInputSource, the coordinate system for that device/input-source should be used here (along with a ray relative to that). This will let the underlying algorithm update the coordinate system for the frame on which the hit-test will be calculated so that the results are valid for the pose on the subsequent frame instead of relative to the frame when the request was made. For example, calling ```xrSession.requestHitTest(xrRay, xrDevice.getCoordinateSystem(xrSession));``` would result in a relative ray calculation based on the device's pose in the upcoming frame.
 *   To enable feature detection of possible future versions of the API with  additional parameters, an error is thrown if additional arguments are given to the function.
 
 `hitTest` return value
