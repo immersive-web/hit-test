@@ -121,6 +121,7 @@ partial interface XRSession {
 `hitTest` return value
 *   The hit results are returned in sorted order with the nearest intersection to the origin of the ray at the beginning of the array and the furthest intersection from the origin of the ray at the end of the array.
 *   XRHitResult.hitMatrix is a 4x4 matrix where the translation represents the position where the ray hit the object and the orientation has a Y-axis that corresponds with the normal of the object at that location.
+*   backfacing surfaces should be excluded from the results - i.e. "backface culling". More precisely, The dot product of the ray direction with the normal vector (aka Y+) must be negative for a result to be returned.
 
 # Capability Detection
 Developers will need to be able to detect whether the hit-test capability (and AR in general) is available so they can display appropriate UX, such as a button. They will also need to be able to request this capability at session creation since implementations may need to select from multiple runtimes or runtime configurations.
