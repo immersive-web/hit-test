@@ -1,5 +1,6 @@
 # WebXR - Hit-test Explainer
 
+<img alt="Hit-test example" src="explainer-media/hit-test-explainer-image.jpg" style="float: left; object-fit: cover; width: 45%; height: 20em; margin-right: 1em; ">
 
 # Overview
 
@@ -120,7 +121,7 @@ partial interface XRSession {
 
 `hitTest` return value
 *   The hit results are returned in sorted order with the nearest intersection to the origin of the ray at the beginning of the array and the furthest intersection from the origin of the ray at the end of the array.
-*   XRHitResult.hitMatrix is a 4x4 matrix where the translation represents the position where the ray hit the object and the orientation has a Y-axis that corresponds with the normal of the object at that location.
+*   XRHitResult.hitMatrix is a 4x4 matrix where the translation represents the position where the ray hit the object. The orientation of the matrix has axes where Y+ points along the estimated surface normal, X+ is perpendicular to the cast ray and parallel to the physical surface centered around the hit test, and Z+ points roughly toward the user's device (see image at top of explainer). If the hit-test ray and the surface normal are almost parallel, very small input variations can result in large changes in the result orientation. In the case that they are exactly parallel, the rotation of the X and Z axes is non-deterministic. This means that the normal use-case of placing objects on a horizontal surface will result in the object facing the user. In the case where you are pointing directly at a wall, the orientation may fluctuate wildly and should probably be ignored by the app.
 
 # Capability Detection
 Developers will need to be able to detect whether the hit-test capability (and AR in general) is available so they can display appropriate UX, such as a button. They will also need to be able to request this capability at session creation since implementations may need to select from multiple runtimes or runtime configurations.
