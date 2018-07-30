@@ -47,9 +47,9 @@ The initial API may not include an options parameter, a dictionary of options th
 
 ## Outputs
 
-The basic return type of the hit-test API will likely be a sorted array of objects containing the hit results. Returning an object makes it easy to extend the functionality of the hit-test API in the future without re-architecting the basic structure of the API for existing apps.
+The basic return type of the hit-test API is a sorted array of objects containing the hit results. Returning an object makes it easy to extend the functionality of the hit-test API in the future without re-architecting the basic structure of the API for existing apps.
 
-Early API implementations may choose to return only location and orientation information as results. However, it is very likely that apps will, in the future, want to know what object was hit, especially as more sophisticated APIs are introduced that expose the actual world understanding elements - after all, knowing what was hit could be an important aspect of connecting world understanding to the placement of virtual objects. For example, you might not want to allow placement of an object near the edge of a table or if it is a large object, maybe the table surface isn't even large enough for the object at all. 
+Early API implementations may choose to return only location and orientation information for each hit. However, it is very likely that apps will, in the future, want to know what object was hit, especially as more sophisticated APIs are introduced that expose the actual world understanding elements - after all, knowing what was hit could be an important aspect of connecting world understanding to the placement of virtual objects. For example, you might not want to allow placement of an object near the edge of a table or if it is a large object, maybe the table surface isn't even large enough for the object at all. Most AR engines have a notion of "trackable objects" and we may want to return the ID of the object that was hit to allow the app to map hit results to world understanding objects.
 
 This explainer does not address Anchors (see [anchors](https://github.com/immersive-web/anchors)), however hit results and anchors are related topics.
 
@@ -113,12 +113,15 @@ partial interface XRSession {
 
 `hitTest` parameters
 *   origin - the origin of the ray as [x, y, z]
-*   direction - the direction of the ray as [x, y, z] - any non-zero-length direction vectors that are passed to the API will automatically be normalized
+*   direction - the direction of the ray as [x, y, z] - any non-zero-length direction vectors that are passed to the API will automatically normalize the ray
     *   Note: We'll start with an  origin-direction pair instead of a pose as a pose overspecifies a ray and has the danger of the developer creating a malformed matrix
 *   coordinateSystem - the coordinate system the ray origin/direction and hit results should be relative to. In order to get a pixel-perfect hit-test relative to an XRDevice or XRInputSource, the coordinate system for that device/input-source should be used here (along with a ray relative to that). This will let the underlying algorithm update the coordinate system for the frame on which the hit-test will be calculated so that the results are valid for the pose on the subsequent frame instead of relative to the frame when the request was made. For example, calling ```xrSession.requestHitTest(xrRay, xrDevice.getCoordinateSystem(xrSession));``` would result in a relative ray calculation based on the device's pose in the upcoming frame.
 *   To enable feature detection of possible future versions of the API with  additional parameters, an error is thrown if additional arguments are given to the function.
 
 `hitTest` return value
+*   Returns a Promise<FrozenArray<XRHitResult>>. The meaning of the promise resolution are as follows:
+    *   If the promise rejects, there was an error (should be detailed in a returned string). It could be that the API is unsupported by the platform or the XRSession is not of the right type for AR. It could be an internal error of some kind.
+    *   If the promise resolves, the test was successful. If the returned array is empty, there were no objects hit. If there are elements in the array, they will follow the description below.
 *   The hit results are returned in sorted order with the nearest intersection to the origin of the ray at the beginning of the array and the furthest intersection from the origin of the ray at the end of the array.
 *   XRHitResult.hitMatrix is a 4x4 matrix where the translation represents the position where the ray hit the object and the orientation has a Y-axis that corresponds with the normal of the object at that location.
 
