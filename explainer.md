@@ -105,16 +105,14 @@ In many ways these privacy implications are similar to video (camera) inputs and
 };
 
 partial interface XRSession {
-  Promise<FrozenArray<XRHitResult>> requestHitTest(Float32Array origin, Float32Array direction, XRCoordinateSystem coordinateSystem);
+  Promise<FrozenArray<XRHitResult>> requestHitTest(XRRay ray, XRCoordinateSystem coordinateSystem);
 }
 ```
 
 ## API Details
 
 `hitTest` parameters
-*   origin - the origin of the ray as [x, y, z]
-*   direction - the direction of the ray as [x, y, z] - any non-zero-length direction vectors that are passed to the API will automatically normalize the ray
-    *   Note: We'll start with an  origin-direction pair instead of a pose as a pose overspecifies a ray and has the danger of the developer creating a malformed matrix
+*   ray - an XRRay object containing the origin/direction of the desired raycast. Note: any non-zero-length direction vectors that are passed to the API will automatically normalize the ray
 *   coordinateSystem - the coordinate system the ray origin/direction and hit results should be relative to. In order to get a pixel-perfect hit-test relative to an XRDevice or XRInputSource, the coordinate system for that device/input-source should be used here (along with a ray relative to that). This will let the underlying algorithm update the coordinate system for the frame on which the hit-test will be calculated so that the results are valid for the pose on the subsequent frame instead of relative to the frame when the request was made. For example, calling ```xrSession.requestHitTest(xrRay, xrDevice.getCoordinateSystem(xrSession));``` would result in a relative ray calculation based on the device's pose in the upcoming frame.
 *   To enable feature detection of possible future versions of the API with  additional parameters, an error is thrown if additional arguments are given to the function.
 
