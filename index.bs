@@ -1,0 +1,112 @@
+<pre class="metadata">
+Shortname: webxr-hit-test
+Title: WebXR Hit Test Module - Level 1
+Group: immersivewebwg
+Status: ED
+ED: https://immersive-web.github.io/hit-test/
+Repository: immersive-web/hit-test
+Level: 1
+Mailing List Archives: https://lists.w3.org/Archives/Public/public-immersive-web/
+
+!Participate: <a href="https://github.com/immersive-web/hit-test/issues/new">File an issue</a> (<a href="https://github.com/immersive-web/hit-test/issues">open issues</a>)
+!Participate: <a href="https://lists.w3.org/Archives/Public/public-immersive-web/">Mailing list archive</a>
+!Participate: <a href="irc://irc.w3.org:6665/">W3C's #immersive-web IRC</a>
+
+Editor: Brandon Jones 87824, Google http://google.com/, bajones@google.com
+Editor: Nell Waliczek 93109, Amazon [Microsoft until 2018] https://amazon.com/, nhw@amazon.com
+
+Abstract: Describes a method for performing hit tests against real world geometry to be used with the WebXR Device API.
+
+Warning: custom
+Custom Warning Title: Unstable API
+Custom Warning Text:
+  <b>The API represented in this document is under development and may change at any time.</b>
+  <p>For additional context on the use of this API please reference the <a href="https://github.com/immersive-web/webxr-ar-module/blob/master/ar-module-explainer.md">WebXR Augmented Reality Module Explainer</a>.</p>
+</pre>
+
+<pre class="link-defaults">
+spec:infra;
+    type:dfn; text:string
+</pre>
+
+<pre class="anchors">
+spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
+    type: interface; text: XRSession; url: xrsession-interface
+</pre>
+
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+
+<style>
+  .unstable::before {
+    content: "This section is not stable";
+    display: block;
+    font-weight: bold;
+    text-align: right;
+    color: red;
+  }
+  .unstable {
+    border: thin solid pink;
+    border-radius: .5em;
+    padding: .5em;
+    margin: .5em calc(-0.5em - 1px);
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='290'><text transform='rotate(-45)' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='70' y='210' opacity='.1'>Unstable</text></svg>");
+    background-repeat: repeat;
+    background-color: #FFF4F4;
+  }
+  .unstable h3:first-of-type {
+    margin-top: 0.5rem;
+  }
+
+  .unstable.example:not(.no-marker)::before {
+    content: "Example " counter(example) " (Unstable)";
+    float: none;
+  }
+
+  .non-normative::before {
+    content: "This section is non-normative.";
+    font-style: italic;
+  }
+  .tg {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+  .tg th {
+    border-style: solid;
+    border-width: 1px;
+    background: #90b8de;
+    color: #fff;
+    font-family: sans-serif;
+    font-weight: bold;
+    border-color: grey;
+  }
+  .tg td {
+    padding: 4px 5px;
+    background-color: rgb(221, 238, 255);
+    font-family: monospace;
+    border-style: solid;
+    border-width: 1px;
+    border-color: grey;
+    overflow: hidden;
+    word-break: normal;
+  }
+</style>
+
+Introduction {#intro}
+============
+
+<section class="non-normative">
+
+This module describes a mechanism for allowing WebXR applications to cast rays into the users real world environment and report back, to the best of the XR device's knowledge, the point at which the ray intersected with a physical object and the orientation of the intersected surface. This allows for virtual objects to be placed in alignment with those surfaces,
+such as placing objects realistically on the floor or attaching them to a wall.
+
+</section>
+
+WebXR Device API Integration {#webxr-device-api-integration}
+============================
+This module expands the definition of {{XRSession}}.
+
+Acknowledgements {#ack}
+================
+
+The following individuals have contributed to the design of the WebXR Hit Test specification:
