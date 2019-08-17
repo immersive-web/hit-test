@@ -1,7 +1,7 @@
 # WebXR Device API - Hit Testing
 This document was originally designed in the Immersive Web Working Group to build upon the WebXR Device API. Ownership of this content has been moved to the Immersive Web Community Group for further incubation.
 
-The purpose of this document is to describe a design for enabling developers to hit test against the real-world environment. For context, it may be helpful to have first read about [WebXR Session Establishment](https://github.com/immersive-web/webxr/blob/master/explainer.md), [Spatial Tracking](https://github.com/immersive-web/webxr/blob/master/spatial-tracking-explainer.md), and [Input Mechanisms](https://github.com/immersive-web/webxr/blob/master/input-explainer.md).
+The purpose of this document is to describe a design for enabling developers to hit test against the real-world environment. For context, it may be helpful to have first read about [WebXR Session Establishment](https://github.com/immersive-web/webxr/blob/master/explainer.md), [Spatial Tracking](https://github.com/immersive-web/webxr/blob/master/spatial-tracking-explainer.md), [Input Mechanisms](https://github.com/immersive-web/webxr/blob/master/input-explainer.md), and the [Augmented Reality Module](https://github.com/immersive-web/webxr-ar-module/blob/master/ar-module-explainer.md).
 
 ## Introduction
 "Hit testing" (aka "raycasting") is the process of finding intersections between 3D geometry and a ray, comprised of an origin and direction. Conceptually, hit testing can be done against virtual 3D geometry or real-world 3D geometry. As WebXR does not have any knowledge of the developer's 3D scene graph, it does not provide APIs for virtual hit testing. It does, however, have information about the real-world and provides a method for developers to hit test against it. Most commonly in WebXR, developers will hit test using `XRInputSource`s or the `XRSession.viewerSpace` to track where a cursor should be drawn on hand-held devices, or even to bounce a virtual object off real-world geometry. In WebXR, 'inline' and 'immersive-vr' sessions are limited to performing virtual hit tests, while 'immersive-ar' sessions can perform both virtual and real-world hit tests. 
@@ -206,6 +206,7 @@ partial interface XRSession {
   // Also listed in the input-explainer.md
   attribute EventHandler oninputsourceschange;
 };
+
 //
 // Frame
 //
@@ -213,6 +214,7 @@ partial interface XRFrame {
   FrozenArray<XRHitTestResult>? getHitTestResults(XRHitTestSource hitTestSource, optional XRSpace relativeTo);
   Promise<FrozenArray<XRHitTestResult>>? requestAsyncHitTestResults(XRHitTestOptionsInit options, optional XRSpace relativeTo);
 };
+
 //
 // Hit Testing
 //
@@ -234,6 +236,19 @@ interface XRHitTestResult {
   readonly attribute XRHitTestOptions hitTestOptions;
   readonly attribute XRRigidTransform transform;
 };
+
+//
+// Geometric Primitives
+//
+[SecureContext, Exposed=Window,
+ Constructor(optional DOMPointInit origin, optional DOMPointInit direction),
+ Constructor(XRRigidTransform transform)]
+interface XRRay {
+  [SameObject] readonly attribute DOMPointReadOnly origin;
+  [SameObject] readonly attribute DOMPointReadOnly direction;
+  [SameObject] readonly attribute Float32Array matrix;
+};
+
 //
 // Events
 //

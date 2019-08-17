@@ -130,7 +130,7 @@ An {{XRRay}} contains an <dfn for=XRRay>internal matrix</dfn> which is a [=/matr
 interface XRRay {
   [SameObject] readonly attribute DOMPointReadOnly origin;
   [SameObject] readonly attribute DOMPointReadOnly direction;
-  readonly attribute Float32Array matrix;
+  [SameObject] readonly attribute Float32Array matrix;
 };
 </pre>
 
