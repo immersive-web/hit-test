@@ -48,7 +48,7 @@ function onInputSourcesChange(event) {
 ```
 
 ### Hit test results
-To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance from the `XRHitTestSource`, with the nearest in the 0th position. If no results exist, the array will have a length of zero. Each entry in the array will have a `hitTestOptions` attribute filled in with `XRHitTestOptions` of the `XRHitTestSource` used to find the result. Each entry will also have a `transform` attribute that represents the result's location in 3D space. If no value is provided for `relativeTo`, transforms will be defined in the coordinate system of the `hitTestOptions.space`. Otherwise, transforms will be defined in the coordinate system of the `relativeTo`. If `relativeTo` is present and cannot be located relative to `hitTestOptions.space` on the current frame, the function will return `null`.
+To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance from the `XRHitTestSource`, with the nearest in the 0th position. If no results exist, the array will have a length of zero. Each entry in the array will have a `hitTestOptions` attribute filled in with `XRHitTestOptions` of the `XRHitTestSource` used to find the result. The `XRHitTestResult` class will also contain a method, `getPose(XRSpace? relativeTo = null)` that can be used to query the result's location in 3D space. If no value is provided for `relativeTo` parameter, the pose will be defined in the coordinate system of the `hitTestOptions.space`. Otherwise, transforms will be defined in the coordinate system of the `relativeTo`. If `relativeTo` is present and cannot be located relative to `hitTestOptions.space` on the current frame, the function will return `null`.
 
 ```js
 function updateScene(timestamp, xrFrame) {
@@ -138,7 +138,7 @@ function onSelectStart(event) {
       activeDragInteraction = {
         inputSource: inputSource,
         target: virtualTarget,
-        initialTargetTransform: virtualTarget.transform,
+        initialTargetTransform: virtualTarget.getPose().transform.matrix,
         initialHitTestResult: combinedHitTestResult["result"],
         hitTestSource = hitTestSources[preferredInputSource]
       };
@@ -160,7 +160,7 @@ function updateScene() {
     let hitTestSource = activeDragInteraction.hitTestSource;
     let combinedHitTestResult = getHitCombinedHitTestResult(event.frame, inputSource, hitTestSource);
     if (combinedHitTestResult["result"]) {
-      activeDragInteraction.target.setTransform(combinedHitTestResult.transform);
+      activeDragInteraction.target.setTransform(combinedHitTestResult.getPose().transform.matrix);
     }
   }
   // Other scene update logic ...
@@ -179,7 +179,7 @@ function onSelect(event) {
     if (combinedHitTestResult["result"]) {
       let target = activeDragInteraction.target;
       let result = combinedHitTestResult["result"];
-      target.setTransform(result.transform);
+      target.setTransform(result.getPose().transform.matrix);
     } else {
       target.setTransform(activeDragInteraction.initialTargetTransform);
     }
@@ -211,8 +211,8 @@ partial interface XRSession {
 // Frame
 //
 partial interface XRFrame {
-  FrozenArray<XRHitTestResult>? getHitTestResults(XRHitTestSource hitTestSource, optional XRSpace relativeTo);
-  Promise<FrozenArray<XRHitTestResult>>? requestAsyncHitTestResults(XRHitTestOptionsInit options, optional XRSpace relativeTo);
+  FrozenArray<XRHitTestResult>? getHitTestResults(XRHitTestSource hitTestSource);
+  Promise<FrozenArray<XRHitTestResult>>? requestAsyncHitTestResults(XRHitTestOptionsInit options);
 };
 
 //
@@ -233,8 +233,9 @@ interface XRHitTestSource {
 };
 [SecureContext, Exposed=Window]
 interface XRHitTestResult {
-  readonly attribute XRHitTestOptions hitTestOptions;
-  readonly attribute XRRigidTransform transform;
+  [SameObject] readonly attribute XRHitTestOptions hitTestOptions;
+
+  XRPose? getPose(optional XRSpace? relative_to = null);
 };
 
 //
