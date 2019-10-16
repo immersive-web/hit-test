@@ -6,56 +6,81 @@ The purpose of this document is to describe a design for enabling developers to 
 ## Introduction
 "Hit testing" (aka "raycasting") is the process of finding intersections between 3D geometry and a ray, comprised of an origin and direction. Conceptually, hit testing can be done against virtual 3D geometry or real-world 3D geometry. As WebXR does not have any knowledge of the developer's 3D scene graph, it does not provide APIs for virtual hit testing. It does, however, have information about the real-world and provides a method for developers to hit test against it. Most commonly in WebXR, developers will hit test using `XRInputSource`s or the `XRReferenceSpace` of type `"viewer"` to track where a cursor should be drawn on hand-held devices, or even to bounce a virtual object off real-world geometry. In WebXR, 'inline' and 'immersive-vr' sessions are limited to performing virtual hit tests, while 'immersive-ar' sessions can perform both virtual and real-world hit tests.
 
+## Use-cases & scope
+Main use-cases enabled by such an API include:
+
+* Showing a reticle that appears to track the real world surfaces at which the device or controller is pointed.
+  * Often, AR apps want to show a reticle that appears to stick to real-world surfaces. The reticle position should reflect most up-to-date knowledge of the real world as of the displayed frame.
+  * Frequency: this action is done every single frame.
+* Placing a virtual object in the real world.
+  * In order for virtual objects to appear to be anchored in the real world, they must be placed at the same height as the real world objects (the floor, a table, a wall, ...).
+  * Frequency: this action is usually done sparsely, in response to user input.
+* Simulating physical interactions with real-world.
+  * Applications may want leverage hit testing API in order to simulate physical interactions (for example collisions) of virtual objects with the real world.
+  * Frequency: this action is done every single frame.
+
+Hit-testing against application's virtual scene elements is explicitly out of scope for this explainer. Hit-testing API might potentially be used to estimate the location of real-world geometry by the application (for example by attempting to perform a hit test using dozens of rays) - this use case is not directly supported by the API, but will not be actively blocked. Due to this fact, access to hit-testing API should be only allowed after explicit user consent equivalent to the consent required for access to any other real-world-understanding APIs.
+
 ## Real-world hit testing
 A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often, though not always, less than useful. 
 
-WebXR addresses this challenge through the use of the `XRHitTestSource` type which acts somewhat like a subscription mechanism. The presence of an `XRHitTestSource` signals to the user agent that the developer intends to query `XRHitTestResult`s in subsequent `XRFrame`s. The user agent can then precompute `XRHitTestResult`s based on the `XRHitTestSource` properties such that each `XRFrame` will be bundled with all "subscribed" hit test results. When the last reference to the `XRHitTestSource` has been released, the user agent is free to stop computing `XRHitTestResult`s for future frames.
+WebXR addresses this challenge through the use of the `XRHitTestSource` type which acts like a subscription mechanism. The presence of an `XRHitTestSource` signals to the user agent that the developer intends to query `XRHitTestResult`s in subsequent `XRFrame`s. The user agent can then precompute `XRHitTestResult`s based on the `XRHitTestSource` properties such that each `XRFrame` will be bundled with all "subscribed" hit test results. When the last reference to the `XRHitTestSource` has been released, the user agent is free to stop computing `XRHitTestResult`s for future frames.
 
 ### Requesting a hit test source
-To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following values:
+To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following key-value pairs:
 * `space` is required and is the `XRSpace` to be tracked by the hit test source. As this `XRSpace` updates its location each frame, the `XRHitTestSource` will move with it.
-* `offsetRay` is optional and, if provided, is the `XRRay` from which the hit test should be performed. The ray's coordinates are defined with `space` as the origin. If an `offsetRay` is not provided, hit testing will be performed using a ray with coincident with the `space` origin and pointing in the "forward" direction. For more information on constructing an `XRRay`, see the [Spatial Tracking explainer](spatial-tracking-explainer.md#rays).
+* `offsetRay` is optional and, if provided, is the `XRRay` from which the hit test should be performed. The ray's coordinates are defined with `space` as the origin. If an `offsetRay` is not provided, hit testing will be performed using a ray with coincident with the `space` origin and pointing in the "forward" direction (see [Rays section](#Rays)).
 
-In this example, an `XRHitTestSource` is created slightly above the center of the `"viewer"` `XRReferenceSpace`. This is because the developer is planning to draw UI elements along the bottom of the hand-held AR device's immersive view while still wanting to give the perception of a centered cursor. For more information, see [Rendering cursors and highlights](#rendering-cursors-and-highlights) in the Input Explainer.
+In this example, an `XRHitTestSource` is created slightly above the center of the `"viewer"` `XRReferenceSpace`. This is because the developer is planning to draw UI elements along the bottom of the hand-held AR device's immersive view while still wanting to give the perception of a centered cursor. For more information, see [Rendering cursors and highlights](https://github.com/immersive-web/webxr/blob/master/input-explainer.md#cursors) in the Input Explainer.
 
 ```js
 let viewerHitTestSource = null;
 let viewerSpace = ...;  // XRReferenceSpace obtained via
                         // a call to XRSession.requestReferenceSpace("viewer");
-let hitTestOptions = { space:viewerSpace, offsetRay:new XRRay({y: 0.5}) };
-xrSession.requestHitTestSource(hitTestOptions).then((hitTestSource) => {
+let hitTestOptionsInit = {
+  space : viewerSpace,
+  offsetRay : new XRRay({y: 0.5})
+};
+
+xrSession.requestHitTestSource(hitTestOptionsInit).then((hitTestSource) => {
   viewerHitTestSource = hitTestSource;
+  // Store some additional data on just created hit test source
+  // by extending the object:
+  viewerHitTestSource.appContext = { options : hitTestOptionsInit };
 });
 ```
 
-### Automatic hit test source creation
-While asynchronous hit test source creation is useful in many scenarios, it is problematic for [transient input sources](#transient-Input-Sources). If an `XRHitTestSource` is requested in response to the `inputsourceschange` event, it may be several frames before a hit test source created in response would able to provide hit test results. By which time the input source may no longer exist. However, because of the potential performance impacts mentioned above, it is important WebXR not perform hit tests for input sources the developer does not need.
+### Pre-registration for transient input sources
+While asynchronous hit test source creation is useful in many scenarios, it is problematic for [transient input sources](https://immersive-web.github.io/webxr/#transient-input). If an `XRHitTestSource` is requested in response to the `inputsourceschange` event using the `XRSession.requestHitTestSource()` API, it may take several frames before a hit test source created in response would able to provide hit test results, by which time the input source may no longer exist. This might be the case even with a one-frame delay between hit test source creation request and its creation. However, because of the potential performance impacts mentioned in section [Real-world hit testing](#real-world-hit-testing), it is important WebXR not perform hit tests for input sources the developer does not need.
 
-To solve this, user agents will automatically generate an `XRHitTestSource` for each new `XRInputSource` that developers can retrieve by calling `XRInputSourcesChangeEvent.getHitTestSource()`. Developers must explicitly retrieve and save these `XRHitTestSource`s if they wish to use them. Otherwise, at the end of the `inputsourceschange` callbacks the pre-created hit test source will disappear. If a developer chooses not to save `XRHitTestSources` in the `inputsourceschange` event handler, they are still able to use the `XRSession.requestHitTestSource()` function at a later time.
+To address this issue and still enable the web applications to request hit test sources for transient input sources, the applications can use the `XRSession.requestHitTestSourceForTransientInput()`:
 
-The `XRInputSourcesChangeEvent.getHitTestSource()` function will only return a `XRHitTestSource` object when passed an `XRInputSource` from the `XRInputSourcesChangeEvent.added` attribute. Any other parameter will cause a `DOMException` to be thrown.
+```javascript
+let transientInputHitTestSource = null;
+let hitTestOptionsInit = {
+  profile : 'generic-touchscreen',
+  offsetRay : new XRRay()
+};
 
-```js
-let hitTestSources = {};
-function onInputSourcesChange(event) {
-  xrInputSources = event.session.getInputSources();
-  foreach (inputSource of event.removed) {
-    delete hitTestSources[inputSource];
-  }
-  foreach (inputSource of event.added)
-    hitTestSources[inputSource] = event.getHitTestSource(inputSource);
-  }
-  updatePreferredInputSource();
-}
+xrSession.requestHitTestSourceForTransientInput(hitTestOptionsInit).then((hitTestSource) => {
+  transientInputHitTestSource = hitTestSource;
+  // Store some additional data on just created hit test source
+  // by extending the object:
+  transientInputHitTestSource.context = { options : hitTestOptionsInit };
+})
 ```
 
+The `XRSession.requestHitTestSourceForTransientInput()` method accepts a dictionary with the following key-value pairs:
+* `profile` is required and specifies the input profile name (see [input profile names](https://immersive-web.github.io/webxr/#xrinputsource-input-profile-name)) that the transient input source must match in order to be considered for a hit test once it is created (for example in response to the user input).
+* `offsetRay` is optional and specifies an `XRRay` for which the hit test should be performed. The ray will be interpreted as if relative to `targetRaySpace` of the transient input source that matches `targetRayMode`.
+
 ### Hit test results
-To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance from the `XRHitTestSource`, with the nearest in the 0th position. If no results exist, the array will have a length of zero. Each entry in the array will have a `hitTestOptions` attribute filled in with `XRHitTestOptions` of the `XRHitTestSource` used to find the result. The `XRHitTestResult` interface will also expose a method, `getPose(optional XRSpace? relativeTo = null)` that can be used to query the result's pose. If no value is provided for `relativeTo` parameter, the pose will be defined in the coordinate system of the `hitTestOptions.space`. Otherwise, transforms will be defined in the coordinate system of the `relativeTo`. If `relativeTo` is present and cannot be located relative to `hitTestOptions.space` on the current frame, the function will return `null`.
+To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance from the `XRHitTestSource`, with the nearest in the 0th position. If no results exist, the array will have a length of zero. The `XRHitTestResult` interface will expose a method, `getPose(XRSpace baseSpace)` that can be used to query the result's pose. If, in the current frame, the relationship between `XRSpace` passed in to `baseSpace` parameter cannot be located relative to the hit test result, the function will return `null`.
 
 ```js
 function updateScene(timestamp, xrFrame) {
   // Scene update logic ...
-  let hitTestResults = xrFrame.getHitTestResults(hitTestSources[preferredInputSource], xrReferenceSpace);
+  let hitTestResults = xrFrame.getHitTestResults(hitTestSources[preferredInputSource]);
   if (hitTestResults && hitTestResults.length > 0) {
     // Do something with the results
   }
@@ -63,23 +88,8 @@ function updateScene(timestamp, xrFrame) {
 }
 ```
 
-On occasion, developers may want hit test results for the current frame even if they have not already created an `XRHitTestSource` to subscribe to the results. For example, when a virtual object needs to bounce off a real-world surface, a single hit-test result can be requested. The results will be delivered asynchronously, though they will be accurate for the frame on which the request was made. Otherwise, `requestAsyncHitTestResults()` shares the behavior of `getHitTestResults()` as described above.
-
-```js
-function updateScene(timestamp, xrFrame) {
-  // Scene update logic ...
-  let hitTestOptions = { space:xrSpace, offsetRay:new XRRay({}, {y: -1}) };
-  xrFrame.requestAsyncHitTestResults(hitTestOptions, xrReferenceSpace).then((hitTestResults) => {
-    if (hitTestResults && hitTestResults.length > 0) {
-      // Do something with the results
-    }
-  });
-  // Other scene update logic ...
-}
-```
-
 #### Rays
-An `XRRay` object includes both an `origin` and `direction`, both given as `DOMPointReadOnly`s. The `origin` represents a 3D coordinate in space with a `w` component that must be 1, and the `direction` represents a normalized 3D directional vector with a `w` component that must be 0. The `XRRay` also defines a `matrix` which represents the transform from a ray originating at `[0, 0, 0]` and extending down the negative Z axis to the ray described by the `XRRay`'s `origin` and `direction`. This is useful for positioning graphical representations of the ray.
+An `XRRay` object includes both an `origin` and `direction`, both given as `DOMPointReadOnly`s. The `origin` represents a 3D coordinate in space with a `w` component that must be equal to 1, and the `direction` represents a normalized 3D directional vector with a `w` component that must be equal to 0. The `XRRay` also defines a `matrix` which represents the transform from a ray originating at `[0, 0, 0]` and extending down the negative Z axis to the ray described by the `XRRay`'s `origin` and `direction`. This is useful for positioning graphical representations of the ray.
 
 ## Combining virtual and real-world hit testing
 A key component to creating realistic presence in XR experiences, relies on the ability to know if a hit test intersects virtual or real-world geometry. For example, developers might want to put a virtual object somewhere in the real-world but only if a different virtual object isn't already present. In future spec revisions, when real-world occlusion is possible with WebXR, developers will likely be able to create virtual buttons that are only "clickable" if there is no physical object in the way. 
@@ -87,126 +97,38 @@ A key component to creating realistic presence in XR experiences, relies on the 
 There are a handful of techniques which can be used to determine a combined hit test result. For example, a developer may choose to weight hit test results differently if a user is already interacting with a particular object. In this explainer, a simple example of combining hit test results is provided: if a virtual hit-test is found it is returned, otherwise the sample returns the closest real-world hit test result. Because WebXR does not have any knowledge of the developer's 3D scene graph, this sample uses the `XRFrame.getPose()` function to create a ray and passes it into the 3D engine's virtual hit test function.
 
 ```js
-function updateScene(timestamp, xrFrame) {
-  // Scene update logic ...
-  let hitTestResult = getHitCombinedHitTestResult(xrFrame);
-  if (combinedHitTestResult["result"]) {
-    // Do something with the result
-  }
-  // Other scene update logic ...
-}
-function getHitCombinedHitTestResult(frame, inputSource, hitTestSource) {
+function getCombinedHitTestResult(frame, inputSource, hitTestSource) {
   // Try to get virtual hit test result
   if (inputSource) {
-    let inputSourcePose = frame.getPose(inputSource.source, xrReferenceSpace);
+    let inputSourcePose = frame.getPose(inputSource.targetRaySpace, xrReferenceSpace);
     if (inputSourcePose) {
-      var virtualHitTestResult = scene.virtualHitTest(new XRRay(inputSource.transform));
-      return { result:virtualHitTestResult, virtualTarget:virtualHitTestResult.target }
+      var virtualHitTestResult = scene.virtualHitTest(new XRRay(inputSourcePose.transform));
+      return {
+        result : virtualHitTestResult,
+        virtualTarget : virtualHitTestResult.target
+      }
     }
   }
   // Try to get real-world hit test result
   if (hitTestSource) {
-    var realHitTestResults = frame.getHitTestResults(hitTestSource, xrReferenceSpace);
+    var realHitTestResults = frame.getHitTestResults(hitTestSource);
     if (realHitTestResults && realHitTestResults.length > 0) {
-      return { result:realHitTestResults[0] };
+      return { result : realHitTestResults[0] };
     }
   }
   return {};
 }
 ```
 
-## Grab-and-Drag
-Another common operation in XR experiences is grabbing a virtual object and moving it to a new location. There are a number of ways to accomplish this experience, and a simple example is provided below to illustrate one approach to doing so with the WebXR apis.
-
-The first step in the grab-and-drag operation is the "grab" step and is done in response to the `selectstart` event. If a draggable virtual object is hit by the `preferredInputSource`, the drag operation is begun by saving the data necessary for the next steps and giving the object a highlight that indicates it is being dragged.
-
-```js
-let activeDragInteraction = null;
-function onSelectStart(event) {
-  // Select start logic ...
-  // Ignore the event if we are already dragging
-  if (!activeDragInteraction) {
-    
-    // Update the preferred input source to be the last one the user interacted with
-    preferredInputSource = event.inputSource;
-    // Use the input's hitTestSource to find a draggable object in the scene
-    let combinedHitTestResult = getHitCombinedHitTestResult(event.frame, 
-                                                            preferredInputSource, 
-                                                            hitTestSources[preferredInputSource]);
-    // The virtualTarget object isn't part of the WebXR API. It is
-    // something set by the imaginary 3D engine in this example
-    let virtualTarget = combinedHitTestResult["virtualTarget"];
-    if (virtualTarget && virtualTarget.isDraggable) {
-      activeDragInteraction = {
-        inputSource: inputSource,
-        target: virtualTarget,
-        initialTargetTransform: virtualTarget.getPose().transform.matrix,
-        initialHitTestResult: combinedHitTestResult["result"],
-        hitTestSource = hitTestSources[preferredInputSource]
-      };
-      // Use imaginary 3D engine to indicate active drag object
-      scene.addDragIndication(activeDragInteraction.target);
-    }
-  }
-  // Other select start logic ...
-}
-```
-
-On each frame, the location of the virtual object being dragged is updated so that it slides along virtual and real-world geometry as the user aims with their input source.
-
-```js
-function updateScene() {
-  // Scene update logic ...
-  if (activeDragInteraction) {
-    let inputSource = activeDragInteraction.inputSource;
-    let hitTestSource = activeDragInteraction.hitTestSource;
-    let combinedHitTestResult = getHitCombinedHitTestResult(event.frame, inputSource, hitTestSource);
-    if (combinedHitTestResult["result"]) {
-      activeDragInteraction.target.setTransform(combinedHitTestResult.getPose().transform.matrix);
-    }
-  }
-  // Other scene update logic ...
-}
-```
-
-When the user releases the "select" gesture, the drag event is completed and the sample double checks that the virtual object will fit at the new location.
-
-```js
-function onSelect(event) {
-  // Only end the drag when the input source that started dragging releases the select action
-  if (activeDragInteraction && event.inputSource == activeDragInteraction.inputSource) {
-    let combinedHitTestResult = getHitCombinedHitTestResult(event.frame, 
-                                                            activeDragInteraction.inputSource, 
-                                                            activeDragInteraction.hitTestSource);
-    if (combinedHitTestResult["result"]) {
-      let target = activeDragInteraction.target;
-      let result = combinedHitTestResult["result"];
-      target.setTransform(result.getPose().transform.matrix);
-    } else {
-      target.setTransform(activeDragInteraction.initialTargetTransform);
-    }
-    activeDragInteraction = null;
-  }
-}
-function onSelectEnd(event) {
-  // If the selection action was cancelled, put the object back where it started
-  if (activeDragInteraction && event.inputSource == activeDragInteraction.inputSource) {
-    activeDragInteraction.target.setTransform(activeDragInteraction.initialTargetTransform);
-    activeDragInteraction = null;
-  }
-}
-```
-
 ## Appendix A: Proposed partial IDL
-This is a partial IDL and is considered additive to the core IDL found in the main [explainer](explainer.md).
+This is a partial IDL and is considered additive to the core IDL found in the main [explainer](https://github.com/immersive-web/webxr/blob/master/explainer.md).
 ```webidl
 //
 // Session
 //
 partial interface XRSession {
   Promise<XRHitTestSource> requestHitTestSource(XRHitTestOptionsInit options);
-  // Also listed in the input-explainer.md
-  attribute EventHandler oninputsourceschange;
+  Promise<XRHitTestSource> requestHitTestSourceForTransientInput(XRTransientInputHitTestOptionsInit options);
 };
 
 //
@@ -214,7 +136,6 @@ partial interface XRSession {
 //
 partial interface XRFrame {
   FrozenArray<XRHitTestResult>? getHitTestResults(XRHitTestSource hitTestSource);
-  Promise<FrozenArray<XRHitTestResult>>? requestAsyncHitTestResults(XRHitTestOptionsInit options);
 };
 
 //
@@ -224,20 +145,19 @@ dictionary XRHitTestOptionsInit {
   required XRSpace space;
   XRRay offsetRay = new XRRay();
 };
-[SecureContext, Exposed=Window]
-interface XRHitTestOptions {
-  readonly attribute XRSpace space;
-  readonly attributeXRRay offsetRay = new XRRay();
+
+dictionary XRTransientInputHitTestOptionsInit {
+  required DOMString profile;
+  XRRay offsetRay = new XRRay();
 };
+
 [SecureContext, Exposed=Window]
 interface XRHitTestSource {
-  readonly attribute XRHitTestOptions hitTestOptions;
 };
+
 [SecureContext, Exposed=Window]
 interface XRHitTestResult {
-  [SameObject] readonly attribute XRHitTestOptions hitTestOptions;
-
-  XRPose? getPose(optional XRSpace? relative_to = null);
+  XRPose? getPose(XRSpace baseSpace);
 };
 
 //
@@ -252,9 +172,3 @@ interface XRRay {
   [SameObject] readonly attribute Float32Array matrix;
 };
 
-//
-// Events
-//
-partial interface XRInputSourceChangeEvent {
-  XRHitTestSource getHitTestSource(XRInputSource inputSource);
-};
