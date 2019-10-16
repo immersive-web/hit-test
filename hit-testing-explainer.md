@@ -75,15 +75,43 @@ The `XRSession.requestHitTestSourceForTransientInput()` method accepts a diction
 * `offsetRay` is optional and specifies an `XRRay` for which the hit test should be performed. The ray will be interpreted as if relative to `targetRaySpace` of the transient input source that matches `targetRayMode`.
 
 ### Hit test results
-To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance from the `XRHitTestSource`, with the nearest in the 0th position. If no results exist, the array will have a length of zero. The `XRHitTestResult` interface will expose a method, `getPose(XRSpace baseSpace)` that can be used to query the result's pose. If, in the current frame, the relationship between `XRSpace` passed in to `baseSpace` parameter cannot be located relative to the hit test result, the function will return `null`.
+To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance along the `XRRay` used to perform the hit test, with the nearest in the 0th position. If no results exist, the array will have a length of zero. The `XRHitTestResult` interface will expose a method, `getPose(XRSpace baseSpace)` that can be used to query the result's pose. If, in the current frame, the relationship between `XRSpace` passed in to `baseSpace` parameter cannot be located relative to the hit test result, the function will return `null`.
 
 ```js
+// Input source returned from a call to XRSession.requestHitTestSource(...):
+let hitTestSource = ...;
+
 function updateScene(timestamp, xrFrame) {
   // Scene update logic ...
-  let hitTestResults = xrFrame.getHitTestResults(hitTestSources[preferredInputSource]);
-  if (hitTestResults && hitTestResults.length > 0) {
+  let hitTestResults = xrFrame.getHitTestResults(hitTestSource);
+  if (hitTestResults.length > 0) {
     // Do something with the results
   }
+  // Other scene update logic ...
+}
+```
+
+In order to obtain hit test results for transient input source hit test subscriptions in a particular frame, developers call `XRFrame.getHitTestResultsForTransientInput()` passing in a `XRTransientInputHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRTransientInputHitTestResult>`. Each element of the array will contain an instance of the input source that was used to obtain the results, and the actual hit test results will be contained in `FrozenArray<XRHitTestResult> results`, ordered by the distance along the ray used to perform the hit test, with the closest result at 0th position.
+
+```js
+// Input source returned from a call to
+// XRSession.requestHitTestSourceForTransientInput(...):
+let transientInputHitTestSource = ...;
+
+function updateScene(timestamp, xrFrame) {
+  // Scene update logic ...
+  let hitTestResultsPerInputSource = xrFrame.getHitTestResultsForTransientInput(transientInputHitTestSource);
+
+  hitTestResultsPerInputSource.forEach(resultsPerInputSource => {
+    if(!isInteresting(resultsPerInputSource.inputSource)) {
+      return; // Application can perform additional
+              // filtering based on the input source.
+    }
+
+    if (resultsPerInputSource.results.length > 0) {
+    // Do something with the results
+    }
+  });
   // Other scene update logic ...
 }
 ```
@@ -128,18 +156,19 @@ This is a partial IDL and is considered additive to the core IDL found in the ma
 //
 partial interface XRSession {
   Promise<XRHitTestSource> requestHitTestSource(XRHitTestOptionsInit options);
-  Promise<XRHitTestSource> requestHitTestSourceForTransientInput(XRTransientInputHitTestOptionsInit options);
+  Promise<XRTransientInputHitTestSource> requestHitTestSourceForTransientInput(XRTransientInputHitTestOptionsInit options);
 };
 
 //
 // Frame
 //
 partial interface XRFrame {
-  FrozenArray<XRHitTestResult>? getHitTestResults(XRHitTestSource hitTestSource);
+  FrozenArray<XRHitTestResult> getHitTestResults(XRHitTestSource hitTestSource);
+  FrozenArray<XRTransientInputHitTestResult> getHitTestResultsForTransientInput(XRHitTestSource hitTestSource);
 };
 
 //
-// Hit Testing
+// Hit Testing Options
 //
 dictionary XRHitTestOptionsInit {
   required XRSpace space;
@@ -151,8 +180,26 @@ dictionary XRTransientInputHitTestOptionsInit {
   XRRay offsetRay = new XRRay();
 };
 
+//
+// Hit Test Sources
+//
+
 [SecureContext, Exposed=Window]
 interface XRHitTestSource {
+};
+
+[SecureContext, Exposed=Window]
+interface XRTransientInputHitTestSource {
+};
+
+//
+// Hit Test Results
+//
+
+[SecureContext, Exposed=Window]
+interface XRTransientInputHitTestResult {
+  XRInputSource inputSource;
+  FrozenArray<XRHitTestResult> results;
 };
 
 [SecureContext, Exposed=Window]
