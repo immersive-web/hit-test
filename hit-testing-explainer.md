@@ -6,6 +6,18 @@ The purpose of this document is to describe a design for enabling developers to 
 ## Introduction
 "Hit testing" (aka "raycasting") is the process of finding intersections between 3D geometry and a ray, comprised of an origin and direction. Conceptually, hit testing can be done against virtual 3D geometry or real-world 3D geometry. As WebXR does not have any knowledge of the developer's 3D scene graph, it does not provide APIs for virtual hit testing. It does, however, have information about the real-world and provides a method for developers to hit test against it. Most commonly in WebXR, developers will hit test using `XRInputSource`s or the `XRReferenceSpace` of type `"viewer"` to track where a cursor should be drawn on hand-held devices, or even to bounce a virtual object off real-world geometry. In WebXR, 'inline' and 'immersive-vr' sessions are limited to performing virtual hit tests, while 'immersive-ar' sessions can perform both virtual and real-world hit tests.
 
+## Use-cases & scope
+Main use-cases enabled by such an API include:
+
+* Showing a reticle that appears to track the real world surfaces at which the device or controller is pointed.
+  * Often, AR apps want to show a reticle that appears to stick to real-world surfaces. The reticle position should reflect most up-to-date knowledge of the real world as of the displayed frame.
+  * Frequency: this action is done every single frame.
+* Placing a virtual object in the real world.
+  * In order for virtual objects to appear to be anchored in the real world, they must be placed at the same height as the real world objects (the floor, a table, a wall, ...).
+  * Frequency: this action is usually done in response to user input and can potentially happen on every frame.
+
+Hit-testing against application's virtual scene elements is explicitly out of scope for this API. Hit-testing might potentially be used to estimate the location of real-world geometry by the application (for example by attempting to perform a hit test using dozens of rays) - this use case is not directly supported by the API, but will not be actively blocked. Due to this fact, access to hit-testing API should only be allowed after explicit user consent equivalent to the consent required for access to any other real-world-understanding APIs.
+
 ## Real-world hit testing
 A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often, though not always, less than useful. 
 
@@ -59,21 +71,6 @@ function updateScene(timestamp, xrFrame) {
   if (hitTestResults && hitTestResults.length > 0) {
     // Do something with the results
   }
-  // Other scene update logic ...
-}
-```
-
-On occasion, developers may want hit test results for the current frame even if they have not already created an `XRHitTestSource` to subscribe to the results. For example, when a virtual object needs to bounce off a real-world surface, a single hit-test result can be requested. The results will be delivered asynchronously, though they will be accurate for the frame on which the request was made. Otherwise, `requestAsyncHitTestResults()` shares the behavior of `getHitTestResults()` as described above.
-
-```js
-function updateScene(timestamp, xrFrame) {
-  // Scene update logic ...
-  let hitTestOptions = { space:xrSpace, offsetRay:new XRRay({}, {y: -1}) };
-  xrFrame.requestAsyncHitTestResults(hitTestOptions, xrReferenceSpace).then((hitTestResults) => {
-    if (hitTestResults && hitTestResults.length > 0) {
-      // Do something with the results
-    }
-  });
   // Other scene update logic ...
 }
 ```
@@ -132,7 +129,6 @@ partial interface XRSession {
 //
 partial interface XRFrame {
   FrozenArray<XRHitTestResult>? getHitTestResults(XRHitTestSource hitTestSource);
-  Promise<FrozenArray<XRHitTestResult>>? requestAsyncHitTestResults(XRHitTestOptionsInit options);
 };
 
 //
