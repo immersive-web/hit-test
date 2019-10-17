@@ -164,7 +164,7 @@ partial interface XRSession {
 //
 partial interface XRFrame {
   FrozenArray<XRHitTestResult> getHitTestResults(XRHitTestSource hitTestSource);
-  FrozenArray<XRTransientInputHitTestResult> getHitTestResultsForTransientInput(XRHitTestSource hitTestSource);
+  FrozenArray<XRTransientInputHitTestResult> getHitTestResultsForTransientInput(XRTransientInputHitTestSource hitTestSource);
 };
 
 //
@@ -183,7 +183,6 @@ dictionary XRTransientInputHitTestOptionsInit {
 //
 // Hit Test Sources
 //
-
 [SecureContext, Exposed=Window]
 interface XRHitTestSource {
 };
@@ -195,16 +194,15 @@ interface XRTransientInputHitTestSource {
 //
 // Hit Test Results
 //
-
-[SecureContext, Exposed=Window]
-interface XRTransientInputHitTestResult {
-  XRInputSource inputSource;
-  FrozenArray<XRHitTestResult> results;
-};
-
 [SecureContext, Exposed=Window]
 interface XRHitTestResult {
   XRPose? getPose(XRSpace baseSpace);
+};
+
+[SecureContext, Exposed=Window]
+interface XRTransientInputHitTestResult {
+  [SameObject] readonly attribute XRInputSource inputSource;
+  FrozenArray<XRHitTestResult> results;
 };
 
 //
