@@ -7,7 +7,7 @@ The purpose of this document is to describe a design for enabling developers to 
 "Hit testing" (aka "raycasting") is the process of finding intersections between 3D geometry and a ray, comprised of an origin and direction. Conceptually, hit testing can be done against virtual 3D geometry or real-world 3D geometry. As WebXR does not have any knowledge of the developer's 3D scene graph, it does not provide APIs for virtual hit testing. It does, however, have information about the real-world and provides a method for developers to hit test against it. Most commonly in WebXR, developers will hit test using `XRInputSource`s or the `XRReferenceSpace` of type `"viewer"` to track where a cursor should be drawn on hand-held devices, or even to bounce a virtual object off real-world geometry. In WebXR, 'inline' and 'immersive-vr' sessions are limited to performing virtual hit tests, while 'immersive-ar' sessions can perform both virtual and real-world hit tests.
 
 ## Use-cases & scope
-Main use-cases enabled by such an API include:
+Main use-cases enabled by hit testing API include:
 
 * Showing a reticle that appears to track the real world surfaces at which the device or controller is pointed.
   * Often, AR apps want to show a reticle that appears to stick to real-world surfaces. The reticle position should reflect most up-to-date knowledge of the real world as of the displayed frame.
