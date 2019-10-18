@@ -32,6 +32,7 @@ WebXR addresses this challenge through the use of the `XRHitTestSource` & `XRTra
 ### Requesting a hit test source
 To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following key-value pairs:
 * `space` is required and is the `XRSpace` to be tracked by the hit test source. As this `XRSpace` updates its location each frame, the `XRHitTestSource` will move with it.
+* `entityTypes` - see [limiting results to specific entities](#Limiting-results-to-specific-entities) section.
 * `offsetRay` is optional and, if provided, is the `XRRay` from which the hit test should be performed. The ray's coordinates are defined with `space` as the origin. If an `offsetRay` is not provided, hit testing will be performed using a ray with coincident with the `space` origin and pointing in the "forward" direction (see [Rays section](#Rays)).
 
 In this example, an `XRHitTestSource` is created slightly above the center of the `"viewer"` `XRReferenceSpace`. This is because the developer is planning to draw UI elements along the bottom of the hand-held AR device's immersive view while still wanting to give the perception of a centered cursor. For more information, see [Rendering cursors and highlights](https://github.com/immersive-web/webxr/blob/master/input-explainer.md#cursors) in the Input Explainer.
@@ -75,6 +76,7 @@ xrSession.requestHitTestSourceForTransientInput(hitTestOptionsInit).then((hitTes
 
 The `XRSession.requestHitTestSourceForTransientInput()` method accepts a dictionary with the following key-value pairs:
 * `profile` is required and specifies the input profile name (see [input profile names](https://immersive-web.github.io/webxr/#xrinputsource-input-profile-name)) that the transient input source must match in order to be considered for a hit test once it is created (for example in response to the user input).
+* `entityTypes` - see [limiting results to specific entities](#Limiting-results-to-specific-entities) section.
 * `offsetRay` is optional and specifies an `XRRay` for which the hit test should be performed. The ray will be interpreted as if relative to `targetRaySpace` of the transient input source that matches the profile mentioned above.
 
 ### Hit test results
