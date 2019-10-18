@@ -25,9 +25,9 @@ Since the hit test API can potentially be used to extract data about user's envi
 As an alternative to using hit-test API, applications could try and perform arbitrary hit tests leveraging data obtained from real-world-geometry APIs. Due to that, it's unclear whether a web-exposed hit test would be useful and feedback from early adopters of the API will be especially important.
 
 ## Real-world hit testing
-A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often, though not always, less than useful. 
+A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often less than useful.
 
-WebXR addresses this challenge through the use of the `XRHitTestSource` type which acts like a subscription mechanism. The presence of an `XRHitTestSource` signals to the user agent that the developer intends to query `XRHitTestResult`s in subsequent `XRFrame`s. The user agent can then precompute `XRHitTestResult`s based on the `XRHitTestSource` properties such that each `XRFrame` will be bundled with all "subscribed" hit test results. When the last reference to the `XRHitTestSource` has been released, the user agent is free to stop computing `XRHitTestResult`s for future frames.
+WebXR addresses this challenge through the use of the `XRHitTestSource` & `XRTransientInputHitTestSource` interfaces which serve as handles to hit test subscription. The presence of a hit test source signals to the user agent that the developer intends to query hit test results in subsequent `XRFrame`s. The user agent can then precompute hit test results based on the properties of a hit test source such that each `XRFrame` will be bundled with all "subscribed" hit test results. When the last reference to the hit test source has been released, the user agent is free to stop computing hit test results for future frames.
 
 ### Requesting a hit test source
 To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following key-value pairs:
@@ -58,7 +58,7 @@ While asynchronous hit test source creation is useful in many scenarios, it is p
 
 To address this issue and still enable the web applications to request hit test sources for transient input sources, the applications can use the `XRSession.requestHitTestSourceForTransientInput()`:
 
-```javascript
+```js
 let transientInputHitTestSource = null;
 let hitTestOptionsInit = {
   profile : 'generic-touchscreen',
@@ -75,7 +75,7 @@ xrSession.requestHitTestSourceForTransientInput(hitTestOptionsInit).then((hitTes
 
 The `XRSession.requestHitTestSourceForTransientInput()` method accepts a dictionary with the following key-value pairs:
 * `profile` is required and specifies the input profile name (see [input profile names](https://immersive-web.github.io/webxr/#xrinputsource-input-profile-name)) that the transient input source must match in order to be considered for a hit test once it is created (for example in response to the user input).
-* `offsetRay` is optional and specifies an `XRRay` for which the hit test should be performed. The ray will be interpreted as if relative to `targetRaySpace` of the transient input source that matches `targetRayMode`.
+* `offsetRay` is optional and specifies an `XRRay` for which the hit test should be performed. The ray will be interpreted as if relative to `targetRaySpace` of the transient input source that matches the profile mentioned above.
 
 ### Hit test results
 To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance along the `XRRay` used to perform the hit test, with the nearest in the 0th position. If no results exist, the array will have a length of zero. The `XRHitTestResult` interface will expose a method, `getPose(XRSpace baseSpace)` that can be used to query the result's pose. If, in the current frame, the relationship between `XRSpace` passed in to `baseSpace` parameter cannot be located relative to the hit test result, the function will return `null`.
