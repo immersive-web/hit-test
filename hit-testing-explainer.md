@@ -7,19 +7,22 @@ The purpose of this document is to describe a design for enabling developers to 
 "Hit testing" (aka "raycasting") is the process of finding intersections between 3D geometry and a ray, comprised of an origin and direction. Conceptually, hit testing can be done against virtual 3D geometry or real-world 3D geometry. As WebXR does not have any knowledge of the developer's 3D scene graph, it does not provide APIs for virtual hit testing. It does, however, have information about the real-world and provides a method for developers to hit test against it. Most commonly in WebXR, developers will hit test using `XRInputSource`s or the `XRReferenceSpace` of type `"viewer"` to track where a cursor should be drawn on hand-held devices, or even to bounce a virtual object off real-world geometry. In WebXR, 'inline' and 'immersive-vr' sessions are limited to performing virtual hit tests, while 'immersive-ar' sessions can perform both virtual and real-world hit tests.
 
 ## Use-cases & scope
-Main use-cases enabled by such an API include:
+Main use-cases enabled by hit testing API include:
 
-* Showing a reticle that appears to track the real world surfaces at which the device or controller is pointed.
-  * Often, AR apps want to show a reticle that appears to stick to real-world surfaces. The reticle position should reflect most up-to-date knowledge of the real world as of the displayed frame.
+* Showing an object that appears to track the real world surfaces at which the device or controller is pointed.
+  * Often, AR apps want to display something that appears to stick to real-world surfaces as the user moves the pointing device. The object's position should reflect most up-to-date knowledge of the real world as of the displayed frame.
   * Frequency: this action is done every single frame.
 * Placing a virtual object in the real world.
   * In order for virtual objects to appear to be anchored in the real world, they must be placed at the same height as the real world objects (the floor, a table, a wall, ...).
-  * Frequency: this action is usually done sparsely, in response to user input.
-* Simulating physical interactions with real-world.
-  * Applications may want leverage hit testing API in order to simulate physical interactions (for example collisions) of virtual objects with the real world.
-  * Frequency: this action is done every single frame.
+  * Frequency: this action is usually done in response to user input and can potentially happen on every frame.
 
-Hit-testing against application's virtual scene elements is explicitly out of scope for this explainer. Hit-testing API might potentially be used to estimate the location of real-world geometry by the application (for example by attempting to perform a hit test using dozens of rays) - this use case is not directly supported by the API, but will not be actively blocked. Due to this fact, access to hit-testing API should be only allowed after explicit user consent equivalent to the consent required for access to any other real-world-understanding APIs.
+Hit-testing against application's virtual scene elements is explicitly out of scope for this API.
+
+Hit-testing might potentially be used to estimate the location of real-world geometry by the application (for example by attempting to perform a hit test using dozens of rays) - this use case is not directly supported by the API, but will not be actively blocked.
+
+Since the hit test API can potentially be used to extract data about user's environment similarly to real-world-geometry APIs (albeit at lower fidelity), UAs should be careful about controlling the access to the API - the specific mechanisms of how this could be achieved are out of scope for this explainer.
+
+As an alternative to using hit-test API, applications could try and perform arbitrary hit tests leveraging data obtained from real-world-geometry APIs. Due to that, it's unclear whether a web-exposed hit test would be useful and feedback from early adopters of the API will be especially important.
 
 ## Real-world hit testing
 A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often, though not always, less than useful. 
