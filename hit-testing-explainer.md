@@ -9,14 +9,20 @@ The purpose of this document is to describe a design for enabling developers to 
 ## Use-cases & scope
 Main use-cases enabled by hit testing API include:
 
-* Showing a reticle that appears to track the real world surfaces at which the device or controller is pointed.
-  * Often, AR apps want to show a reticle that appears to stick to real-world surfaces. The reticle position should reflect most up-to-date knowledge of the real world as of the displayed frame.
+* Showing an object that appears to track the real world surfaces at which the device or controller is pointed.
+  * Often, AR apps want to display something that appears to stick to real-world surfaces as the user moves the pointing device. The object's position should reflect most up-to-date knowledge of the real world as of the displayed frame.
   * Frequency: this action is done every single frame.
 * Placing a virtual object in the real world.
   * In order for virtual objects to appear to be anchored in the real world, they must be placed at the same height as the real world objects (the floor, a table, a wall, ...).
   * Frequency: this action is usually done in response to user input and can potentially happen on every frame.
 
-Hit-testing against application's virtual scene elements is explicitly out of scope for this API. Hit-testing might potentially be used to estimate the location of real-world geometry by the application (for example by attempting to perform a hit test using dozens of rays) - this use case is not directly supported by the API, but will not be actively blocked. Due to this fact, access to hit-testing API should only be allowed after explicit user consent equivalent to the consent required for access to any other real-world-understanding APIs.
+Hit-testing against application's virtual scene elements is explicitly out of scope for this API.
+
+Hit-testing might potentially be used to estimate the location of real-world geometry by the application (for example by attempting to perform a hit test using dozens of rays) - this use case is not directly supported by the API, but will not be actively blocked.
+
+Since the hit test API can potentially be used to extract data about user's environment similarly to real-world-geometry APIs (albeit at lower fidelity), UAs should be careful about controlling the access to the API - the specific mechanisms of how this could be achieved are out of scope for this explainer.
+
+As an alternative to using hit-test API, applications could try and perform arbitrary hit tests leveraging data obtained from real-world-geometry APIs. Due to that, it's unclear whether a web-exposed hit test would be useful and feedback from early adopters of the API will be especially important.
 
 ## Real-world hit testing
 A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often, though not always, less than useful. 
