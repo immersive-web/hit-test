@@ -32,6 +32,7 @@ WebXR addresses this challenge through the use of the `XRHitTestSource` & `XRTra
 ### Requesting a hit test source
 To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following key-value pairs:
 * `space` is required and is the `XRSpace` to be tracked by the hit test source. As this `XRSpace` updates its location each frame, the `XRHitTestSource` will move with it.
+* `entityTypes` - see [limiting results to specific entities](#Limiting-results-to-specific-entities) section.
 * `offsetRay` is optional and, if provided, is the `XRRay` from which the hit test should be performed. The ray's coordinates are defined with `space` as the origin. If an `offsetRay` is not provided, hit testing will be performed using a ray with coincident with the `space` origin and pointing in the "forward" direction (see [Rays section](#Rays)).
 
 In this example, an `XRHitTestSource` is created slightly above the center of the `"viewer"` `XRReferenceSpace`. This is because the developer is planning to draw UI elements along the bottom of the hand-held AR device's immersive view while still wanting to give the perception of a centered cursor. For more information, see [Rendering cursors and highlights](https://github.com/immersive-web/webxr/blob/master/input-explainer.md#cursors) in the Input Explainer.
@@ -75,6 +76,7 @@ xrSession.requestHitTestSourceForTransientInput(hitTestOptionsInit).then((hitTes
 
 The `XRSession.requestHitTestSourceForTransientInput()` method accepts a dictionary with the following key-value pairs:
 * `profile` is required and specifies the input profile name (see [input profile names](https://immersive-web.github.io/webxr/#xrinputsource-input-profile-name)) that the transient input source must match in order to be considered for a hit test once it is created (for example in response to the user input).
+* `entityTypes` - see [limiting results to specific entities](#Limiting-results-to-specific-entities) section.
 * `offsetRay` is optional and specifies an `XRRay` for which the hit test should be performed. The ray will be interpreted as if relative to `targetRaySpace` of the transient input source that matches the profile mentioned above.
 
 ### Hit test results
@@ -118,6 +120,27 @@ function updateScene(timestamp, xrFrame) {
   // Other scene update logic ...
 }
 ```
+
+### Limiting results to specific entities
+Hit test results returned from the underlying platform can carry an information about the real-world entity that caused the hit test result to be present. Examples of the entities include planes and feature points. The application can specify what kind of entities should be used for a particular hit test subscription by setting a value of `entityTypes` key in `XRHitTestOptionsInit` / `XRTransientInputHitTestOptionsInit`:
+
+```js
+
+let hitTestOptionsInit = {
+  space : xrSpace,
+  entityTypes : ["plane", "point"],
+  offsetRay : XRRay()
+};
+
+let transientInputHitTestOptionsInit = {
+  profile : "generic-touchscreen",
+  entityTypes : ["plane"],
+  offsetRay : XRRay()
+};
+
+```
+
+Using multiple values in the array set for `entityTypes` key will be treated as a logical "or" filter. For example `entityTypes : ["plane", "point"]` would mean that the arrays returned from `XRFrame.getHitTestResults()` / `XRFrame.getHitTestResultsForTransientInput()` will contain hit tests based off of real-world planes, as well as results based off of characteristic points detected in the user's environment; those are the hit test results whose entities satisfy a condition `(type == "plane") or (type == "point")`, assuming that the `type` contains a type of the given entity. If the application does not set a value for `entityTypes` key when requesting hit test source, a default value of `["plane"]` will be used.
 
 #### Rays
 An `XRRay` object includes both an `origin` and `direction`, both given as `DOMPointReadOnly`s. The `origin` represents a 3D coordinate in space with a `w` component that must be equal to 1, and the `direction` represents a normalized 3D directional vector with a `w` component that must be equal to 0. The `XRRay` also defines a `matrix` which represents the transform from a ray originating at `[0, 0, 0]` and extending down the negative Z axis to the ray described by the `XRRay`'s `origin` and `direction`. This is useful for positioning graphical representations of the ray.
@@ -173,13 +196,20 @@ partial interface XRFrame {
 //
 // Hit Testing Options
 //
+enum XRHitTestTrackableType {
+  "point",
+  "plane"
+};
+
 dictionary XRHitTestOptionsInit {
   required XRSpace space;
+  FrozenArray<XRHitTestTrackableType> entityTypes;
   XRRay offsetRay = new XRRay();
 };
 
 dictionary XRTransientInputHitTestOptionsInit {
   required DOMString profile;
+  FrozenArray<XRHitTestTrackableType> entityTypes;
   XRRay offsetRay = new XRRay();
 };
 
