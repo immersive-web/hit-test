@@ -20,9 +20,12 @@ Abstract: Describes a method for performing hit tests against real world geometr
 <pre class="anchors">
 spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
     type: interface; text: XRSession; url: xrsession-interface
+    for: XRSpace;
+        type: dfn; text: session; url: xrspace-session
+        type: dfn; text: native origin; url: xrspace-native-origin
+        type: dfn; text: origin offset; url: xrspace-origin-offset
+        type: dfn; text: effective origin; url: xrspace-effective-origin
     type: interface; text: XRFrame; url: xrframe-interface
-    type: dfn; text: native origin; url: xrspace-native-origin
-    type: dfn; text: effective origin; url: xrspace-effective-origin
     type: dfn; text: XR device; url: xrsession-xr-device
     type: dfn; text: XR animation frame; url: xr-animation-frame
     type: dfn; text: list of animation frame callbacks; url: list-of-animation-frame-callbacks
@@ -33,6 +36,8 @@ spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
     type: dfn; text: normalize; url: normalize
 spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     type: method; text: IsDetachedBuffer; url: sec-isdetachedbuffer
+    type: dfn; text: populate the pose; url: populate-the-pose
+    type: dfn; text: identity transform; url: identity-transform
 </pre>
 
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -102,6 +107,7 @@ enum XRHitTestTrackableType {
 
 XRHitTestOptionsInit {#hit-test-options-dictionary}
 --------------------
+
 Issue: Add effectiveOffsetRay / effectiveEntityTypes?
 
 An {{XRHitTestOptionsInit}} dictionary represents a set of configurable values that affect the behavior of the hit test being performed.
@@ -137,7 +143,7 @@ The {{XRHitTestSource}} object serves as a handle to an active subscription to h
 
 Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">session</dfn> which stores an {{XRSession}} that was used to create the hit test source.
 
-Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">native origin</dfn> which stores information sufficient to identify the [=/native origin=] of an {{XRSpace}} that was used to [=request hit test=]. This information will be subsequently used when computing hit test results.
+Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">native origin</dfn> which stores information sufficient to identify the [=XRSpace/native origin=] of an {{XRSpace}} that was used to [=request hit test=]. This information will be subsequently used when computing hit test results.
 
 Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">entity types</dfn>, which is an array of <a enum lt="XRHitTestTrackableType">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results.
 
@@ -150,9 +156,9 @@ Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">offset ray
 In order to <dfn>create a hit test source</dfn> from |session|, |space|, |entityTypes| and |offsetRay|, the User Agent MUST run the following steps:
     1. Let |hitTestSource| be a new {{XRHitTestSource}}.
     1. Initialize |hitTestSource|'s [=XRHitTestSource/session=] to |session|.
-    1. Initialize |hitTestSource|'s [=XRHitTestSource/native origin=] to |space|'s [=/native origin=].
+    1. Initialize |hitTestSource|'s [=XRHitTestSource/native origin=] to |space|'s [=XRSpace/native origin=].
     1. Initialize |hitTestSource|'s [=XRHitTestSource/entity types=] to |entityTypes|.
-    1. Compute |transformedOffsetRay| from |offsetRay| and |space| such that |transformedOffsetRay|, when interpreted in |space|'s [=/native origin=] coordinate system, represents the same ray as |offsetRay| does when interpreted in |space|'s [=effective origin=] coordinate system.
+    1. Compute |transformedOffsetRay| from |offsetRay| and |space| such that |transformedOffsetRay|, when interpreted in |space|'s [=XRSpace/native origin=] coordinate system, represents the same ray as |offsetRay| does when interpreted in |space|'s [=effective origin=] coordinate system.
     1. Initialize |hitTestSource|'s [=XRHitTestSource/offset ray=] to |transformedOffsetRay|.
     1. Return |hitTestSource|.
 
@@ -189,14 +195,12 @@ Each {{XRHitTestResult}} has an associated <dfn for="XRHitTestResult">frame</dfn
 
 Each {{XRHitTestResult}} has an associated <dfn for="XRHitTestResult">native origin</dfn>.
 
-Issue: add a section for system-specific types (native result, native entity type, planes, points, describe requirements for native hit test)
-
 <div class="algorithm" data-algorithm="create-hit-test-result">
 
 In order to <dfn>create a hit test result</dfn> given {{XRFrame}} |frame|, array of {{XRHitTestTrackableType}} |entityTypes|, and |nativeResult|, the User Agent MUST run the following steps:
     1. Let |hitTestResult| be a new {{XRHitTestResult}}.
     1. Query [=/XR device=] for the entity type, |nativeEntityType| of the |nativeResult|.
-    1. Convert |nativeEntityType| to |entityType| of type {{XRHitTestTrackableType}}.
+    1. [=Convert from native entity type=] |nativeEntityType| to |entityType|.
     1. If |entityType| is <code>null</code> or is not present in |entityTypes| array, return <code>null</code> and abort these steps.
     1. Set |hitTestResult|'s [=XRHitTestResult/frame=] to |frame|.
     1. Set |hitTestResult|'s [=XRHitTestResult/native origin=] to a native origin obtained from |nativeResult|.
@@ -204,16 +208,18 @@ In order to <dfn>create a hit test result</dfn> given {{XRFrame}} |frame|, array
 
 </div>
 
-The <dfn method for="XRHitTestResult">getPose(|baseSpace|)</dfn> method, when invoked on {{XRHitTestResult}} |hitTestResult|, provides the pose of the |hitTestResult| relative to |baseSpace| as an {{XRPose}}, at the time represented by [=XRHitTestResult/frame=].
+The {{XRHitTestResult/getPose(baseSpace)}} method, when invoked on {{XRHitTestResult}} |hitTestResult| with parameter, provides the pose of the |hitTestResult| relative to |baseSpace| as an {{XRPose}}, at the time represented by [=XRHitTestResult/frame=].
 
 <div class="algorithm" data-algorithm="populate-result-pose">
 
-When {{XRHitTestResult/getPose(baseSpace)}} method is invoked, the User Agent MUST run the following steps:
-1. WIP
+When <dfn method for="XRHitTestResult">getPose(|baseSpace|)</dfn> method is invoked on |hitTestResult|, the User Agent MUST run the following steps:
+  1. Let |frame| be the |hitTestResult|'s [=XRHitTestResult/frame=].
+  1. Let |pose| be a new {{XRPose}}.
+  1. Let |space| be a new {{XRSpace}}, with [=XRSpace/native origin=] set to [=XRHitTestResult/native origin=], [=XRSpace/origin offset=] set to [=/identity transform=], and [=XRSpace/session=] set to [=XRHitTestResult/frame=]'s session.
+  1. [=/Populate the pose=] of |space| in |baseSpace| at the time represented by |frame| into |pose|.
+  1. Return |pose|.
 
 </div>
-
-Issue: fill the algorithm out based on XRFrame.getPose().
 
 Requesting hit test {#requesting-hit-test}
 ===================
@@ -377,14 +383,14 @@ To <dfn for="XRRay">obtain the matrix</dfn> for a given {{XRRay}} |ray|
     </dl>
   1. Let |translation| be the translation matrix with components corresponding to |ray|'s {{XRRay/origin}}
   1. Let |matrix| be the result of premultiplying |rotation| from the left onto |translation| (i.e. <code>translation * rotation</code>) in column-vector notation.
-  1. Set |ray|'s [=XRRay/matrix=] to |matrix|
-  1. Return |matrix|
+  1. Set |ray|'s [=XRRay/matrix=] to |matrix|.
+  1. Return |matrix|.
 
 </div>
 
 <div class="algorithm" data-algorithm="distance-along-ray">
 
-The <dfn>distance along the ray</dfn>, |distance|, from {{XRRay}} |ray| to any entity |entity| is defined such that <code>|ray|.origin + |ray|.direction * |distance|</code> results in a point beloning to the entity |entity|,|distance| is non-negative, and there does not exist a smaller value of |distance| for the above predicate to still hold. It is up to the [=/XR device=] to define the meaning of "point belonging to an entity".
+The <dfn>distance along the ray</dfn>, |distance|, from {{XRRay}} |ray| to any entity |entity| is defined such that <code>|ray|.origin + |ray|.direction * |distance|</code> results in a point beloning to the entity |entity|, |distance| is non-negative, and there does not exist a smaller value of |distance| for the above predicate to still hold. It is up to the [=/XR device=] to define the meaning of "point belonging to an entity".
 
 </div>
 
@@ -404,7 +410,7 @@ Native hit test {#native-hit-test}
 
 In this specification it is assumed that [=/XR device=] exposes a way for the User Agent to query for hit test results that satisfies the following requirements:
 - Accepts a 3D ray that will be tested against user's environment.
-- Returns a collection of 3D poses representing intersection points of the passed in ray with user's environment. Each entry in the collection should also contain information about the type of the native entity that was used to obtain that native result.
+- Returns a collection of 3D poses representing intersection points of the passed in ray with user's environment. Each entry in the collection should also contain information about the type of the native entity that was used to obtain that native result and enough information to enable User Agent to compute surface normal to the user's environment at the intersection point.
 
 Note: For devices that do not expose the hit test functionality natively, it might still be possible for User Agents to implement this specification by leveraging other ways of obtaining the information about user's environment that might be exposed by the XR device.
 
@@ -415,18 +421,30 @@ Native hit test results returned by [=XR device=] should contain information abo
 - Point - signifies that hit test result was computed based on characteristic points found in user's environment.
 - Plane - signifies that hit test result was computed based on planes detected in user's environment.
 
-Issue: add algorithm to convert from native to XRHitTestTrackableType.
 Issue: native hit test can return results that fall outside of plane's polygon - how should those be handled?
 
 <div class="algorithm" data-algorithm="convert-native-type-to-trackable-type">
+
+To <dfn>convert from native entity type</dfn> into {{XRHitTestTrackableType}}, the User Agent MUST run the following steps:
+  1. Let |nativeEntityType| be the native entity type to be converted.
+  1. Let |entityType| be a new {{XRHitTestTrackableType}}.
+  1. Initialize |entityType| as follows:
+    <dl class="switch">
+      <dt>If |nativeEntityType| contains type that corresponds to {{XRHitTestTrackableType/"point"}}</dt>
+      <dd>Set |entityType| to {{XRHitTestTrackableType/"point"}}.</dd>
+      <dt>Else, if |nativeEntityType| contains type that corresponds to {{XRHitTestTrackableType/"plane"}}</dt>
+      <dd>Set |entityType| to {{XRHitTestTrackableType/"plane"}}.</dd>
+      <dt>Else</dt>
+      <dd>Set |entityType| to <code>null</code></dd>
+    </dl>
+  1. Return |entityType|.
 
 </div>
 
 Native hit test result {#native-hit-test-result}
 ----------------------
 
-
-
+Native hit test results returned from XR device should contain the position of the intersection point with user's environment. Depending on the native entity type and the information available to the XR device, the result should also contain orientation defined in such a way to allow the User Agent to compute a surface normal to the user's environment at the intersection point.
 
 Acknowledgements {#ack}
 ================
