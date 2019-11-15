@@ -21,7 +21,7 @@ Warning: custom
 Custom Warning Title: Unstable API
 Custom Warning Text:
   <b>The API represented in this document is under development and may change at any time.</b>
-  <p>For additional context on the use of this API please reference the <a href="https://github.com/immersive-web/hit-test/blob/master/explainer.md">WebXR Hit-test Explainer</a>.</p>
+  <p>For additional context on the use of this API please reference the <a href="https://github.com/immersive-web/hit-test/blob/master/hit-testing-explainer.md">WebXR Hit-test Explainer</a>.</p>
 </pre>
 
 <pre class="link-defaults">
