@@ -27,7 +27,7 @@ As an alternative to using hit-test API, applications could try and perform arbi
 ## Real-world hit testing
 A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often less than useful.
 
-WebXR addresses this challenge through the use of the `XRHitTestSource` & `XRTransientInputHitTestSource` interfaces which serve as handles to hit test subscription. The presence of a hit test source signals to the user agent that the developer intends to query hit test results in subsequent `XRFrame`s. The user agent can then precompute hit test results based on the properties of a hit test source such that each `XRFrame` will be bundled with all "subscribed" hit test results. When the last reference to the hit test source has been released, the user agent is free to stop computing hit test results for future frames.
+WebXR addresses this challenge through the use of the `XRHitTestSource` & `XRTransientInputHitTestSource` interfaces which serve as handles to hit test subscription. The presence of a hit test source signals to the user agent that the developer intends to query hit test results in subsequent `XRFrame`s. The user agent can then precompute hit test results based on the properties of a hit test source such that each `XRFrame` will be bundled with all "subscribed" hit test results.
 
 ### Requesting a hit test source
 To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following key-value pairs:
