@@ -25,64 +25,125 @@ Since the hit test API can potentially be used to extract data about user's envi
 As an alternative to using hit-test API, applications could try and perform arbitrary hit tests leveraging data obtained from real-world-geometry APIs. Due to that, it's unclear whether a web-exposed hit test would be useful and feedback from early adopters of the API will be especially important.
 
 ## Real-world hit testing
-A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often, though not always, less than useful. 
+A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often less than useful.
 
-WebXR addresses this challenge through the use of the `XRHitTestSource` type which acts somewhat like a subscription mechanism. The presence of an `XRHitTestSource` signals to the user agent that the developer intends to query `XRHitTestResult`s in subsequent `XRFrame`s. The user agent can then precompute `XRHitTestResult`s based on the `XRHitTestSource` properties such that each `XRFrame` will be bundled with all "subscribed" hit test results. When the last reference to the `XRHitTestSource` has been released, the user agent is free to stop computing `XRHitTestResult`s for future frames.
+WebXR addresses this challenge through the use of the `XRHitTestSource` & `XRTransientInputHitTestSource` interfaces which serve as handles to hit test subscription. The presence of a hit test source signals to the user agent that the developer intends to query hit test results in subsequent `XRFrame`s. The user agent can then precompute hit test results based on the properties of a hit test source such that each `XRFrame` will be bundled with all "subscribed" hit test results. When the last reference to the hit test source has been released, the user agent is free to stop computing hit test results for future frames.
 
 ### Requesting a hit test source
-To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following values:
+To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following key-value pairs:
 * `space` is required and is the `XRSpace` to be tracked by the hit test source. As this `XRSpace` updates its location each frame, the `XRHitTestSource` will move with it.
-* `offsetRay` is optional and, if provided, is the `XRRay` from which the hit test should be performed. The ray's coordinates are defined with `space` as the origin. If an `offsetRay` is not provided, hit testing will be performed using a ray with coincident with the `space` origin and pointing in the "forward" direction. For more information on constructing an `XRRay`, see the [Spatial Tracking explainer](spatial-tracking-explainer.md#rays).
+* `entityTypes` - see [limiting results to specific entities](#Limiting-results-to-specific-entities) section.
+* `offsetRay` is optional and, if provided, is the `XRRay` from which the hit test should be performed. The ray's coordinates are defined with `space` as the origin. If an `offsetRay` is not provided, hit testing will be performed using a ray with coincident with the `space` origin and pointing in the "forward" direction (see [Rays section](#Rays)).
 
-In this example, an `XRHitTestSource` is created slightly above the center of the `"viewer"` `XRReferenceSpace`. This is because the developer is planning to draw UI elements along the bottom of the hand-held AR device's immersive view while still wanting to give the perception of a centered cursor. For more information, see [Rendering cursors and highlights](#rendering-cursors-and-highlights) in the Input Explainer.
+In this example, an `XRHitTestSource` is created slightly above the center of the `"viewer"` `XRReferenceSpace`. This is because the developer is planning to draw UI elements along the bottom of the hand-held AR device's immersive view while still wanting to give the perception of a centered cursor. For more information, see [Rendering cursors and highlights](https://github.com/immersive-web/webxr/blob/master/input-explainer.md#cursors) in the Input Explainer.
 
 ```js
 let viewerHitTestSource = null;
 let viewerSpace = ...;  // XRReferenceSpace obtained via
                         // a call to XRSession.requestReferenceSpace("viewer");
-let hitTestOptions = { space:viewerSpace, offsetRay:new XRRay({y: 0.5}) };
-xrSession.requestHitTestSource(hitTestOptions).then((hitTestSource) => {
+let hitTestOptionsInit = {
+  space : viewerSpace,
+  offsetRay : new XRRay({y: 0.5})
+};
+
+xrSession.requestHitTestSource(hitTestOptionsInit).then((hitTestSource) => {
   viewerHitTestSource = hitTestSource;
+  // Store some additional data on just created hit test source
+  // by extending the object:
+  viewerHitTestSource.appContext = { options : hitTestOptionsInit };
 });
 ```
 
-### Automatic hit test source creation
-While asynchronous hit test source creation is useful in many scenarios, it is problematic for [transient input sources](#transient-Input-Sources). If an `XRHitTestSource` is requested in response to the `inputsourceschange` event, it may be several frames before a hit test source created in response would able to provide hit test results. By which time the input source may no longer exist. However, because of the potential performance impacts mentioned above, it is important WebXR not perform hit tests for input sources the developer does not need.
+### Pre-registration for transient input sources
+While asynchronous hit test source creation is useful in many scenarios, it is problematic for [transient input sources](https://immersive-web.github.io/webxr/#transient-input). If an `XRHitTestSource` is requested in response to the `inputsourceschange` event using the `XRSession.requestHitTestSource()` API, it may take several frames before a hit test source created in response would able to provide hit test results, by which time the input source may no longer exist. This might be the case even with a one-frame delay between hit test source creation request and its creation. However, because of the potential performance impacts mentioned in section [Real-world hit testing](#real-world-hit-testing), it is important WebXR not perform hit tests for input sources the developer does not need.
 
-To solve this, user agents will automatically generate an `XRHitTestSource` for each new `XRInputSource` that developers can retrieve by calling `XRInputSourcesChangeEvent.getHitTestSource()`. Developers must explicitly retrieve and save these `XRHitTestSource`s if they wish to use them. Otherwise, at the end of the `inputsourceschange` callbacks the pre-created hit test source will disappear. If a developer chooses not to save `XRHitTestSources` in the `inputsourceschange` event handler, they are still able to use the `XRSession.requestHitTestSource()` function at a later time.
-
-The `XRInputSourcesChangeEvent.getHitTestSource()` function will only return a `XRHitTestSource` object when passed an `XRInputSource` from the `XRInputSourcesChangeEvent.added` attribute. Any other parameter will cause a `DOMException` to be thrown.
+To address this issue and still enable the web applications to request hit test sources for transient input sources, the applications can use the `XRSession.requestHitTestSourceForTransientInput()`:
 
 ```js
-let hitTestSources = {};
-function onInputSourcesChange(event) {
-  xrInputSources = event.session.getInputSources();
-  foreach (inputSource of event.removed) {
-    delete hitTestSources[inputSource];
-  }
-  foreach (inputSource of event.added)
-    hitTestSources[inputSource] = event.getHitTestSource(inputSource);
-  }
-  updatePreferredInputSource();
-}
+let transientInputHitTestSource = null;
+let hitTestOptionsInit = {
+  profile : 'generic-touchscreen',
+  offsetRay : new XRRay()
+};
+
+xrSession.requestHitTestSourceForTransientInput(hitTestOptionsInit).then((hitTestSource) => {
+  transientInputHitTestSource = hitTestSource;
+  // Store some additional data on just created hit test source
+  // by extending the object:
+  transientInputHitTestSource.context = { options : hitTestOptionsInit };
+})
 ```
 
+The `XRSession.requestHitTestSourceForTransientInput()` method accepts a dictionary with the following key-value pairs:
+* `profile` is required and specifies the input profile name (see [input profile names](https://immersive-web.github.io/webxr/#xrinputsource-input-profile-name)) that the transient input source must match in order to be considered for a hit test once it is created (for example in response to the user input).
+* `entityTypes` - see [limiting results to specific entities](#Limiting-results-to-specific-entities) section.
+* `offsetRay` is optional and specifies an `XRRay` for which the hit test should be performed. The ray will be interpreted as if relative to `targetRaySpace` of the transient input source that matches the profile mentioned above.
+
 ### Hit test results
-To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance from the `XRHitTestSource`, with the nearest in the 0th position. If no results exist, the array will have a length of zero. Each entry in the array will have a `hitTestOptions` attribute filled in with `XRHitTestOptions` of the `XRHitTestSource` used to find the result. The `XRHitTestResult` interface will also expose a method, `getPose(optional XRSpace? relativeTo = null)` that can be used to query the result's pose. If no value is provided for `relativeTo` parameter, the pose will be defined in the coordinate system of the `hitTestOptions.space`. Otherwise, transforms will be defined in the coordinate system of the `relativeTo`. If `relativeTo` is present and cannot be located relative to `hitTestOptions.space` on the current frame, the function will return `null`.
+To get synchronous hit test results for a particular frame, developers call `XRFrame.getHitTestResults()` passing in a `XRHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRHitTestResult>` in which `XRHitTestResult`s are ordered by distance along the `XRRay` used to perform the hit test, with the nearest in the 0th position. If no results exist, the array will have a length of zero. The `XRHitTestResult` interface will expose a method, `getPose(XRSpace baseSpace)` that can be used to query the result's pose. If, in the current frame, the relationship between `XRSpace` passed in to `baseSpace` parameter cannot be located relative to the hit test result, the function will return `null`.
 
 ```js
+// Input source returned from a call to XRSession.requestHitTestSource(...):
+let hitTestSource = ...;
+
 function updateScene(timestamp, xrFrame) {
   // Scene update logic ...
-  let hitTestResults = xrFrame.getHitTestResults(hitTestSources[preferredInputSource], xrReferenceSpace);
-  if (hitTestResults && hitTestResults.length > 0) {
+  let hitTestResults = xrFrame.getHitTestResults(hitTestSource);
+  if (hitTestResults.length > 0) {
     // Do something with the results
   }
   // Other scene update logic ...
 }
 ```
 
+In order to obtain hit test results for transient input source hit test subscriptions in a particular frame, developers call `XRFrame.getHitTestResultsForTransientInput()` passing in a `XRTransientInputHitTestSource` as the `hitTestSource` parameter. This function will return a `FrozenArray<XRTransientInputHitTestResult>`. Each element of the array will contain an instance of the input source that was used to obtain the results, and the actual hit test results will be contained in `FrozenArray<XRHitTestResult> results`, ordered by the distance along the ray used to perform the hit test, with the closest result at 0th position.
+
+```js
+// Input source returned from a call to
+// XRSession.requestHitTestSourceForTransientInput(...):
+let transientInputHitTestSource = ...;
+
+function updateScene(timestamp, xrFrame) {
+  // Scene update logic ...
+  let hitTestResultsPerInputSource = xrFrame.getHitTestResultsForTransientInput(transientInputHitTestSource);
+
+  hitTestResultsPerInputSource.forEach(resultsPerInputSource => {
+    if(!isInteresting(resultsPerInputSource.inputSource)) {
+      return; // Application can perform additional
+              // filtering based on the input source.
+    }
+
+    if (resultsPerInputSource.results.length > 0) {
+    // Do something with the results
+    }
+  });
+  // Other scene update logic ...
+}
+```
+
+### Limiting results to specific entities
+Hit test results returned from the underlying platform can carry an information about the real-world entity that caused the hit test result to be present. Examples of the entities include planes and feature points. The application can specify what kind of entities should be used for a particular hit test subscription by setting a value of `entityTypes` key in `XRHitTestOptionsInit` / `XRTransientInputHitTestOptionsInit`:
+
+```js
+
+let hitTestOptionsInit = {
+  space : xrSpace,
+  entityTypes : ["plane", "point"],
+  offsetRay : XRRay()
+};
+
+let transientInputHitTestOptionsInit = {
+  profile : "generic-touchscreen",
+  entityTypes : ["plane"],
+  offsetRay : XRRay()
+};
+
+```
+
+Using multiple values in the array set for `entityTypes` key will be treated as a logical "or" filter. For example `entityTypes : ["plane", "point"]` would mean that the arrays returned from `XRFrame.getHitTestResults()` / `XRFrame.getHitTestResultsForTransientInput()` will contain hit tests based off of real-world planes, as well as results based off of characteristic points detected in the user's environment; those are the hit test results whose entities satisfy a condition `(type == "plane") or (type == "point")`, assuming that the `type` contains a type of the given entity. If the application does not set a value for `entityTypes` key when requesting hit test source, a default value of `["plane"]` will be used.
+
 #### Rays
-An `XRRay` object includes both an `origin` and `direction`, both given as `DOMPointReadOnly`s. The `origin` represents a 3D coordinate in space with a `w` component that must be 1, and the `direction` represents a normalized 3D directional vector with a `w` component that must be 0. The `XRRay` also defines a `matrix` which represents the transform from a ray originating at `[0, 0, 0]` and extending down the negative Z axis to the ray described by the `XRRay`'s `origin` and `direction`. This is useful for positioning graphical representations of the ray.
+An `XRRay` object includes both an `origin` and `direction`, both given as `DOMPointReadOnly`s. The `origin` represents a 3D coordinate in space with a `w` component that must be equal to 1, and the `direction` represents a normalized 3D directional vector with a `w` component that must be equal to 0. The `XRRay` also defines a `matrix` which represents the transform from a ray originating at `[0, 0, 0]` and extending down the negative Z axis to the ray described by the `XRRay`'s `origin` and `direction`. This is useful for positioning graphical representations of the ray.
 
 ## Combining virtual and real-world hit testing
 A key component to creating realistic presence in XR experiences, relies on the ability to know if a hit test intersects virtual or real-world geometry. For example, developers might want to put a virtual object somewhere in the real-world but only if a different virtual object isn't already present. In future spec revisions, when real-world occlusion is possible with WebXR, developers will likely be able to create virtual buttons that are only "clickable" if there is no physical object in the way. 
@@ -90,28 +151,23 @@ A key component to creating realistic presence in XR experiences, relies on the 
 There are a handful of techniques which can be used to determine a combined hit test result. For example, a developer may choose to weight hit test results differently if a user is already interacting with a particular object. In this explainer, a simple example of combining hit test results is provided: if a virtual hit-test is found it is returned, otherwise the sample returns the closest real-world hit test result. Because WebXR does not have any knowledge of the developer's 3D scene graph, this sample uses the `XRFrame.getPose()` function to create a ray and passes it into the 3D engine's virtual hit test function.
 
 ```js
-function updateScene(timestamp, xrFrame) {
-  // Scene update logic ...
-  let hitTestResult = getHitCombinedHitTestResult(xrFrame);
-  if (combinedHitTestResult["result"]) {
-    // Do something with the result
-  }
-  // Other scene update logic ...
-}
-function getHitCombinedHitTestResult(frame, inputSource, hitTestSource) {
+function getCombinedHitTestResult(frame, inputSource, hitTestSource) {
   // Try to get virtual hit test result
   if (inputSource) {
-    let inputSourcePose = frame.getPose(inputSource.source, xrReferenceSpace);
+    let inputSourcePose = frame.getPose(inputSource.targetRaySpace, xrReferenceSpace);
     if (inputSourcePose) {
-      var virtualHitTestResult = scene.virtualHitTest(new XRRay(inputSource.transform));
-      return { result:virtualHitTestResult, virtualTarget:virtualHitTestResult.target }
+      var virtualHitTestResult = scene.virtualHitTest(new XRRay(inputSourcePose.transform));
+      return {
+        result : virtualHitTestResult,
+        virtualTarget : virtualHitTestResult.target
+      }
     }
   }
   // Try to get real-world hit test result
   if (hitTestSource) {
-    var realHitTestResults = frame.getHitTestResults(hitTestSource, xrReferenceSpace);
+    var realHitTestResults = frame.getHitTestResults(hitTestSource);
     if (realHitTestResults && realHitTestResults.length > 0) {
-      return { result:realHitTestResults[0] };
+      return { result : realHitTestResults[0] };
     }
   }
   return {};
@@ -119,45 +175,67 @@ function getHitCombinedHitTestResult(frame, inputSource, hitTestSource) {
 ```
 
 ## Appendix A: Proposed partial IDL
-This is a partial IDL and is considered additive to the core IDL found in the main [explainer](explainer.md).
+This is a partial IDL and is considered additive to the core IDL found in the main [explainer](https://github.com/immersive-web/webxr/blob/master/explainer.md).
 ```webidl
 //
 // Session
 //
 partial interface XRSession {
   Promise<XRHitTestSource> requestHitTestSource(XRHitTestOptionsInit options);
-  // Also listed in the input-explainer.md
-  attribute EventHandler oninputsourceschange;
+  Promise<XRTransientInputHitTestSource> requestHitTestSourceForTransientInput(XRTransientInputHitTestOptionsInit options);
 };
 
 //
 // Frame
 //
 partial interface XRFrame {
-  FrozenArray<XRHitTestResult>? getHitTestResults(XRHitTestSource hitTestSource);
+  FrozenArray<XRHitTestResult> getHitTestResults(XRHitTestSource hitTestSource);
+  FrozenArray<XRTransientInputHitTestResult> getHitTestResultsForTransientInput(XRTransientInputHitTestSource hitTestSource);
 };
 
 //
-// Hit Testing
+// Hit Testing Options
 //
+enum XRHitTestTrackableType {
+  "point",
+  "plane"
+};
+
 dictionary XRHitTestOptionsInit {
   required XRSpace space;
+  FrozenArray<XRHitTestTrackableType> entityTypes;
   XRRay offsetRay = new XRRay();
 };
-[SecureContext, Exposed=Window]
-interface XRHitTestOptions {
-  readonly attribute XRSpace space;
-  readonly attributeXRRay offsetRay = new XRRay();
+
+dictionary XRTransientInputHitTestOptionsInit {
+  required DOMString profile;
+  FrozenArray<XRHitTestTrackableType> entityTypes;
+  XRRay offsetRay = new XRRay();
 };
+
+//
+// Hit Test Sources
+//
 [SecureContext, Exposed=Window]
 interface XRHitTestSource {
-  readonly attribute XRHitTestOptions hitTestOptions;
 };
+
+[SecureContext, Exposed=Window]
+interface XRTransientInputHitTestSource {
+};
+
+//
+// Hit Test Results
+//
 [SecureContext, Exposed=Window]
 interface XRHitTestResult {
-  [SameObject] readonly attribute XRHitTestOptions hitTestOptions;
+  XRPose? getPose(XRSpace baseSpace);
+};
 
-  XRPose? getPose(optional XRSpace? relative_to = null);
+[SecureContext, Exposed=Window]
+interface XRTransientInputHitTestResult {
+  [SameObject] readonly attribute XRInputSource inputSource;
+  FrozenArray<XRHitTestResult> results;
 };
 
 //
@@ -172,9 +250,3 @@ interface XRRay {
   [SameObject] readonly attribute Float32Array matrix;
 };
 
-//
-// Events
-//
-partial interface XRInputSourceChangeEvent {
-  XRHitTestSource getHitTestSource(XRInputSource inputSource);
-};
