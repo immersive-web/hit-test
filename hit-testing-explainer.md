@@ -27,7 +27,7 @@ As an alternative to using hit-test API, applications could try and perform arbi
 ## Real-world hit testing
 A key challenge with enabling real-world hit testing in WebXR is that computing real-world hit test results can be performance-impacting and dependant on secondary threads in many of the underlying implementations. However from a developer perspective, out-of-date asynchronous hit test results are often less than useful.
 
-WebXR addresses this challenge through the use of the `XRHitTestSource` & `XRTransientInputHitTestSource` interfaces which serve as handles to hit test subscription. The presence of a hit test source signals to the user agent that the developer intends to query hit test results in subsequent `XRFrame`s. The user agent can then precompute hit test results based on the properties of a hit test source such that each `XRFrame` will be bundled with all "subscribed" hit test results. When the last reference to the hit test source has been released, the user agent is free to stop computing hit test results for future frames.
+WebXR addresses this challenge through the use of the `XRHitTestSource` & `XRTransientInputHitTestSource` interfaces which serve as handles to hit test subscription. The presence of a hit test source signals to the user agent that the developer intends to query hit test results in subsequent `XRFrame`s. The user agent can then precompute hit test results based on the properties of a hit test source such that each `XRFrame` will be bundled with all "subscribed" hit test results.
 
 ### Requesting a hit test source
 To create an `XRHitTestSource` developers call the `XRSession.requestHitTestSource()` function. This function accepts an `XRHitTestOptionsInit` dictionary with the following key-value pairs:
@@ -142,6 +142,28 @@ let transientInputHitTestOptionsInit = {
 
 Using multiple values in the array set for `entityTypes` key will be treated as a logical "or" filter. For example `entityTypes : ["plane", "point"]` would mean that the arrays returned from `XRFrame.getHitTestResults()` / `XRFrame.getHitTestResultsForTransientInput()` will contain hit tests based off of real-world planes, as well as results based off of characteristic points detected in the user's environment; those are the hit test results whose entities satisfy a condition `(type == "plane") or (type == "point")`, assuming that the `type` contains a type of the given entity. If the application does not set a value for `entityTypes` key when requesting hit test source, a default value of `["plane"]` will be used.
 
+### Unsubscribing from hit test
+
+In order to allow the applications to unsubscribe from hit test sources, hit test source and hit test source for transient input expose a `cancel()` method:
+
+```js
+let hitTestSource = ...;  // Obtained from XRSession.requestHitTestSource(...).
+
+// Unsubscribe from hit test:
+hitTestSource.cancel();
+// hitTestSource will no longer be usable to obtain the results,
+// might as well set it to null to avoid mistakes.
+hitTestSource = null;
+
+let hitTestSourceForTransientInput = ...; // Obtained from XRSession.requestHitTestSourceForTransientInput(...).
+
+// Unsubscribe from hit test for transient input:
+hitTestSourceForTransientInput.cancel();
+// hitTestSourceForTransientInput will no longer be usable to obtain the results,
+// might as well set it to null to avoid mistakes.
+hitTestSourceForTransientInput = null;
+```
+
 #### Rays
 An `XRRay` object includes both an `origin` and `direction`, both given as `DOMPointReadOnly`s. The `origin` represents a 3D coordinate in space with a `w` component that must be equal to 1, and the `direction` represents a normalized 3D directional vector with a `w` component that must be equal to 0. The `XRRay` also defines a `matrix` which represents the transform from a ray originating at `[0, 0, 0]` and extending down the negative Z axis to the ray described by the `XRRay`'s `origin` and `direction`. This is useful for positioning graphical representations of the ray.
 
@@ -218,10 +240,12 @@ dictionary XRTransientInputHitTestOptionsInit {
 //
 [SecureContext, Exposed=Window]
 interface XRHitTestSource {
+  void cancel();
 };
 
 [SecureContext, Exposed=Window]
 interface XRTransientInputHitTestSource {
+  void cancel();
 };
 
 //
@@ -235,7 +259,7 @@ interface XRHitTestResult {
 [SecureContext, Exposed=Window]
 interface XRTransientInputHitTestResult {
   [SameObject] readonly attribute XRInputSource inputSource;
-  FrozenArray<XRHitTestResult> results;
+  readonly attribute FrozenArray<XRHitTestResult> results;
 };
 
 //
