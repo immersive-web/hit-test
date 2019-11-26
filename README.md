@@ -6,4 +6,4 @@ There are many ways that real-world geometry could be exposed through a web API.
 
 This approach abstracts the understanding of the world with a high level primitive that will work across many underlying technologies. A hit-test API would unlock a significant number of use cases for AR while allowing the work to expose other types of world understanding in a web-friendly way to proceed in parallel.
 
-For more information about this proposal, please read the [explainer](explainer.md) and issues/PRs.
+For more information about this proposal, please read the [explainer](hit-testing-explainer.md) and issues/PRs.
