@@ -98,12 +98,14 @@ An {{XRHitTestTrackableType}} enum specifies the type of entity that can be used
 <script type="idl">
 enum XRHitTestTrackableType {
   "point",
-  "plane"
+  "plane",
+  "mesh"
 };
 </script>
 
 - A hit test trackable of type <dfn enum-value for="XRHitTestTrackableType">"point"</dfn> indicates that the hit test results will be computed based on the feature points detected by the underlying Augmented Reality system.
 - A hit test trackable of type <dfn enum-value for="XRHitTestTrackableType">"plane"</dfn> indicates that the hit test results will be computed based on the planes detected by the underlying Augmented Reality system.
+- A hit test trackable of type <dfn enum-value for="XRHitTestTrackableType">"mesh"</dfn> indicates that the hit test results will be computed based on the meshes detected by the underlying Augmented Reality system.
 
 XRHitTestOptionsInit {#hit-test-options-dictionary}
 --------------------
@@ -191,11 +193,11 @@ interface XRHitTestResult {
 };
 </script>
 
-A {{XRHitTestResult}} contains single result of a hit test.
+A {{XRHitTestResult}} contains single result of a hit test. It encapsulates information about the intersection point of the ray used to perform the hit test with user's environment as understood by the underlying [=XR device=].
 
 Each {{XRHitTestResult}} has an associated <dfn for="XRHitTestResult">frame</dfn> which is an {{XRFrame}} for which the result was computed.
 
-Each {{XRHitTestResult}} has an associated <dfn for="XRHitTestResult">native origin</dfn>.
+Each {{XRHitTestResult}} has an associated <dfn for="XRHitTestResult">native origin</dfn>. This native origin defines new coordinate system whose Y axis represents the surface's normal vector at the intersection point.
 
 <div class="algorithm" data-algorithm="create-hit-test-result">
 
@@ -210,7 +212,7 @@ In order to <dfn>create a hit test result</dfn> given {{XRFrame}} |frame|, array
 
 </div>
 
-The {{XRHitTestResult/getPose(baseSpace)}} method, when invoked on {{XRHitTestResult}} |hitTestResult| with parameter, provides the pose of the |hitTestResult| relative to |baseSpace| as an {{XRPose}}, at the time represented by [=XRHitTestResult/frame=].
+The {{XRHitTestResult/getPose(baseSpace)}} method, when invoked on {{XRHitTestResult}} |hitTestResult| with |baseSpace| parameter, provides the pose of the |hitTestResult| relative to |baseSpace| as an {{XRPose}}, at the time represented by [=XRHitTestResult/frame=].
 
 <div class="algorithm" data-algorithm="populate-result-pose">
 
@@ -340,7 +342,7 @@ The <dfn constructor for="XRRay">XRRay(|transform|)</dfn> constructor MUST perfo
   1. Initialize |ray|'s {{XRRay/direction}} to <code>{ x: 0.0, y: 0.0, z: -1.0, w: 0.0 }</code>.
   1. Transform |ray|'s {{XRRay/origin}} by premultiplying the |transform|'s {{XRRigidTransform/matrix}} and set |ray| to the result.
   1. Transform |ray|'s {{XRRay/direction}} by premultiplying the |transform|'s {{XRRigidTransform/matrix}} and set |ray| to the result.
-  1. [=Normalize=] the {{DOMPointReadOnly/x}}, {{DOMPointReadOnly/y}}, and {{DOMPointReadOnly/z}} components of |ray|'s {{XRRay/direction}}
+  1. [=Normalize=] the {{DOMPointReadOnly/x}}, {{DOMPointReadOnly/y}}, and {{DOMPointReadOnly/z}} components of |ray|'s {{XRRay/direction}}.
   1. Return |ray|.
 
 </div>
@@ -359,9 +361,9 @@ To <dfn for="XRRay">obtain the matrix</dfn> for a given {{XRRay}} |ray|
 
   1. If |ray|'s [=XRRay/matrix=] is not <code>null</code>, perform the following steps:
     1. If the operation {{IsDetachedBuffer}} on [=XRRay/matrix=] is <code>false</code>, return |ray|'s [=XRRay/matrix=].
-  1. Let |z| be the vector <code>[0, 0, -1]</code>
-  1. Let |axis| be the vector cross product of |z| and |ray|'s {{XRRay/direction}}, <code>z × direction</code>
-  1. Let |cos_angle| be the scalar dot product of |z| and |ray|'s {{XRRay/direction}}, <code>z · direction</code>
+  1. Let |z| be the vector <code>[0, 0, -1]</code>.
+  1. Let |axis| be the vector cross product of |z| and |ray|'s {{XRRay/direction}}, <code>z × direction</code>.
+  1. Let |cos_angle| be the scalar dot product of |z| and |ray|'s {{XRRay/direction}}, <code>z · direction</code>.
   1. Set |rotation| based on the following:
     <dl class="switch">
       <dt> If |cos_angle| is greater than -1 and less than 1
@@ -371,7 +373,7 @@ To <dfn for="XRRay">obtain the matrix</dfn> for a given {{XRRay}} |ray|
       <dt> Else
       <dd> Set |rotation| to an identity matrix.
     </dl>
-  1. Let |translation| be the translation matrix with components corresponding to |ray|'s {{XRRay/origin}}
+  1. Let |translation| be the translation matrix with components corresponding to |ray|'s {{XRRay/origin}}.
   1. Let |matrix| be the result of premultiplying |rotation| from the left onto |translation| (i.e. <code>translation * rotation</code>) in column-vector notation.
   1. Set |ray|'s [=XRRay/matrix=] to |matrix|.
   1. Return |matrix|.
@@ -408,6 +410,7 @@ Native entity type {#native-entity-type-section}
 [=Native hit test results=] returned by [=XR device=] should contain information about the <dfn lt="native entity type">type of the entity</dfn> used to compute the result. Such native types might consist of, but not be limited to:
 - Point - signifies that hit test result was computed based on characteristic points found in user's environment.
 - Plane - signifies that hit test result was computed based on planes detected in user's environment.
+- Mesh - signifies that the hit test result was computed based on meshes detected in user's environment.
 
 <div class="algorithm" data-algorithm="convert-native-type-to-trackable-type">
 
@@ -420,6 +423,8 @@ To <dfn>convert from native entity type</dfn> into {{XRHitTestTrackableType}}, t
       <dd>Set |entityType| to {{XRHitTestTrackableType/"point"}}.</dd>
       <dt>Else, if |nativeEntityType| contains type that corresponds to {{XRHitTestTrackableType/"plane"}}</dt>
       <dd>Set |entityType| to {{XRHitTestTrackableType/"plane"}}.</dd>
+      <dt>Else, if |nativeEntityType| contains type that corresponds to {{XRHitTestTrackableType/"mesh"}}</dt>
+      <dd>Set |entityType| to {{XRHitTestTrackableType/"mesh"}}.</dd>
       <dt>Else</dt>
       <dd>Set |entityType| to <code>null</code></dd>
     </dl>
@@ -431,6 +436,10 @@ Native hit test result {#native-hit-test-result-section}
 ----------------------
 
 <dfn lt="native hit test result|native hit test results">Native hit test results</dfn> returned from XR device should contain the position of the intersection point with user's environment. Depending on the native entity type and the information available to the XR device, the result should also contain orientation defined in such a way to allow the user agent to compute a surface normal to the user's environment at the intersection point.
+
+The information about position and orientation of the intersection point should be contained in [=native hit test result=]'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface's normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector).
+
+Issue: Decide if we need to specify other axes of the coordinate system defined by hit test result's native origin to maintain compatibility between different implementations & differrent AR frameworks.
 
 Acknowledgements {#ack}
 ================
