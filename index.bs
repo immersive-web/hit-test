@@ -17,6 +17,10 @@ Editor: Piotr Bialecki 114482, Google http://google.com/, bialpio@google.com
 Abstract: Describes a method for performing hit tests against real world geometry to be used with the WebXR Device API.
 </pre>
 
+<pre class="link-defaults">
+spec:webxr device api - level 1; type:dfn; for:/; text:xr device
+</pre>
+
 <pre class="anchors">
 spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
     type: interface; text: XRSession; url: xrsession-interface
@@ -25,8 +29,13 @@ spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
         type: dfn; text: native origin; url: xrspace-native-origin
         type: dfn; text: origin offset; url: xrspace-origin-offset
         type: dfn; text: effective origin; url: xrspace-effective-origin
+    for: XRSession;
+        type: dfn; text: list of frame updates; url: xrsession-list-of-frame-updates
+        type: dfn; text: XR device; url: xrsession-xr-device
     type: interface; text: XRFrame; url: xrframe-interface
-    type: dfn; text: XR device; url: xrsession-xr-device
+    for: XRFrame;
+        type: dfn; text: session; url: dom-xrframe-session
+    type: dfn; text: XR device; url: xr-device
     type: dfn; text: XR animation frame; url: xr-animation-frame
     type: dfn; text: list of animation frame callbacks; url: list-of-animation-frame-callbacks
     type: callback; text: XRFrameRequestCallback; url: callbackdef-xrframerequestcallback
@@ -203,7 +212,9 @@ Each {{XRHitTestResult}} has an associated <dfn for="XRHitTestResult">native ori
 
 In order to <dfn>create a hit test result</dfn> given {{XRFrame}} |frame|, array of {{XRHitTestTrackableType}} |entityTypes|, and [=native hit test result=] |nativeResult|, the user agent MUST run the following steps:
     1. Let |hitTestResult| be a new {{XRHitTestResult}}.
-    1. Query [=/XR device=] for [=native entity type=], |nativeEntityType|, of the |nativeResult|.
+    1. Let |session| be |frame|'s [=XRFrame/session=].
+    1. Let |device| be |session|'s [=XRSession/XR device=].
+    1. Query |device| for [=native entity type=], |nativeEntityType|, of the |nativeResult|.
     1. [=Convert from native entity type=] |nativeEntityType| to |entityType|.
     1. If |entityType| is <code>null</code> or is not present in |entityTypes| array, return <code>null</code> and abort these steps.
     1. Set |hitTestResult|'s [=XRHitTestResult/frame=] to |frame|.
@@ -248,6 +259,7 @@ The application can <dfn>request hit test</dfn> using {{XRSession}}'s {{XRSessio
 
 The <dfn method for="XRSession">requestHitTestSource(|options|)</dfn> method, when invoked on an {{XRSession}} |session|, MUST run the following steps:
 
+  1. Add [=compute hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it was not already added.
   1. Let |promise| be [=a new Promise=].
   1. Validate that |options| dictionary contains {{XRHitTestOptionsInit/space}} key with a value of type {{XRSpace}} - if not, [=/reject=] |promise| with a {{TypeError}} and abort these steps.
   1. Initialize |space| of type {{XRSpace}} to the value contained in |options| dictionary under the {{XRHitTestOptionsInit/space}} key.
@@ -263,15 +275,15 @@ The <dfn method for="XRSession">requestHitTestSource(|options|)</dfn> method, wh
 Computing hit test results {#computing-hit-test-results}
 ==========================
 
-Issue: Add extension point to the main spec, in "xr animation frame" algorithm.
-
 Every time the user agent processes [=/XR animation frame=] for {{XRSession}}, it needs to <dfn>compute hit test results</dfn>. This MUST happen prior to invoking any of the callbacks from [=/list of animation frame callbacks=] of a given {{XRSession}}.
 
 <div class="algorithm" data-algorithm="compute-hit-test-results">
 
 In order to [=compute hit test results=] for a given {{XRFrame}} |frame|, for each hit test source, |hitTestSource|, that is present in {{XRFrame/session}}'s [=XRSession/set of active hit test sources=], the user agent MUST perform the following steps:
-    1. Let the |entityTypes| be the |hitTestSource|'s [=XRHitTestSource/entity types=].
-    1. Query the [=/XR device=]'s tracking system for |hitTestSource|'s [=XRHitTestSource/native origin=]'s latest |coordinates|.
+    1. Let |entityTypes| be the |hitTestSource|'s [=XRHitTestSource/entity types=].
+    1. Let |session| be |frame|'s {{XRFrame/session}}.
+    1. Let |device| be the |session|'s  [=XRSession/XR device=].
+    1. Query the |device|'s tracking system for |hitTestSource|'s [=XRHitTestSource/native origin=]'s latest |coordinates|.
     1. Interpret |hitTestSource|'s [=XRHitTestSource/offset ray=], |offsetRay|, as if expressed relative to |coordinates| and using that interpretation, perform [=native hit test=] obtaining [=native hit test results=] |nativeResults|.
     1. Let |hitTestResults| be an empty [=/list=].
     1. Given the |frame| and |entityTypes|, for each native hit test result |nativeResult| in |nativeResults|, perform the following steps:
