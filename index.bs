@@ -214,7 +214,7 @@ When {{XRHitTestSource/cancel()}} method is invoked, the user agent MUST <dfn>ca
 
 </div>
 
-When the application no longer retains any references to a particular {{XRHitTestSource}} <var>hitTestSource</var>, the user agent CAN [=cancel a hit test source=] if <var>hitTestSource</var> is still [=XRHitTestSource/active=]. The cancelation CAN happen at an unspecified time (or not at all) and the application SHOULD NOT rely on this behavior for cleanup.
+When the application no longer retains any references to a particular {{XRHitTestSource}} <var>hitTestSource</var>, the user agent MAY [=cancel a hit test source=] if <var>hitTestSource</var> is still [=XRHitTestSource/active=]. The cancelation MAY happen at an unspecified time (or not at all) and the application SHOULD NOT rely on this behavior for cleanup.
 
 
 XRTransientInputHitTestSource {#transient-input-hit-test-source-interface}
@@ -261,7 +261,7 @@ When {{XRTransientInputHitTestSource/cancel()}} method is invoked, the user agen
 
 </div>
 
-When the application no longer retains any references to a particular {{XRTransientInputHitTestSource}} <var>hitTestSource</var>, the user agent CAN [=cancel a hit test source for transient input=] if <var>hitTestSource</var> is still [=XRTransientInputHitTestSource/active=]. The cancelation CAN happen at an unspecified time (or not at all) and the application SHOULD NOT rely on this behavior for cleanup.
+When the application no longer retains any references to a particular {{XRTransientInputHitTestSource}} <var>hitTestSource</var>, the user agent MAY [=cancel a hit test source for transient input=] if <var>hitTestSource</var> is still [=XRTransientInputHitTestSource/active=]. The cancelation MAY happen at an unspecified time (or not at all) and the application SHOULD NOT rely on this behavior for cleanup.
 
 Hit test result {#hit-test-result}
 ===============
@@ -303,6 +303,7 @@ The {{XRHitTestResult/getPose(baseSpace)}} method, when invoked on {{XRHitTestRe
 
 When <dfn method for="XRHitTestResult">getPose(|baseSpace|)</dfn> method is invoked on |hitTestResult|, the user agent MUST run the following steps:
   1. Let |frame| be the |hitTestResult|'s [=XRHitTestResult/frame=].
+  1. If |frame|'s [=XRFrame/active=] boolean is <code>false</code>, throw an {{InvalidStateError}} and abort these steps.
   1. Let |pose| be a new {{XRPose}}.
   1. Let |space| be a new {{XRSpace}}, with [=XRSpace/native origin=] set to [=XRHitTestResult/native origin=], [=XRSpace/origin offset=] set to [=/identity transform=], and [=XRSpace/session=] set to [=XRHitTestResult/frame=]'s session.
   1. [=/Populate the pose=] of |space| in |baseSpace| at the time represented by |frame| into |pose|.
