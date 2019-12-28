@@ -43,8 +43,6 @@ spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
         type: dfn; text: input profile name; url: xrinputsource-input-profile-name
     type: dfn; text: list of active XR input sources; url: list-of-active-xr-input-sources
     type: dfn; text: XR device; url: xr-device
-    type: dfn; text: XR animation frame; url: xr-animation-frame
-    type: dfn; text: list of animation frame callbacks; url: list-of-animation-frame-callbacks
     type: dfn; text: matrix; url: matrix
     type: dfn; text: normalize; url: normalize
     type: dfn; text: populate the pose; url: populate-the-pose
@@ -391,11 +389,9 @@ The <dfn method for="XRSession">requestHitTestSourceForTransientInput(|options|)
 Computing hit test results {#computing-hit-test-results}
 ==========================
 
-Every time the user agent processes [=/XR animation frame=] for {{XRSession}}, it needs to <dfn>compute all hit test results</dfn>. This MUST happen prior to invoking any of the callbacks from [=/list of animation frame callbacks=] of a given {{XRSession}}.
-
 <div class="algorithm" data-algorithm="compute-all-hit-test-results">
 
-In order to [=compute all hit test results=] for a given {{XRFrame}} |frame|, the user agent MUST perform the following steps:
+In order to <dfn>compute all hit test results</dfn> for a given {{XRFrame}} |frame|, the user agent MUST perform the following steps:
     1. Invoke [=compute hit test results=] algorithm with |frame|.
     1. Invoke [=compute hit test results for transient input=] algorithm with |frame|.
 
