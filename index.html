@@ -1167,6 +1167,18 @@ Possible extra rowspan handling
 		margin-left: auto;
 		margin-right: auto;
 	}
+	.overlarge {
+		/* Magic to create good table positioning:
+		   "content column" is 50ems wide at max; less on smaller screens.
+		   Extra space (after ToC + content) is empty on the right.
+
+		   1. When table < content column, centers table in column.
+		   2. When content < table < available, left-aligns.
+		   3. When table > available, fills available + scroll bar.
+		*/ 
+		display: grid;
+		grid-template-columns: minmax(0, 50em);
+	}
 	.overlarge > table {
 		/* limit preferred width of table */
 		max-width: 50em;
@@ -1176,7 +1188,6 @@ Possible extra rowspan handling
 
 	@media (min-width: 55em) {
 		.overlarge {
-			margin-left: calc(13px + 26.5rem - 50vw);
 			margin-right: calc(13px + 26.5rem - 50vw);
 			max-width: none;
 		}
@@ -1184,14 +1195,12 @@ Possible extra rowspan handling
 	@media screen and (min-width: 78em) {
 		body:not(.toc-inline) .overlarge {
 			/* 30.5em body padding 50em content area */
-			margin-left: calc(40em - 50vw) !important;
 			margin-right: calc(40em - 50vw) !important;
 		}
 	}
 	@media screen and (min-width: 90em) {
 		body:not(.toc-inline) .overlarge {
 			/* 4em html margin 30.5em body padding 50em content area */
-			margin-left: 0 !important;
 			margin-right: calc(84.5em - 100vw) !important;
 		}
 	}
@@ -1212,7 +1221,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 087ea90e1ebd0321c20373d89950d1c6b73d5df1" name="generator">
+  <meta content="Bikeshed version 6a4c097ae8b731ee02752a258e8ac5ffbb752299" name="generator">
   <link href="https://immersive-web.github.io/hit-test/" rel="canonical">
   <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
   <link href="favicon-96x96.png" rel="icon" sizes="96x96" type="image/png">
@@ -1502,7 +1511,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebXR Hit Test Module</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-12-13">13 December 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-01-10">10 January 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1523,7 +1532,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
    <div data-fill-with="warning"></div>
    <p class="copyright" data-fill-with="copyright"><a href="http://creativecommons.org/publicdomain/zero/1.0/" rel="license"><img alt="CC0" src="https://licensebuttons.net/p/zero/1.0/80x15.png"></a> To the extent possible under law, the editors have waived all copyright
 and related or neighboring rights to this work.
-In addition, as of 13 December 2019,
+In addition, as of 10 January 2020,
 the editors have made this specification available under the <a href="http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0" rel="license">Open Web Foundation Agreement Version 1.0</a>,
 which is available at http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0.
 Parts of this work may be from another specification document.  If so, those parts are instead covered by the license of that specification document. </p>
@@ -1547,16 +1556,19 @@ Parts of this work may be from another specification document.  If so, those par
      <ol class="toc">
       <li><a href="#hit-test-trackable-type-enum"><span class="secno">2.1</span> <span class="content">XRHitTestTrackableType</span></a>
       <li><a href="#hit-test-options-dictionary"><span class="secno">2.2</span> <span class="content">XRHitTestOptionsInit</span></a>
+      <li><a href="#transient-input-hit-test-options-dictionary"><span class="secno">2.3</span> <span class="content">XRTransientInputHitTestOptionsInit</span></a>
      </ol>
     <li>
      <a href="#hit-test-source"><span class="secno">3</span> <span class="content">Hit test source</span></a>
      <ol class="toc">
       <li><a href="#hit-test-source-interface"><span class="secno">3.1</span> <span class="content">XRHitTestSource</span></a>
+      <li><a href="#transient-input-hit-test-source-interface"><span class="secno">3.2</span> <span class="content">XRTransientInputHitTestSource</span></a>
      </ol>
     <li>
      <a href="#hit-test-result"><span class="secno">4</span> <span class="content">Hit test result</span></a>
      <ol class="toc">
       <li><a href="#xr-hit-test-result-interface"><span class="secno">4.1</span> <span class="content">XRHitTestResult</span></a>
+      <li><a href="#xr-transient-input-hit-test-result-interface"><span class="secno">4.2</span> <span class="content">XRTransientInputHitTestResult</span></a>
      </ol>
     <li><a href="#requesting-hit-test"><span class="secno">5</span> <span class="content">Requesting hit test</span></a>
     <li><a href="#computing-hit-test-results"><span class="secno">6</span> <span class="content">Computing hit test results</span></a>
@@ -1624,9 +1636,22 @@ Parts of this work may be from another specification document.  If so, those par
 </pre>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrhittestoptionsinit-space"><code>space</code></dfn> dictionary member specifies <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace①">XRSpace</a></code> relative to which the <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray①">offsetRay</a></code> is specified.</p>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrhittestoptionsinit-entitytypes"><code>entityTypes</code></dfn> dictionary member specifies array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype②">XRHitTestTrackableTypes</a> that will be used to compute results of the hit test.</p>
-   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrhittestoptionsinit-offsetray"><code>offsetRay</code></dfn> dictionary member specifies <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①">XRRay</a></code> used to perform hit test. The <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray②">offsetRay</a></code> is expressed in a coordinate system defined by <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space①">space</a></code>.</p>
+   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrhittestoptionsinit-offsetray"><code>offsetRay</code></dfn> dictionary member specifies <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①">XRRay</a></code> that will be used to perform hit test. The <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray②">offsetRay</a></code> will be interpreted as if expressed in a coordinate system defined by <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space①">space</a></code>.</p>
    <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit①">XRHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrhittestoptionsinit-effective-entitytypes">effective entityTypes</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-entitytypes" id="ref-for-dom-xrhittestoptionsinit-entitytypes①">entityTypes</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-entitytypes" id="ref-for-dom-xrhittestoptionsinit-entitytypes②">entityTypes</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-entitytypes" id="ref-for-xrhittestoptionsinit-effective-entitytypes">effective entityTypes</a> is set to an array containing single element, <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane①">"plane"</a></code>.</p>
    <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit②">XRHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrhittestoptionsinit-effective-offsetray">effective offsetRay</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray③">offsetRay</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray④">offsetRay</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-offsetray" id="ref-for-xrhittestoptionsinit-effective-offsetray">effective offsetRay</a> is set to an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray②">XRRay</a></code> constructed by invoking <code class="idl"><a data-link-type="idl" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray">XRRay()</a></code> without any parameters.</p>
+   <h3 class="heading settled" data-level="2.3" id="transient-input-hit-test-options-dictionary"><span class="secno">2.3. </span><span class="content">XRTransientInputHitTestOptionsInit</span><a class="self-link" href="#transient-input-hit-test-options-dictionary"></a></h3>
+   <p>An <code class="idl"><a data-link-type="idl" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit">XRTransientInputHitTestOptionsInit</a></code> dictionary represents a set of configurable values that affect the behavior of the hit test for transient input that is being performed.</p>
+<pre class="idl highlight def"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-xrtransientinputhittestoptionsinit"><code><c- g>XRTransientInputHitTestOptionsInit</c-></code></dfn> {
+  <c- b>required</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString"><c- b>DOMString</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-xrtransientinputhittestoptionsinit-profile" id="ref-for-dom-xrtransientinputhittestoptionsinit-profile"><c- g>profile</c-></a>;
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype③"><c- n>XRHitTestTrackableType</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="FrozenArray<XRHitTestTrackableType> " href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes"><c- g>entityTypes</c-></a>;
+  <a class="n" data-link-type="idl-name" href="#xrray" id="ref-for-xrray③"><c- n>XRRay</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRRay " href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray"><c- g>offsetRay</c-></a>;
+};
+</pre>
+   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrtransientinputhittestoptionsinit-profile"><code>profile</code></dfn> dictionary member specifies an <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrinputsource-input-profile-name" id="ref-for-xrinputsource-input-profile-name">input profile name</a> of the transient input source that will be used to compute hit test results.</p>
+   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrtransientinputhittestoptionsinit-entitytypes"><code>entityTypes</code></dfn> dictionary member specifies array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype④">XRHitTestTrackableTypes</a> that will be used to compute results of the hit test.</p>
+   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrtransientinputhittestoptionsinit-offsetray"><code>offsetRay</code></dfn> dictionary member specifies <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray④">XRRay</a></code> that will be used to perform hit test. The <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray①">offsetRay</a></code> will be interpreted as if expressed in a coordinate system defined by <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrinputsource" id="ref-for-xrinputsource">XRInputSource</a></code> whose profile matches the passed in <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-profile" id="ref-for-dom-xrtransientinputhittestoptionsinit-profile①">profile</a></code> when computing hit test results for transient input sources.</p>
+   <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit①">XRTransientInputHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestoptionsinit-effective-entitytypes">effective entityTypes</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes①">entityTypes</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes②">entityTypes</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrtransientinputhittestoptionsinit-effective-entitytypes" id="ref-for-xrtransientinputhittestoptionsinit-effective-entitytypes">effective entityTypes</a> is set to an array containing single element, <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane②">"plane"</a></code>.</p>
+   <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit②">XRTransientInputHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestoptionsinit-effective-offsetray">effective offsetRay</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray②">offsetRay</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray③">offsetRay</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrtransientinputhittestoptionsinit-effective-offsetray" id="ref-for-xrtransientinputhittestoptionsinit-effective-offsetray">effective offsetRay</a> is set to an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑤">XRRay</a></code> constructed by invoking <code class="idl"><a data-link-type="idl" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray①">XRRay()</a></code> without any parameters.</p>
    <h2 class="heading settled" data-level="3" id="hit-test-source"><span class="secno">3. </span><span class="content">Hit test source</span><a class="self-link" href="#hit-test-source"></a></h2>
    <h3 class="heading settled" data-level="3.1" id="hit-test-source-interface"><span class="secno">3.1. </span><span class="content">XRHitTestSource</span><a class="self-link" href="#hit-test-source-interface"></a></h3>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->]
@@ -1637,8 +1662,8 @@ Parts of this work may be from another specification document.  If so, those par
    <p>The <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource">XRHitTestSource</a></code> object serves as a handle to an active subscription to hit test.</p>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource①">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-session">session</dfn> which stores an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface">XRSession</a></code> that was used to create the hit test source.</p>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource②">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-native-origin">native origin</dfn> which stores information sufficient to identify the <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrspace-native-origin" id="ref-for-xrspace-native-origin">native origin</a> of an <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace②">XRSpace</a></code> that was used to <a data-link-type="dfn" href="#request-hit-test" id="ref-for-request-hit-test">request hit test</a>. This information will be subsequently used when computing hit test results.</p>
-   <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource③">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-entity-types">entity types</dfn>, which is an array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype③">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results.</p>
-   <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource④">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-offset-ray">offset ray</dfn>, which is an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray③">XRRay</a></code> that will be used when computing hit test results.</p>
+   <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource③">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-entity-types">entity types</dfn>, which is an array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑤">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results.</p>
+   <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource④">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-offset-ray">offset ray</dfn>, which is an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑥">XRRay</a></code> that will be used when computing hit test results.</p>
    <p><code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource⑤">XRHitTestSource</a></code> is considered <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-active">active</dfn> for as long as it’s present in <a data-link-type="dfn" href="#xrhittestsource-session" id="ref-for-xrhittestsource-session">session</a>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources" id="ref-for-xrsession-set-of-active-hit-test-sources">set of active hit test sources</a>.</p>
    <div class="algorithm" data-algorithm="create-hit-test-source">
     <p>In order to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="create-a-hit-test-source">create a hit test source</dfn> from <var>session</var>, <var>space</var>, <var>entityTypes</var> and <var>offsetRay</var>, the user agent MUST run the following steps:</p>
@@ -1669,10 +1694,50 @@ Parts of this work may be from another specification document.  If so, those par
       <p>Remove <var>hitTestSource</var> from <a data-link-type="dfn" href="#xrhittestsource-session" id="ref-for-xrhittestsource-session②">session</a>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources" id="ref-for-xrsession-set-of-active-hit-test-sources①">set of active hit test sources</a>.</p>
     </ol>
    </div>
-   <p>When the application no longer retains any references to a particular <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource⑧">XRHitTestSource</a></code> <var>hitTestSource</var>, the user agent CAN <a data-link-type="dfn" href="#cancel-a-hit-test-source" id="ref-for-cancel-a-hit-test-source">cancel a hit test source</a> that is still <a data-link-type="dfn" href="#xrhittestsource-active" id="ref-for-xrhittestsource-active①">active</a>. The cancelation CAN happen at an unspecified time (or not at all) and the application SHOULD NOT rely on this behavior for cleanup.</p>
+   <p>When the application no longer retains any references to a particular <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource⑧">XRHitTestSource</a></code> <var>hitTestSource</var>, the user agent MAY <a data-link-type="dfn" href="#cancel-a-hit-test-source" id="ref-for-cancel-a-hit-test-source">cancel a hit test source</a> if <var>hitTestSource</var> is still <a data-link-type="dfn" href="#xrhittestsource-active" id="ref-for-xrhittestsource-active①">active</a>. The cancelation MAY happen at an unspecified time (or not at all) and the application SHOULD NOT rely on this behavior for cleanup.</p>
+   <h3 class="heading settled" data-level="3.2" id="transient-input-hit-test-source-interface"><span class="secno">3.2. </span><span class="content">XRTransientInputHitTestSource</span><a class="self-link" href="#transient-input-hit-test-source-interface"></a></h3>
+<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="xrtransientinputhittestsource"><code><c- g>XRTransientInputHitTestSource</c-></code></dfn> {
+  <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-xrtransientinputhittestsource-cancel" id="ref-for-dom-xrtransientinputhittestsource-cancel"><c- g>cancel</c-></a>();
+};
+</pre>
+   <p>The <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource">XRTransientInputHitTestSource</a></code> object serves as a handle to an active subscription to hit test for transient input sources.</p>
+   <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource①">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-session">session</dfn> which stores an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface①">XRSession</a></code> that was used to create the hit test source.</p>
+   <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource②">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-profile">profile</dfn> which stores <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrinputsource-input-profile-name" id="ref-for-xrinputsource-input-profile-name①">input profile name</a> of an input source. This information will be subsequently used when computing hit test results for transient input sources.</p>
+   <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource③">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-entity-types">entity types</dfn>, which is an array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑥">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results.</p>
+   <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource④">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-offset-ray">offset ray</dfn>, which is an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑦">XRRay</a></code> that will be used when computing hit test results.</p>
+   <p><code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource⑤">XRTransientInputHitTestSource</a></code> is considered <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-active">active</dfn> for as long as it’s present in <a data-link-type="dfn" href="#xrtransientinputhittestsource-session" id="ref-for-xrtransientinputhittestsource-session">session</a>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources-for-transient-input" id="ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input">set of active hit test sources for transient input</a>.</p>
+   <div class="algorithm" data-algorithm="create-hit-test-source-transient">
+    <p>In order to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="create-a-hit-test-source-for-transient-input">create a hit test source for transient input</dfn> from <var>session</var>, <var>profile</var>, <var>entityTypes</var> and <var>offsetRay</var>, the user agent MUST run the following steps:</p>
+    <ol>
+     <li data-md>
+      <p>Let <var>hitTestSource</var> be a new <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource⑥">XRTransientInputHitTestSource</a></code>.</p>
+     <li data-md>
+      <p>Initialize <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrtransientinputhittestsource-session" id="ref-for-xrtransientinputhittestsource-session①">session</a> to <var>session</var>.</p>
+     <li data-md>
+      <p>Initialize <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrtransientinputhittestsource-profile" id="ref-for-xrtransientinputhittestsource-profile">profile</a> to <var>profile</var>.</p>
+     <li data-md>
+      <p>Initialize <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrtransientinputhittestsource-entity-types" id="ref-for-xrtransientinputhittestsource-entity-types">entity types</a> to <var>entityTypes</var>.</p>
+     <li data-md>
+      <p>Initialize <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrtransientinputhittestsource-offset-ray" id="ref-for-xrtransientinputhittestsource-offset-ray">offset ray</a> to <var>offsetRay</var>.</p>
+     <li data-md>
+      <p>Return <var>hitTestSource</var>.</p>
+    </ol>
+   </div>
+   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="method" data-export id="dom-xrtransientinputhittestsource-cancel"><code>cancel()</code></dfn> method, when invoked on <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource⑦">XRTransientInputHitTestSource</a></code> <var>hitTestSource</var>, signals that the application is no longer interested in obtaining hit test results for the specified <var>hitTestSource</var>.</p>
+   <div class="algorithm" data-algorithm="cancel-hit-test-source-transient">
+    <p>When <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestsource-cancel" id="ref-for-dom-xrtransientinputhittestsource-cancel①">cancel()</a></code> method is invoked, the user agent MUST <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="cancel-a-hit-test-source-for-transient-input">cancel a hit test source for transient input</dfn> by running the following steps:</p>
+    <ol>
+     <li data-md>
+      <p>If the <var>hitTestSource</var> is not <a data-link-type="dfn" href="#xrtransientinputhittestsource-active" id="ref-for-xrtransientinputhittestsource-active">active</a>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror①">InvalidStateError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>Remove <var>hitTestSource</var> from <a data-link-type="dfn" href="#xrhittestsource-session" id="ref-for-xrhittestsource-session③">session</a>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources-for-transient-input" id="ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input①">set of active hit test sources for transient input</a>.</p>
+    </ol>
+   </div>
+   <p>When the application no longer retains any references to a particular <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource⑧">XRTransientInputHitTestSource</a></code> <var>hitTestSource</var>, the user agent MAY <a data-link-type="dfn" href="#cancel-a-hit-test-source-for-transient-input" id="ref-for-cancel-a-hit-test-source-for-transient-input">cancel a hit test source for transient input</a> if <var>hitTestSource</var> is still <a data-link-type="dfn" href="#xrtransientinputhittestsource-active" id="ref-for-xrtransientinputhittestsource-active①">active</a>. The cancelation MAY happen at an unspecified time (or not at all) and the application SHOULD NOT rely on this behavior for cleanup.</p>
    <h2 class="heading settled" data-level="4" id="hit-test-result"><span class="secno">4. </span><span class="content">Hit test result</span><a class="self-link" href="#hit-test-result"></a></h2>
    <h3 class="heading settled" data-level="4.1" id="xr-hit-test-result-interface"><span class="secno">4.1. </span><span class="content">XRHitTestResult</span><a class="self-link" href="#xr-hit-test-result-interface"></a></h3>
-<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext②"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="xrhittestresult"><code><c- g>XRHitTestResult</c-></code></dfn> {
   <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrpose" id="ref-for-xrpose"><c- n>XRPose</c-></a>? <a class="idl-code" data-link-type="method" href="#dom-xrhittestresult-getpose" id="ref-for-dom-xrhittestresult-getpose"><c- g>getPose</c-></a>(<a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace③"><c- n>XRSpace</c-></a> <dfn class="idl-code" data-dfn-for="XRHitTestResult/getPose(baseSpace)" data-dfn-type="argument" data-export id="dom-xrhittestresult-getpose-basespace-basespace"><code><c- g>baseSpace</c-></code><a class="self-link" href="#dom-xrhittestresult-getpose-basespace-basespace"></a></dfn>);
 };
@@ -1681,7 +1746,7 @@ Parts of this work may be from another specification document.  If so, those par
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestresult" id="ref-for-xrhittestresult①">XRHitTestResult</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestResult" data-dfn-type="dfn" data-noexport id="xrhittestresult-frame">frame</dfn> which is an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface">XRFrame</a></code> for which the result was computed.</p>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestresult" id="ref-for-xrhittestresult②">XRHitTestResult</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestResult" data-dfn-type="dfn" data-noexport id="xrhittestresult-native-origin">native origin</dfn>. This native origin defines new coordinate system whose Y axis represents the surface’s normal vector at the intersection point.</p>
    <div class="algorithm" data-algorithm="create-hit-test-result">
-    <p>In order to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="create-a-hit-test-result">create a hit test result</dfn> given <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface①">XRFrame</a></code> <var>frame</var>, array of <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype④">XRHitTestTrackableType</a></code> <var>entityTypes</var>, and <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result">native hit test result</a> <var>nativeResult</var>, the user agent MUST run the following steps:</p>
+    <p>In order to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="create-a-hit-test-result">create a hit test result</dfn> given <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface①">XRFrame</a></code> <var>frame</var>, array of <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑦">XRHitTestTrackableType</a></code> <var>entityTypes</var>, and <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result">native hit test result</a> <var>nativeResult</var>, the user agent MUST run the following steps:</p>
     <ol>
      <li data-md>
       <p>Let <var>hitTestResult</var> be a new <code class="idl"><a data-link-type="idl" href="#xrhittestresult" id="ref-for-xrhittestresult③">XRHitTestResult</a></code>.</p>
@@ -1710,6 +1775,8 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p>Let <var>frame</var> be the <var>hitTestResult</var>’s <a data-link-type="dfn" href="#xrhittestresult-frame" id="ref-for-xrhittestresult-frame②">frame</a>.</p>
      <li data-md>
+      <p>If <var>frame</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrframe-active" id="ref-for-xrframe-active">active</a> boolean is <code>false</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror②">InvalidStateError</a></code> and abort these steps.</p>
+     <li data-md>
       <p>Let <var>pose</var> be a new <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrpose" id="ref-for-xrpose②">XRPose</a></code>.</p>
      <li data-md>
       <p>Let <var>space</var> be a new <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace④">XRSpace</a></code>, with <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrspace-native-origin" id="ref-for-xrspace-native-origin③">native origin</a> set to <a data-link-type="dfn" href="#xrhittestresult-native-origin" id="ref-for-xrhittestresult-native-origin①">native origin</a>, <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrspace-origin-offset" id="ref-for-xrspace-origin-offset">origin offset</a> set to <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#identity-transform" id="ref-for-identity-transform">identity transform</a>, and <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrspace-session" id="ref-for-xrspace-session">session</a> set to <a data-link-type="dfn" href="#xrhittestresult-frame" id="ref-for-xrhittestresult-frame③">frame</a>'s session.</p>
@@ -1719,47 +1786,99 @@ Parts of this work may be from another specification document.  If so, those par
       <p>Return <var>pose</var>.</p>
     </ol>
    </div>
-   <h2 class="heading settled" data-level="5" id="requesting-hit-test"><span class="secno">5. </span><span class="content">Requesting hit test</span><a class="self-link" href="#requesting-hit-test"></a></h2>
-<pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface①"><c- g>XRSession</c-></a> {
-  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource⑨"><c- n>XRHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsource" id="ref-for-dom-xrsession-requesthittestsource"><c- g>requestHitTestSource</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit③"><c- n>XRHitTestOptionsInit</c-></a> <dfn class="idl-code" data-dfn-for="XRSession/requestHitTestSource(options)" data-dfn-type="argument" data-export id="dom-xrsession-requesthittestsource-options-options"><code><c- g>options</c-></code><a class="self-link" href="#dom-xrsession-requesthittestsource-options-options"></a></dfn>);
-};
-
-<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface②"><c- g>XRFrame</c-></a> {
-  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult" id="ref-for-xrhittestresult⑤"><c- n>XRHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresults" id="ref-for-dom-xrframe-gethittestresults"><c- g>getHitTestResults</c-></a>(<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource①⓪"><c- n>XRHitTestSource</c-></a> <dfn class="idl-code" data-dfn-for="XRFrame/getHitTestResults(hitTestSource)" data-dfn-type="argument" data-export id="dom-xrframe-gethittestresults-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code><a class="self-link" href="#dom-xrframe-gethittestresults-hittestsource-hittestsource"></a></dfn>);
+   <h3 class="heading settled" data-level="4.2" id="xr-transient-input-hit-test-result-interface"><span class="secno">4.2. </span><span class="content">XRTransientInputHitTestResult</span><a class="self-link" href="#xr-transient-input-hit-test-result-interface"></a></h3>
+<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext③"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+<c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="xrtransientinputhittestresult"><code><c- g>XRTransientInputHitTestResult</c-></code></dfn> {
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrinputsource" id="ref-for-xrinputsource①"><c- n>XRInputSource</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestResult" data-dfn-type="attribute" data-export data-readonly data-type="XRInputSource" id="dom-xrtransientinputhittestresult-inputsource"><code><c- g>inputSource</c-></code></dfn>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult" id="ref-for-xrhittestresult⑤"><c- n>XRHitTestResult</c-></a>> <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestResult" data-dfn-type="attribute" data-export data-readonly data-type="FrozenArray<XRHitTestResult>" id="dom-xrtransientinputhittestresult-results"><code><c- g>results</c-></code></dfn>;
 };
 </pre>
-   <p>The <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface②">XRSession</a></code> is extended to contain an associated <dfn class="dfn-paneled" data-dfn-for="XRSession" data-dfn-type="dfn" data-noexport id="xrsession-set-of-active-hit-test-sources">set of active hit test sources</dfn> that will be used when computing hit test results.</p>
-   <p>The <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface③">XRFrame</a></code> is extended to contain an associated <dfn class="dfn-paneled" data-dfn-for="XRFrame" data-dfn-type="dfn" data-noexport id="xrframe-map-of-hit-test-sources-to-hit-test-results">map of hit test sources to hit test results</dfn> that stores a mapping from <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource①①">XRHitTestSource</a></code> to an array of <a class="idl-code" data-link-type="interface" href="#xrhittestresult" id="ref-for-xrhittestresult⑥">XRHitTestResults</a>.</p>
-   <p>The application can <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="request-hit-test">request hit test</dfn> using <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface③">XRSession</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrsession-requesthittestsource" id="ref-for-dom-xrsession-requesthittestsource①">requestHitTestSource()</a></code> method.</p>
-   <div class="algorithm" data-algorithm="request-hit-test-source">
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRSession" data-dfn-type="method" data-export id="dom-xrsession-requesthittestsource"><code>requestHitTestSource(<var>options</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface④">XRSession</a></code> <var>session</var>, MUST run the following steps:</p>
+   <p>A <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestresult" id="ref-for-xrtransientinputhittestresult">XRTransientInputHitTestResult</a></code> contains array of result of a hit test for transient input, grouped by <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrinputsource" id="ref-for-xrinputsource②">XRInputSource</a></code> <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestresult-inputsource" id="ref-for-dom-xrtransientinputhittestresult-inputsource">inputSource</a></code>.</p>
+   <p>The <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestresult-inputsource" id="ref-for-dom-xrtransientinputhittestresult-inputsource①">inputSource</a></code> attribute contains an <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrinputsource" id="ref-for-xrinputsource③">XRInputSource</a></code> that was used to compute the <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestresult-results" id="ref-for-dom-xrtransientinputhittestresult-results">results</a></code> array.</p>
+   <p>The <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestresult-results" id="ref-for-dom-xrtransientinputhittestresult-results①">results</a></code> attribute contains an array of computed <code class="idl"><a data-link-type="idl" href="#xrhittestresult" id="ref-for-xrhittestresult⑥">XRHitTestResult</a></code>s.</p>
+   <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestresult" id="ref-for-xrtransientinputhittestresult①">XRTransientInputHitTestResult</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestResult" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestresult-frame">frame</dfn> which is an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface②">XRFrame</a></code> for which the results were computed.</p>
+   <div class="algorithm" data-algorithm="create-hit-test-result-for-transient-input">
+    <p>In order to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="create-a-hit-test-result-for-transient-input">create a hit test result for transient input</dfn> given <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrinputsource" id="ref-for-xrinputsource④">XRInputSource</a></code> <var>inputSource</var>, <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface③">XRFrame</a></code> <var>frame</var>, array of <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑧">XRHitTestTrackableType</a></code> <var>entityTypes</var>, and array of <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result①">native hit test results</a> <var>nativeResults</var>, the user agent MUST run the following steps:</p>
     <ol>
      <li data-md>
-      <p>Add <a data-link-type="dfn" href="#compute-hit-test-results" id="ref-for-compute-hit-test-results">compute hit test results</a> algorithm to <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrsession-list-of-frame-updates" id="ref-for-xrsession-list-of-frame-updates">list of frame updates</a> if it was not already added.</p>
+      <p>Let <var>hitTestResult</var> be a new <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestresult" id="ref-for-xrtransientinputhittestresult②">XRTransientInputHitTestResult</a></code>.</p>
+     <li data-md>
+      <p>Set <var>hitTestResult</var>’s <a data-link-type="dfn" href="#xrtransientinputhittestresult-frame" id="ref-for-xrtransientinputhittestresult-frame">frame</a> to <var>frame</var>.</p>
+     <li data-md>
+      <p>Set <var>hitTestResult</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestresult-inputsource" id="ref-for-dom-xrtransientinputhittestresult-inputsource②">inputSource</a></code> to <var>inputSource</var>.</p>
+     <li data-md>
+      <p>Let <var>results</var> be an empty array of <code class="idl"><a data-link-type="idl" href="#xrhittestresult" id="ref-for-xrhittestresult⑦">XRHitTestResult</a></code>s.</p>
+     <li data-md>
+      <p>For each <var>nativeResult</var> in <var>nativeResults</var>:</p>
+      <ol>
+       <li data-md>
+        <p><a data-link-type="dfn" href="#create-a-hit-test-result" id="ref-for-create-a-hit-test-result">Create a hit test result</a> <var>result</var> from <var>frame</var>, <var>entityTypes</var>, and <var>nativeResult</var>.</p>
+       <li data-md>
+        <p>If <var>result</var> is <code>null</code>, continue to the next entry in <var>nativeResults</var>.</p>
+       <li data-md>
+        <p>Add <var>result</var> to <var>results</var> array.</p>
+      </ol>
+     <li data-md>
+      <p>Set <var>hitTestResult</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestresult-results" id="ref-for-dom-xrtransientinputhittestresult-results②">results</a></code> to <var>results</var>.</p>
+     <li data-md>
+      <p>Return <var>hitTestResult</var>.</p>
+    </ol>
+   </div>
+   <h2 class="heading settled" data-level="5" id="requesting-hit-test"><span class="secno">5. </span><span class="content">Requesting hit test</span><a class="self-link" href="#requesting-hit-test"></a></h2>
+<pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface②"><c- g>XRSession</c-></a> {
+  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource⑨"><c- n>XRHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsource" id="ref-for-dom-xrsession-requesthittestsource"><c- g>requestHitTestSource</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit③"><c- n>XRHitTestOptionsInit</c-></a> <dfn class="idl-code" data-dfn-for="XRSession/requestHitTestSource(options)" data-dfn-type="argument" data-export id="dom-xrsession-requesthittestsource-options-options"><code><c- g>options</c-></code><a class="self-link" href="#dom-xrsession-requesthittestsource-options-options"></a></dfn>);
+  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource⑨"><c- n>XRTransientInputHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsourcefortransientinput" id="ref-for-dom-xrsession-requesthittestsourcefortransientinput"><c- g>requestHitTestSourceForTransientInput</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit③"><c- n>XRTransientInputHitTestOptionsInit</c-></a> <dfn class="idl-code" data-dfn-for="XRSession/requestHitTestSourceForTransientInput(options)" data-dfn-type="argument" data-export id="dom-xrsession-requesthittestsourcefortransientinput-options-options"><code><c- g>options</c-></code><a class="self-link" href="#dom-xrsession-requesthittestsourcefortransientinput-options-options"></a></dfn>);
+};
+</pre>
+   <p>The <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface③">XRSession</a></code> is extended to contain an associated <dfn class="dfn-paneled" data-dfn-for="XRSession" data-dfn-type="dfn" data-noexport id="xrsession-set-of-active-hit-test-sources">set of active hit test sources</dfn> that will be used when computing hit test results.</p>
+   <p>The <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface④">XRSession</a></code> is extended to contain an associated <dfn class="dfn-paneled" data-dfn-for="XRSession" data-dfn-type="dfn" data-noexport id="xrsession-set-of-active-hit-test-sources-for-transient-input">set of active hit test sources for transient input</dfn> that will be used when computing hit test results for transient input.</p>
+   <p>The application can <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="request-hit-test">request hit test</dfn> using <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface⑤">XRSession</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrsession-requesthittestsource" id="ref-for-dom-xrsession-requesthittestsource①">requestHitTestSource()</a></code> method.</p>
+   <div class="algorithm" data-algorithm="request-hit-test-source">
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRSession" data-dfn-type="method" data-export id="dom-xrsession-requesthittestsource"><code>requestHitTestSource(<var>options</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface⑥">XRSession</a></code> <var>session</var>, MUST run the following steps:</p>
+    <ol>
+     <li data-md>
+      <p>Add <a data-link-type="dfn" href="#compute-all-hit-test-results" id="ref-for-compute-all-hit-test-results">compute all hit test results</a> algorithm to <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrsession-list-of-frame-updates" id="ref-for-xrsession-list-of-frame-updates">list of frame updates</a> if it is not already present there.</p>
      <li data-md>
       <p>Let <var>promise</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-new-promise" id="ref-for-a-new-promise">a new Promise</a>.</p>
      <li data-md>
-      <p>Validate that <var>options</var> dictionary contains <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space②">space</a></code> key with a value of type <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace⑤">XRSpace</a></code> - if not, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror">TypeError</a></code> and abort these steps.</p>
+      <p><a data-link-type="dfn" href="#create-a-hit-test-source" id="ref-for-create-a-hit-test-source">Create a hit test source</a>, <var>hitTestSource</var>, with <var>session</var>, <var>options</var>’ <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space②">space</a></code>, <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-entitytypes" id="ref-for-xrhittestoptionsinit-effective-entitytypes①">effective entityTypes</a> and <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-offsetray" id="ref-for-xrhittestoptionsinit-effective-offsetray①">effective offsetRay</a>.</p>
      <li data-md>
-      <p>Initialize <var>space</var> of type <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace⑥">XRSpace</a></code> to the value contained in <var>options</var> dictionary under the <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space③">space</a></code> key.</p>
-     <li data-md>
-      <p>Set <var>entityTypes</var> to <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-entitytypes" id="ref-for-xrhittestoptionsinit-effective-entitytypes①">effective entityTypes</a>.</p>
-     <li data-md>
-      <p>Set <var>offsetRay</var> to <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-offsetray" id="ref-for-xrhittestoptionsinit-effective-offsetray①">effective offsetRay</a>.</p>
-     <li data-md>
-      <p><a data-link-type="dfn" href="#create-a-hit-test-source" id="ref-for-create-a-hit-test-source">Create a hit test source</a>, <var>hitTestSource</var>, with <var>session</var>, <var>space</var>, <var>entityTypes</var> and <var>offsetRay</var>.</p>
-     <li data-md>
-      <p>If <var>hitTestSource</var> is <code>null</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject①">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#operationerror" id="ref-for-operationerror">OperationError</a></code> and abort these steps.</p>
+      <p>If <var>hitTestSource</var> is <code>null</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#operationerror" id="ref-for-operationerror">OperationError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Store created <var>hitTestSource</var> in <var>session</var>’s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources" id="ref-for-xrsession-set-of-active-hit-test-sources②">set of active hit test sources</a>.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve">Resolve</a> <var>promise</var> with created <var>hitTestSource</var>.</p>
     </ol>
    </div>
+   <div class="algorithm" data-algorithm="request-hit-test-source-for-transient-input">
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRSession" data-dfn-type="method" data-export id="dom-xrsession-requesthittestsourcefortransientinput"><code>requestHitTestSourceForTransientInput(<var>options</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface⑦">XRSession</a></code> <var>session</var>, MUST run the following steps:</p>
+    <ol>
+     <li data-md>
+      <p>Add <a data-link-type="dfn" href="#compute-all-hit-test-results" id="ref-for-compute-all-hit-test-results①">compute all hit test results</a> algorithm to <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrsession-list-of-frame-updates" id="ref-for-xrsession-list-of-frame-updates①">list of frame updates</a> if it is not already present there.</p>
+     <li data-md>
+      <p>Let <var>promise</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-new-promise" id="ref-for-a-new-promise①">a new Promise</a>.</p>
+     <li data-md>
+      <p><a data-link-type="dfn" href="#create-a-hit-test-source-for-transient-input" id="ref-for-create-a-hit-test-source-for-transient-input">Create a hit test source for transient input</a>, <var>hitTestSource</var>, with <var>session</var>, <var>options</var>’ <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-profile" id="ref-for-dom-xrtransientinputhittestoptionsinit-profile②">profile</a></code>, <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-entitytypes" id="ref-for-xrhittestoptionsinit-effective-entitytypes②">effective entityTypes</a> and <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-offsetray" id="ref-for-xrhittestoptionsinit-effective-offsetray②">effective offsetRay</a>.</p>
+     <li data-md>
+      <p>If <var>hitTestSource</var> is <code>null</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject①">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#operationerror" id="ref-for-operationerror①">OperationError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>Store created <var>hitTestSource</var> in <var>session</var>’s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources-for-transient-input" id="ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input②">set of active hit test sources for transient input</a>.</p>
+     <li data-md>
+      <p><a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①">Resolve</a> <var>promise</var> with created <var>hitTestSource</var>.</p>
+    </ol>
+   </div>
    <h2 class="heading settled" data-level="6" id="computing-hit-test-results"><span class="secno">6. </span><span class="content">Computing hit test results</span><a class="self-link" href="#computing-hit-test-results"></a></h2>
-   <p>Every time the user agent processes <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-animation-frame" id="ref-for-xr-animation-frame">XR animation frame</a> for <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface⑤">XRSession</a></code>, it needs to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="compute-hit-test-results">compute hit test results</dfn>. This MUST happen prior to invoking any of the callbacks from <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#list-of-animation-frame-callbacks" id="ref-for-list-of-animation-frame-callbacks">list of animation frame callbacks</a> of a given <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface⑥">XRSession</a></code>.</p>
+   <div class="algorithm" data-algorithm="compute-all-hit-test-results">
+    <p>In order to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="compute-all-hit-test-results">compute all hit test results</dfn> for a given <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface④">XRFrame</a></code> <var>frame</var>, the user agent MUST perform the following steps:</p>
+    <ol>
+     <li data-md>
+      <p>Invoke <a data-link-type="dfn" href="#compute-hit-test-results" id="ref-for-compute-hit-test-results">compute hit test results</a> algorithm with <var>frame</var>.</p>
+     <li data-md>
+      <p>Invoke <a data-link-type="dfn" href="#compute-hit-test-results-for-transient-input" id="ref-for-compute-hit-test-results-for-transient-input">compute hit test results for transient input</a> algorithm with <var>frame</var>.</p>
+    </ol>
+   </div>
    <div class="algorithm" data-algorithm="compute-hit-test-results">
-    <p>In order to <a data-link-type="dfn" href="#compute-hit-test-results" id="ref-for-compute-hit-test-results①">compute hit test results</a> for a given <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface④">XRFrame</a></code> <var>frame</var>, for each hit test source, <var>hitTestSource</var>, that is present in <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#dom-xrframe-session" id="ref-for-dom-xrframe-session①">session</a></code>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources" id="ref-for-xrsession-set-of-active-hit-test-sources③">set of active hit test sources</a>, the user agent MUST perform the following steps:</p>
+    <p>In order to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="compute-hit-test-results">compute hit test results</dfn> for a given <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑤">XRFrame</a></code> <var>frame</var>, for each hit test source, <var>hitTestSource</var>, that is present in <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#dom-xrframe-session" id="ref-for-dom-xrframe-session①">session</a></code>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources" id="ref-for-xrsession-set-of-active-hit-test-sources③">set of active hit test sources</a>, the user agent MUST perform the following steps:</p>
     <ol>
      <li data-md>
       <p>Let <var>entityTypes</var> be the <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrhittestsource-entity-types" id="ref-for-xrhittestsource-entity-types①">entity types</a>.</p>
@@ -1770,14 +1889,14 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p>Query the <var>device</var>’s tracking system for <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrhittestsource-native-origin" id="ref-for-xrhittestsource-native-origin①">native origin</a>'s latest <var>coordinates</var>.</p>
      <li data-md>
-      <p>Interpret <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrhittestsource-offset-ray" id="ref-for-xrhittestsource-offset-ray①">offset ray</a>, <var>offsetRay</var>, as if expressed relative to <var>coordinates</var> and using that interpretation, perform <a data-link-type="dfn" href="#native-hit-test" id="ref-for-native-hit-test">native hit test</a> obtaining <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result①">native hit test results</a> <var>nativeResults</var>.</p>
+      <p>Interpret <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrhittestsource-offset-ray" id="ref-for-xrhittestsource-offset-ray①">offset ray</a>, <var>offsetRay</var>, as if expressed relative to <var>coordinates</var> and using that interpretation, perform <a data-link-type="dfn" href="#native-hit-test" id="ref-for-native-hit-test">native hit test</a> obtaining <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result②">native hit test results</a> <var>nativeResults</var>.</p>
      <li data-md>
       <p>Let <var>hitTestResults</var> be an empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list">list</a>.</p>
      <li data-md>
-      <p>Given the <var>frame</var> and <var>entityTypes</var>, for each native hit test result <var>nativeResult</var> in <var>nativeResults</var>, perform the following steps:</p>
+      <p>For each native hit test result <var>nativeResult</var> in <var>nativeResults</var>, perform the following steps:</p>
       <ol>
        <li data-md>
-        <p><a data-link-type="dfn" href="#create-a-hit-test-result" id="ref-for-create-a-hit-test-result">Create a hit test result</a>, <var>hitTestResult</var>.</p>
+        <p><a data-link-type="dfn" href="#create-a-hit-test-result" id="ref-for-create-a-hit-test-result①">Create a hit test result</a>, <var>hitTestResult</var> from <var>frame</var>, <var>entityTypes</var>, and <var>nativeResult</var>.</p>
        <li data-md>
         <p>If <var>hitTestResult</var> is <code>null</code>, continue to the next entry in <var>nativeResults</var>.</p>
        <li data-md>
@@ -1787,36 +1906,91 @@ Parts of this work may be from another specification document.  If so, those par
       <p>Store <var>hitTestResults</var> in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results">map of hit test sources to hit test results</a> under the <var>hitTestSource</var> key.</p>
     </ol>
    </div>
-   <h2 class="heading settled" data-level="7" id="obtaining-hit-test-results"><span class="secno">7. </span><span class="content">Obtaining hit test results</span><a class="self-link" href="#obtaining-hit-test-results"></a></h2>
-   <p>The application can <dfn data-dfn-type="dfn" data-noexport id="obtain-hit-test-results">obtain hit test results<a class="self-link" href="#obtain-hit-test-results"></a></dfn> from an <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource①②">XRHitTestSource</a></code> by using <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑤">XRFrame</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrframe-gethittestresults" id="ref-for-dom-xrframe-gethittestresults①">getHitTestResults()</a></code> method.</p>
-   <div class="algorithm" data-algorithm="obtain-hit-test-results">
-    <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="XRFrame" data-dfn-type="method" data-export id="dom-xrframe-gethittestresults"><code>getHitTestResults(<var>hitTestSource</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑥">XRFrame</a></code> <var>frame</var>, the user agent   MUST run the following steps:</p>
+   <div class="algorithm" data-algorithm="compute-hit-test-results-for-transient-input">
+    <p>In order to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="compute-hit-test-results-for-transient-input">compute hit test results for transient input</dfn> for a given <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑥">XRFrame</a></code> <var>frame</var>, for each hit test source, <var>hitTestSource</var>, that is present in <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#dom-xrframe-session" id="ref-for-dom-xrframe-session③">session</a></code>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources-for-transient-input" id="ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input③">set of active hit test sources for transient input</a>, the user agent MUST perform the following steps:</p>
     <ol>
      <li data-md>
-      <p>Look up an entry for <var>hitTestSource</var> in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results①">map of hit test sources to hit test results</a> and assign it to <var>results</var>.</p>
+      <p>Let <var>entityTypes</var> be the <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrtransientinputhittestsource-entity-types" id="ref-for-xrtransientinputhittestsource-entity-types①">entity types</a>.</p>
+     <li data-md>
+      <p>Let <var>session</var> be <var>frame</var>’s <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#dom-xrframe-session" id="ref-for-dom-xrframe-session④">session</a></code>.</p>
+     <li data-md>
+      <p>Let <var>device</var> be the <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrsession-xr-device" id="ref-for-xrsession-xr-device②">XR device</a>.</p>
+     <li data-md>
+      <p>Let <var>candidateInputSources</var> be a set of all <var>session</var>’s input sources contained in <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#list-of-active-xr-input-sources" id="ref-for-list-of-active-xr-input-sources">list of active XR input sources</a> that are considered transient.</p>
+     <li data-md>
+      <p>Let <var>matchingInputSources</var> be a set of all input sources contained in <var>candidateInputSources</var> whose <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#dom-xrinputsource-profiles" id="ref-for-dom-xrinputsource-profiles">profiles</a></code> array contain an entry equal to <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrtransientinputhittestsource-profile" id="ref-for-xrtransientinputhittestsource-profile①">profile</a>.</p>
+     <li data-md>
+      <p>Let <var>hitTestResults</var> be an empty array of XRTransientInputHitTestResults.</p>
+     <li data-md>
+      <p>For each transient input source <var>inputSource</var> in <var>matchingInputSources</var>:</p>
+      <ol>
+       <li data-md>
+        <p>Query the <var>device</var>’s tracking system for <var>inputSource</var>’s <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#dom-xrinputsource-targetrayspace" id="ref-for-dom-xrinputsource-targetrayspace">targetRaySpace</a></code>'s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrspace-native-origin" id="ref-for-xrspace-native-origin④">native origin</a>'s latest <var>coordinates</var>.</p>
+       <li data-md>
+        <p>Interpret <var>hitTestSource</var>’s <a data-link-type="dfn" href="#xrtransientinputhittestsource-offset-ray" id="ref-for-xrtransientinputhittestsource-offset-ray①">offset ray</a>, as if expressed relative to <var>coordinates</var> and using that interpretation, perform <a data-link-type="dfn" href="#native-hit-test" id="ref-for-native-hit-test①">native hit test</a> obtaining <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result③">native hit test results</a> <var>nativeResults</var>.</p>
+       <li data-md>
+        <p><a data-link-type="dfn" href="#create-a-hit-test-result-for-transient-input" id="ref-for-create-a-hit-test-result-for-transient-input">Create a hit test result for transient input</a>, <var>hitTestResult</var> from <var>frame</var>, <var>inputSource</var>, <var>entityTypes</var>, and <var>nativeResults</var>.</p>
+       <li data-md>
+        <p>Add <var>hitTestResult</var> to <var>hitTestResults</var> array.</p>
+      </ol>
+     <li data-md>
+      <p>Store <var>hitTestResults</var> in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input">map of hit test sources to hit test results for transient input</a> under the <var>hitTestSource</var> key.</p>
+    </ol>
+   </div>
+   <h2 class="heading settled" data-level="7" id="obtaining-hit-test-results"><span class="secno">7. </span><span class="content">Obtaining hit test results</span><a class="self-link" href="#obtaining-hit-test-results"></a></h2>
+<pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑦"><c- g>XRFrame</c-></a> {
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult" id="ref-for-xrhittestresult⑧"><c- n>XRHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresults" id="ref-for-dom-xrframe-gethittestresults"><c- g>getHitTestResults</c-></a>(<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource①⓪"><c- n>XRHitTestSource</c-></a> <dfn class="idl-code" data-dfn-for="XRFrame/getHitTestResults(hitTestSource)" data-dfn-type="argument" data-export id="dom-xrframe-gethittestresults-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code><a class="self-link" href="#dom-xrframe-gethittestresults-hittestsource-hittestsource"></a></dfn>);
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestresult" id="ref-for-xrtransientinputhittestresult③"><c- n>XRTransientInputHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresultsfortransientinput" id="ref-for-dom-xrframe-gethittestresultsfortransientinput"><c- g>getHitTestResultsForTransientInput</c-></a>(<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource①⓪"><c- n>XRTransientInputHitTestSource</c-></a> <dfn class="idl-code" data-dfn-for="XRFrame/getHitTestResultsForTransientInput(hitTestSource)" data-dfn-type="argument" data-export id="dom-xrframe-gethittestresultsfortransientinput-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code><a class="self-link" href="#dom-xrframe-gethittestresultsfortransientinput-hittestsource-hittestsource"></a></dfn>);
+};
+</pre>
+   <p>The <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑧">XRFrame</a></code> is extended to contain an associated <dfn class="dfn-paneled" data-dfn-for="XRFrame" data-dfn-type="dfn" data-noexport id="xrframe-map-of-hit-test-sources-to-hit-test-results">map of hit test sources to hit test results</dfn> that stores a mapping from <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource①①">XRHitTestSource</a></code> to an array of <a class="idl-code" data-link-type="interface" href="#xrhittestresult" id="ref-for-xrhittestresult⑨">XRHitTestResults</a>.</p>
+   <p>The <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑨">XRFrame</a></code> is extended to contain an associated <dfn class="dfn-paneled" data-dfn-for="XRFrame" data-dfn-type="dfn" data-noexport id="xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input">map of hit test sources to hit test results for transient input</dfn> that stores a mapping from <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource①①">XRTransientInputHitTestSource</a></code> to an array of <a class="idl-code" data-link-type="interface" href="#xrtransientinputhittestresult" id="ref-for-xrtransientinputhittestresult④">XRTransientInputHitTestResults</a>.</p>
+   <p>The application can <dfn data-dfn-type="dfn" data-noexport id="obtain-hit-test-results">obtain hit test results<a class="self-link" href="#obtain-hit-test-results"></a></dfn> from an <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource①②">XRHitTestSource</a></code> by using <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface①⓪">XRFrame</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrframe-gethittestresults" id="ref-for-dom-xrframe-gethittestresults①">getHitTestResults()</a></code> method.</p>
+   <div class="algorithm" data-algorithm="obtain-hit-test-results">
+    <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="XRFrame" data-dfn-type="method" data-export id="dom-xrframe-gethittestresults"><code>getHitTestResults(<var>hitTestSource</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface①①">XRFrame</a></code> <var>frame</var>, the user agent MUST run the following steps:</p>
+    <ol>
+     <li data-md>
+      <p>If <var>frame</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrframe-active" id="ref-for-xrframe-active①">active</a> boolean is <code>false</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror③">InvalidStateError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>Check that the entry for <var>hitTestSource</var> is present in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results①">map of hit test sources to hit test results</a>. If the entry is not present, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror④">InvalidStateError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>Look up an entry for <var>hitTestSource</var> in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results②">map of hit test sources to hit test results</a> and assign it to <var>results</var>.</p>
      <li data-md>
       <p>Return <var>results</var>.</p>
     </ol>
    </div>
-   <p class="issue" id="issue-e3d68193"><a class="self-link" href="#issue-e3d68193"></a> Improve - this probably needs to ensure that frame is active, etc.</p>
+   <p>The application can <dfn data-dfn-type="dfn" data-noexport id="obtain-hit-test-results-for-transient-input">obtain hit test results for transient input<a class="self-link" href="#obtain-hit-test-results-for-transient-input"></a></dfn> from an <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource①②">XRTransientInputHitTestSource</a></code> by using <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface①②">XRFrame</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrframe-gethittestresultsfortransientinput" id="ref-for-dom-xrframe-gethittestresultsfortransientinput①">getHitTestResultsForTransientInput()</a></code> method.</p>
+   <div class="algorithm" data-algorithm="obtain-hit-test-results-for-transient-input">
+    <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="XRFrame" data-dfn-type="method" data-export id="dom-xrframe-gethittestresultsfortransientinput"><code>getHitTestResultsForTransientInput(<var>hitTestSource</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface①③">XRFrame</a></code> <var>frame</var>, the user agent MUST run the following steps:</p>
+    <ol>
+     <li data-md>
+      <p>If <var>frame</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrframe-active" id="ref-for-xrframe-active②">active</a> boolean is <code>false</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑤">InvalidStateError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>Check that the entry for <var>hitTestSource</var> is present in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input①">map of hit test sources to hit test results for transient input</a>. If the entry is not present, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑥">InvalidStateError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>Look up an entry for <var>hitTestSource</var> in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input②">map of hit test sources to hit test results for transient input</a> and assign it to <var>results</var>.</p>
+     <li data-md>
+      <p>Return <var>results</var>.</p>
+    </ol>
+   </div>
    <h2 class="heading settled" data-level="8" id="geometric-primitives"><span class="secno">8. </span><span class="content">Geometric primitives</span><a class="self-link" href="#geometric-primitives"></a></h2>
    <h3 class="heading settled" data-level="8.1" id="xrray-interface"><span class="secno">8.1. </span><span class="content">XRRay</span><a class="self-link" href="#xrray-interface"></a></h3>
-   <p>An <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray④">XRRay</a></code> is a geometric ray described by an <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin">origin</a></code> point and <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction">direction</a></code> vector.</p>
-   <p>An <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑤">XRRay</a></code> contains a <dfn class="dfn-paneled" data-dfn-for="XRRay" data-dfn-type="dfn" data-noexport id="xrray-matrix">matrix</dfn> which is a <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#matrix" id="ref-for-matrix">matrix</a>.</p>
-<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext②"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②"><c- g>Exposed</c-></a>=<c- n>Window</c->,
- <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray①"><c- g>Constructor</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit"><c- n>DOMPointInit</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(origin, direction)" data-dfn-type="argument" data-export id="dom-xrray-xrray-origin-direction-origin"><code><c- g>origin</c-></code><a class="self-link" href="#dom-xrray-xrray-origin-direction-origin"></a></dfn>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit①"><c- n>DOMPointInit</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(origin, direction)" data-dfn-type="argument" data-export id="dom-xrray-xrray-origin-direction-direction"><code><c- g>direction</c-></code><a class="self-link" href="#dom-xrray-xrray-origin-direction-direction"></a></dfn>),
+   <p>An <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑧">XRRay</a></code> is a geometric ray described by an <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin">origin</a></code> point and <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction">direction</a></code> vector.</p>
+   <p>An <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑨">XRRay</a></code> contains a <dfn class="dfn-paneled" data-dfn-for="XRRay" data-dfn-type="dfn" data-noexport id="xrray-matrix">matrix</dfn> which is a <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#matrix" id="ref-for-matrix">matrix</a>.</p>
+<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext④"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>Window</c->,
+ <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray②"><c- g>Constructor</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit"><c- n>DOMPointInit</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(origin, direction)" data-dfn-type="argument" data-export id="dom-xrray-xrray-origin-direction-origin"><code><c- g>origin</c-></code><a class="self-link" href="#dom-xrray-xrray-origin-direction-origin"></a></dfn>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit①"><c- n>DOMPointInit</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(origin, direction)" data-dfn-type="argument" data-export id="dom-xrray-xrray-origin-direction-direction"><code><c- g>direction</c-></code><a class="self-link" href="#dom-xrray-xrray-origin-direction-direction"></a></dfn>),
  <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray-transform" id="ref-for-dom-xrray-xrray-transform"><c- g>Constructor</c-></a>(<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webxr/#xrrigidtransform-interface" id="ref-for-xrrigidtransform-interface"><c- n>XRRigidTransform</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(transform)" data-dfn-type="argument" data-export id="dom-xrray-xrray-transform-transform"><code><c- g>transform</c-></code><a class="self-link" href="#dom-xrray-xrray-transform-transform"></a></dfn>)]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="xrray"><code><c- g>XRRay</c-></code></dfn> {
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin①"><c- g>origin</c-></a>;
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly①"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction①"><c- g>direction</c-></a>;
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject②"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-Float32Array" id="ref-for-idl-Float32Array"><c- b>Float32Array</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Float32Array" href="#dom-xrray-matrix" id="ref-for-dom-xrray-matrix"><c- g>matrix</c-></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin①"><c- g>origin</c-></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject②"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly①"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction①"><c- g>direction</c-></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject③"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-Float32Array" id="ref-for-idl-Float32Array"><c- b>Float32Array</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Float32Array" href="#dom-xrray-matrix" id="ref-for-dom-xrray-matrix"><c- g>matrix</c-></a>;
 };
 </pre>
    <div class="algorithm" data-algorithm="construct-ray-origin-direction">
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="constructor" data-export data-lt="XRRay(origin, direction)|XRRay(origin)|XRRay()" id="dom-xrray-xrray"><code>XRRay(<var>origin</var>, <var>direction</var>)</code></dfn> constructor MUST perform the following steps when invoked:</p>
     <ol>
      <li data-md>
-      <p>Let <var>ray</var> be a new <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑥">XRRay</a></code>.</p>
+      <p>Let <var>ray</var> be a new <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①⓪">XRRay</a></code>.</p>
      <li data-md>
       <p>Initialize <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin②">origin</a></code> to <code>{ x: 0.0, y: 0.0, z: 0.0, w: 1.0 }</code>.</p>
      <li data-md>
@@ -1837,7 +2011,7 @@ Parts of this work may be from another specification document.  If so, those par
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="constructor" data-export id="dom-xrray-xrray-transform"><code>XRRay(<var>transform</var>)</code></dfn> constructor MUST perform the following steps when invoked:</p>
     <ol>
      <li data-md>
-      <p>Let <var>ray</var> be a new <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑦">XRRay</a></code>.</p>
+      <p>Let <var>ray</var> be a new <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①①">XRRay</a></code>.</p>
      <li data-md>
       <p>Initialize <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin④">origin</a></code> to <code>{ x: 0.0, y: 0.0, z: 0.0, w: 1.0 }</code>.</p>
      <li data-md>
@@ -1854,10 +2028,10 @@ Parts of this work may be from another specification document.  If so, those par
    </div>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="attribute" data-export id="dom-xrray-origin"><code>origin</code></dfn> attribute defines the 3-dimensional point in space that the ray originates from, given in meters. The <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin⑥">origin</a></code>'s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-w" id="ref-for-dom-dompointreadonly-w">w</a></code> attribute MUST be <code>1.0</code>.</p>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="attribute" data-export id="dom-xrray-direction"><code>direction</code></dfn> attribute defines the ray’s 3-dimensional directional vector. The <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction⑧">direction</a></code>'s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-w" id="ref-for-dom-dompointreadonly-w①">w</a></code> attribute MUST be <code>0.0</code> and the vector MUST be normalized to have a length of <code>1.0</code>.</p>
-   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="attribute" data-export id="dom-xrray-matrix"><code>matrix</code></dfn> attribute is a <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#matrix" id="ref-for-matrix①">matrix</a> which represents a transform that can be used to position objects along the <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑧">XRRay</a></code>. It is a transform from a ray originating at <code>[0, 0, 0]</code> and extending down the negative Z axis to the ray described by the <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑨">XRRay</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin⑦">origin</a></code> and <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction⑨">direction</a></code>. Such a matrix MUST be one that has a rotation component which leaves any vector perpendicular to <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction①⓪">direction</a></code> and the <code>Z</code> axis unchanged. This attribute MUST be computed by <a data-link-type="dfn" href="#xrray-obtain-the-matrix" id="ref-for-xrray-obtain-the-matrix">obtaining the matrix</a> for the <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①⓪">XRRay</a></code>. This attribute SHOULD be lazily evaluated.</p>
-   <p class="note" role="note"><span>Note:</span> The <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①①">XRRay</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrray-matrix" id="ref-for-dom-xrray-matrix①">matrix</a></code> can be used to easily position graphical representations of the ray when rendering.</p>
+   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="attribute" data-export id="dom-xrray-matrix"><code>matrix</code></dfn> attribute is a <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#matrix" id="ref-for-matrix①">matrix</a> which represents a transform that can be used to position objects along the <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①②">XRRay</a></code>. It is a transform from a ray originating at <code>[0, 0, 0]</code> and extending down the negative Z axis to the ray described by the <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①③">XRRay</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin⑦">origin</a></code> and <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction⑨">direction</a></code>. Such a matrix MUST be one that has a rotation component which leaves any vector perpendicular to <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction①⓪">direction</a></code> and the <code>Z</code> axis unchanged. This attribute MUST be computed by <a data-link-type="dfn" href="#xrray-obtain-the-matrix" id="ref-for-xrray-obtain-the-matrix">obtaining the matrix</a> for the <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①④">XRRay</a></code>. This attribute SHOULD be lazily evaluated.</p>
+   <p class="note" role="note"><span>Note:</span> The <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①⑤">XRRay</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrray-matrix" id="ref-for-dom-xrray-matrix①">matrix</a></code> can be used to easily position graphical representations of the ray when rendering.</p>
    <div class="algorithm" data-algorithm="obtain-ray-matrix">
-    <p>To <dfn class="dfn-paneled" data-dfn-for="XRRay" data-dfn-type="dfn" data-noexport id="xrray-obtain-the-matrix">obtain the matrix</dfn> for a given <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①②">XRRay</a></code> <var>ray</var></p>
+    <p>To <dfn class="dfn-paneled" data-dfn-for="XRRay" data-dfn-type="dfn" data-noexport id="xrray-obtain-the-matrix">obtain the matrix</dfn> for a given <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①⑥">XRRay</a></code> <var>ray</var></p>
     <ol>
      <li data-md>
       <p>If <var>ray</var>’s <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix①">matrix</a> is not <code>null</code>, perform the following steps:</p>
@@ -1892,7 +2066,7 @@ Parts of this work may be from another specification document.  If so, those par
     </ol>
    </div>
    <div class="algorithm" data-algorithm="distance-along-ray">
-    <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="distance-along-the-ray">distance along the ray</dfn>, <var>distance</var>, from <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①③">XRRay</a></code> <var>ray</var> to any entity <var>entity</var> is defined such that <code><var>ray</var>.origin + <var>ray</var>.direction * <var>distance</var></code> results in a point beloning to the entity <var>entity</var>, <var>distance</var> is non-negative, and there does not exist a smaller value of <var>distance</var> for the above predicate to still hold. It is up to the <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-device" id="ref-for-xr-device①">XR device</a> to define the meaning of "point belonging to an entity".</p>
+    <p>The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="distance-along-the-ray">distance along the ray</dfn>, <var>distance</var>, from <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①⑦">XRRay</a></code> <var>ray</var> to any entity <var>entity</var> is defined such that <code><var>ray</var>.origin + <var>ray</var>.direction * <var>distance</var></code> results in a point beloning to the entity <var>entity</var>, <var>distance</var> is non-negative, and there does not exist a smaller value of <var>distance</var> for the above predicate to still hold. It is up to the <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-device" id="ref-for-xr-device①">XR device</a> to define the meaning of "point belonging to an entity".</p>
    </div>
    <h2 class="heading settled" data-level="9" id="native-device-concepts"><span class="secno">9. </span><span class="content">Native device concepts</span><a class="self-link" href="#native-device-concepts"></a></h2>
    <section class="non-normative">
@@ -1908,7 +2082,7 @@ Parts of this work may be from another specification document.  If so, those par
    </ul>
    <p class="note" role="note"><span>Note:</span> For devices that do not expose the hit test functionality natively, it might still be possible for user agents to implement this specification by leveraging other ways of obtaining the information about user’s environment that might be exposed by the XR device.</p>
    <h3 class="heading settled" data-level="9.2" id="native-entity-type-section"><span class="secno">9.2. </span><span class="content">Native entity type</span><a class="self-link" href="#native-entity-type-section"></a></h3>
-   <p><a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result②">Native hit test results</a> returned by <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-device" id="ref-for-xr-device③">XR device</a> should contain information about the <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="native entity type" data-noexport id="native-entity-type">type of the entity</dfn> used to compute the result. Such native types might consist of, but not be limited to:</p>
+   <p><a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result④">Native hit test results</a> returned by <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-device" id="ref-for-xr-device③">XR device</a> should contain information about the <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="native entity type" data-noexport id="native-entity-type">type of the entity</dfn> used to compute the result. Such native types might consist of, but not be limited to:</p>
    <ul>
     <li data-md>
      <p>Point - signifies that hit test result was computed based on characteristic points found in user’s environment.</p>
@@ -1918,19 +2092,19 @@ Parts of this work may be from another specification document.  If so, those par
      <p>Mesh - signifies that the hit test result was computed based on meshes detected in user’s environment.</p>
    </ul>
    <div class="algorithm" data-algorithm="convert-native-type-to-trackable-type">
-    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="convert-from-native-entity-type">convert from native entity type</dfn> into <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑤">XRHitTestTrackableType</a></code>, the user agent MUST run the following steps:</p>
+    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="convert-from-native-entity-type">convert from native entity type</dfn> into <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑨">XRHitTestTrackableType</a></code>, the user agent MUST run the following steps:</p>
     <ol>
      <li data-md>
       <p>Let <var>nativeEntityType</var> be the native entity type to be converted.</p>
      <li data-md>
-      <p>Let <var>entityType</var> be a new <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑥">XRHitTestTrackableType</a></code>.</p>
+      <p>Let <var>entityType</var> be a new <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype①⓪">XRHitTestTrackableType</a></code>.</p>
      <li data-md>
       <p>Initialize <var>entityType</var> as follows:</p>
       <dl class="switch">
        <dt>If <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point①">"point"</a></code>
        <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point②">"point"</a></code>.
-       <dt>Else, if <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane②">"plane"</a></code>
-       <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane③">"plane"</a></code>.
+       <dt>Else, if <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane③">"plane"</a></code>
+       <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane④">"plane"</a></code>.
        <dt>Else, if <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh①">"mesh"</a></code>
        <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh②">"mesh"</a></code>.
        <dt>Else
@@ -1942,7 +2116,7 @@ Parts of this work may be from another specification document.  If so, those par
    </div>
    <h3 class="heading settled" data-level="9.3" id="native-hit-test-result-section"><span class="secno">9.3. </span><span class="content">Native hit test result</span><a class="self-link" href="#native-hit-test-result-section"></a></h3>
    <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="native hit test result|native hit test results" data-noexport id="native-hit-test-result">Native hit test results</dfn> returned from XR device should contain the position of the intersection point with user’s environment. Depending on the native entity type and the information available to the XR device, the result should also contain orientation defined in such a way to allow the user agent to compute a surface normal to the user’s environment at the intersection point.</p>
-   <p>The information about position and orientation of the intersection point should be contained in <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result③">native hit test result</a>'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface’s normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector).</p>
+   <p>The information about position and orientation of the intersection point should be contained in <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result⑤">native hit test result</a>'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface’s normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector).</p>
    <p class="issue" id="issue-4d2e55aa"><a class="self-link" href="#issue-4d2e55aa"></a> Decide if we need to specify other axes of the coordinate system defined by hit test result’s native origin to maintain compatibility between different implementations &amp; differrent AR frameworks.</p>
    <h2 class="heading settled" data-level="10" id="ack"><span class="secno">10. </span><span class="content">Acknowledgements</span><a class="self-link" href="#ack"></a></h2>
    <p>The following individuals have contributed to the design of the WebXR Hit Test specification:</p>
@@ -2096,23 +2270,66 @@ Parts of this work may be from another specification document.  If so, those par
   <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
   <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
   <ul class="index">
-   <li><a href="#xrhittestsource-active">active</a><span>, in §3.1</span>
-   <li><a href="#dom-xrhittestsource-cancel">cancel()</a><span>, in §3.1</span>
+   <li>
+    active
+    <ul>
+     <li><a href="#xrhittestsource-active">dfn for XRHitTestSource</a><span>, in §3.1</span>
+     <li><a href="#xrtransientinputhittestsource-active">dfn for XRTransientInputHitTestSource</a><span>, in §3.2</span>
+    </ul>
+   <li>
+    cancel()
+    <ul>
+     <li><a href="#dom-xrhittestsource-cancel">method for XRHitTestSource</a><span>, in §3.1</span>
+     <li><a href="#dom-xrtransientinputhittestsource-cancel">method for XRTransientInputHitTestSource</a><span>, in §3.2</span>
+    </ul>
    <li><a href="#cancel-a-hit-test-source">cancel a hit test source</a><span>, in §3.1</span>
+   <li><a href="#cancel-a-hit-test-source-for-transient-input">cancel a hit test source for transient input</a><span>, in §3.2</span>
+   <li><a href="#compute-all-hit-test-results">compute all hit test results</a><span>, in §6</span>
    <li><a href="#compute-hit-test-results">compute hit test results</a><span>, in §6</span>
+   <li><a href="#compute-hit-test-results-for-transient-input">compute hit test results for transient input</a><span>, in §6</span>
    <li><a href="#convert-from-native-entity-type">convert from native entity type</a><span>, in §9.2</span>
    <li><a href="#create-a-hit-test-result">create a hit test result</a><span>, in §4.1</span>
+   <li><a href="#create-a-hit-test-result-for-transient-input">create a hit test result for transient input</a><span>, in §4.2</span>
    <li><a href="#create-a-hit-test-source">create a hit test source</a><span>, in §3.1</span>
+   <li><a href="#create-a-hit-test-source-for-transient-input">create a hit test source for transient input</a><span>, in §3.2</span>
    <li><a href="#dom-xrray-direction">direction</a><span>, in §8.1</span>
    <li><a href="#distance-along-the-ray">distance along the ray</a><span>, in §8.1</span>
-   <li><a href="#xrhittestoptionsinit-effective-entitytypes">effective entityTypes</a><span>, in §2.2</span>
-   <li><a href="#xrhittestoptionsinit-effective-offsetray">effective offsetRay</a><span>, in §2.2</span>
-   <li><a href="#xrhittestsource-entity-types">entity types</a><span>, in §3.1</span>
-   <li><a href="#dom-xrhittestoptionsinit-entitytypes">entityTypes</a><span>, in §2.2</span>
-   <li><a href="#xrhittestresult-frame">frame</a><span>, in §4.1</span>
+   <li>
+    effective entityTypes
+    <ul>
+     <li><a href="#xrhittestoptionsinit-effective-entitytypes">dfn for XRHitTestOptionsInit</a><span>, in §2.2</span>
+     <li><a href="#xrtransientinputhittestoptionsinit-effective-entitytypes">dfn for XRTransientInputHitTestOptionsInit</a><span>, in §2.3</span>
+    </ul>
+   <li>
+    effective offsetRay
+    <ul>
+     <li><a href="#xrhittestoptionsinit-effective-offsetray">dfn for XRHitTestOptionsInit</a><span>, in §2.2</span>
+     <li><a href="#xrtransientinputhittestoptionsinit-effective-offsetray">dfn for XRTransientInputHitTestOptionsInit</a><span>, in §2.3</span>
+    </ul>
+   <li>
+    entity types
+    <ul>
+     <li><a href="#xrhittestsource-entity-types">dfn for XRHitTestSource</a><span>, in §3.1</span>
+     <li><a href="#xrtransientinputhittestsource-entity-types">dfn for XRTransientInputHitTestSource</a><span>, in §3.2</span>
+    </ul>
+   <li>
+    entityTypes
+    <ul>
+     <li><a href="#dom-xrhittestoptionsinit-entitytypes">dict-member for XRHitTestOptionsInit</a><span>, in §2.2</span>
+     <li><a href="#dom-xrtransientinputhittestoptionsinit-entitytypes">dict-member for XRTransientInputHitTestOptionsInit</a><span>, in §2.3</span>
+    </ul>
+   <li>
+    frame
+    <ul>
+     <li><a href="#xrhittestresult-frame">dfn for XRHitTestResult</a><span>, in §4.1</span>
+     <li><a href="#xrtransientinputhittestresult-frame">dfn for XRTransientInputHitTestResult</a><span>, in §4.2</span>
+    </ul>
+   <li><a href="#dom-xrframe-gethittestresultsfortransientinput">getHitTestResultsForTransientInput(hitTestSource)</a><span>, in §7</span>
    <li><a href="#dom-xrframe-gethittestresults">getHitTestResults(hitTestSource)</a><span>, in §7</span>
    <li><a href="#dom-xrhittestresult-getpose">getPose(baseSpace)</a><span>, in §4.1</span>
-   <li><a href="#xrframe-map-of-hit-test-sources-to-hit-test-results">map of hit test sources to hit test results</a><span>, in §5</span>
+   <li><a href="#dom-xrtransientinputhittestresult-inputsource">inputSource</a><span>, in §4.2</span>
+   <li><a href="#xrframe-map-of-hit-test-sources-to-hit-test-results">map of hit test sources to hit test results</a><span>, in §7</span>
+   <li><a href="#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input">map of hit test sources to hit test results for transient input</a><span>, in §7</span>
    <li>
     matrix
     <ul>
@@ -2131,16 +2348,41 @@ Parts of this work may be from another specification document.  If so, those par
      <li><a href="#xrhittestsource-native-origin">dfn for XRHitTestSource</a><span>, in §3.1</span>
     </ul>
    <li><a href="#obtain-hit-test-results">obtain hit test results</a><span>, in §7</span>
+   <li><a href="#obtain-hit-test-results-for-transient-input">obtain hit test results for transient input</a><span>, in §7</span>
    <li><a href="#xrray-obtain-the-matrix">obtain the matrix</a><span>, in §8.1</span>
-   <li><a href="#xrhittestsource-offset-ray">offset ray</a><span>, in §3.1</span>
-   <li><a href="#dom-xrhittestoptionsinit-offsetray">offsetRay</a><span>, in §2.2</span>
+   <li>
+    offset ray
+    <ul>
+     <li><a href="#xrhittestsource-offset-ray">dfn for XRHitTestSource</a><span>, in §3.1</span>
+     <li><a href="#xrtransientinputhittestsource-offset-ray">dfn for XRTransientInputHitTestSource</a><span>, in §3.2</span>
+    </ul>
+   <li>
+    offsetRay
+    <ul>
+     <li><a href="#dom-xrhittestoptionsinit-offsetray">dict-member for XRHitTestOptionsInit</a><span>, in §2.2</span>
+     <li><a href="#dom-xrtransientinputhittestoptionsinit-offsetray">dict-member for XRTransientInputHitTestOptionsInit</a><span>, in §2.3</span>
+    </ul>
    <li><a href="#dom-xrray-origin">origin</a><span>, in §8.1</span>
    <li><a href="#dom-xrhittesttrackabletype-plane">"plane"</a><span>, in §2.1</span>
    <li><a href="#dom-xrhittesttrackabletype-point">"point"</a><span>, in §2.1</span>
+   <li>
+    profile
+    <ul>
+     <li><a href="#xrtransientinputhittestsource-profile">dfn for XRTransientInputHitTestSource</a><span>, in §3.2</span>
+     <li><a href="#dom-xrtransientinputhittestoptionsinit-profile">dict-member for XRTransientInputHitTestOptionsInit</a><span>, in §2.3</span>
+    </ul>
    <li><a href="#request-hit-test">request hit test</a><span>, in §5</span>
+   <li><a href="#dom-xrsession-requesthittestsourcefortransientinput">requestHitTestSourceForTransientInput(options)</a><span>, in §5</span>
    <li><a href="#dom-xrsession-requesthittestsource">requestHitTestSource(options)</a><span>, in §5</span>
-   <li><a href="#xrhittestsource-session">session</a><span>, in §3.1</span>
+   <li><a href="#dom-xrtransientinputhittestresult-results">results</a><span>, in §4.2</span>
+   <li>
+    session
+    <ul>
+     <li><a href="#xrhittestsource-session">dfn for XRHitTestSource</a><span>, in §3.1</span>
+     <li><a href="#xrtransientinputhittestsource-session">dfn for XRTransientInputHitTestSource</a><span>, in §3.2</span>
+    </ul>
    <li><a href="#xrsession-set-of-active-hit-test-sources">set of active hit test sources</a><span>, in §5</span>
+   <li><a href="#xrsession-set-of-active-hit-test-sources-for-transient-input">set of active hit test sources for transient input</a><span>, in §5</span>
    <li><a href="#dom-xrhittestoptionsinit-space">space</a><span>, in §2.2</span>
    <li><a href="#dictdef-xrhittestoptionsinit">XRHitTestOptionsInit</a><span>, in §2.2</span>
    <li><a href="#xrhittestresult">XRHitTestResult</a><span>, in §4.1</span>
@@ -2151,6 +2393,9 @@ Parts of this work may be from another specification document.  If so, those par
    <li><a href="#dom-xrray-xrray">XRRay(origin)</a><span>, in §8.1</span>
    <li><a href="#dom-xrray-xrray">XRRay(origin, direction)</a><span>, in §8.1</span>
    <li><a href="#dom-xrray-xrray-transform">XRRay(transform)</a><span>, in §8.1</span>
+   <li><a href="#dictdef-xrtransientinputhittestoptionsinit">XRTransientInputHitTestOptionsInit</a><span>, in §2.3</span>
+   <li><a href="#xrtransientinputhittestresult">XRTransientInputHitTestResult</a><span>, in §4.2</span>
+   <li><a href="#xrtransientinputhittestsource">XRTransientInputHitTestSource</a><span>, in §3.2</span>
   </ul>
   <aside class="dfn-panel" data-for="term-for-sec-isdetachedbuffer">
    <a href="https://tc39.github.io/ecma262/#sec-isdetachedbuffer">https://tc39.github.io/ecma262/#sec-isdetachedbuffer</a><b>Referenced in:</b>
@@ -2200,12 +2445,20 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-list">6. Computing hit test results</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-DOMString">
+   <a href="https://heycam.github.io/webidl/#idl-DOMString">https://heycam.github.io/webidl/#idl-DOMString</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-DOMString">2.3. XRTransientInputHitTestOptionsInit</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-Exposed">
    <a href="https://heycam.github.io/webidl/#Exposed">https://heycam.github.io/webidl/#Exposed</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-Exposed">3.1. XRHitTestSource</a>
-    <li><a href="#ref-for-Exposed①">4.1. XRHitTestResult</a>
-    <li><a href="#ref-for-Exposed②">8.1. XRRay</a>
+    <li><a href="#ref-for-Exposed①">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-Exposed②">4.1. XRHitTestResult</a>
+    <li><a href="#ref-for-Exposed③">4.2. XRTransientInputHitTestResult</a>
+    <li><a href="#ref-for-Exposed④">8.1. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-Float32Array">
@@ -2218,38 +2471,38 @@ Parts of this work may be from another specification document.  If so, those par
    <a href="https://heycam.github.io/webidl/#invalidstateerror">https://heycam.github.io/webidl/#invalidstateerror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-invalidstateerror">3.1. XRHitTestSource</a>
+    <li><a href="#ref-for-invalidstateerror①">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-invalidstateerror②">4.1. XRHitTestResult</a>
+    <li><a href="#ref-for-invalidstateerror③">7. Obtaining hit test results</a> <a href="#ref-for-invalidstateerror④">(2)</a> <a href="#ref-for-invalidstateerror⑤">(3)</a> <a href="#ref-for-invalidstateerror⑥">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-operationerror">
    <a href="https://heycam.github.io/webidl/#operationerror">https://heycam.github.io/webidl/#operationerror</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-operationerror">5. Requesting hit test</a>
+    <li><a href="#ref-for-operationerror">5. Requesting hit test</a> <a href="#ref-for-operationerror①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-SameObject">
    <a href="https://heycam.github.io/webidl/#SameObject">https://heycam.github.io/webidl/#SameObject</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-SameObject">8.1. XRRay</a> <a href="#ref-for-SameObject①">(2)</a> <a href="#ref-for-SameObject②">(3)</a>
+    <li><a href="#ref-for-SameObject">4.2. XRTransientInputHitTestResult</a>
+    <li><a href="#ref-for-SameObject①">8.1. XRRay</a> <a href="#ref-for-SameObject②">(2)</a> <a href="#ref-for-SameObject③">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-SecureContext">
    <a href="https://heycam.github.io/webidl/#SecureContext">https://heycam.github.io/webidl/#SecureContext</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-SecureContext">3.1. XRHitTestSource</a>
-    <li><a href="#ref-for-SecureContext①">4.1. XRHitTestResult</a>
-    <li><a href="#ref-for-SecureContext②">8.1. XRRay</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="term-for-exceptiondef-typeerror">
-   <a href="https://heycam.github.io/webidl/#exceptiondef-typeerror">https://heycam.github.io/webidl/#exceptiondef-typeerror</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-exceptiondef-typeerror">5. Requesting hit test</a>
+    <li><a href="#ref-for-SecureContext①">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-SecureContext②">4.1. XRHitTestResult</a>
+    <li><a href="#ref-for-SecureContext③">4.2. XRTransientInputHitTestResult</a>
+    <li><a href="#ref-for-SecureContext④">8.1. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-a-new-promise">
    <a href="https://heycam.github.io/webidl/#a-new-promise">https://heycam.github.io/webidl/#a-new-promise</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-a-new-promise">5. Requesting hit test</a>
+    <li><a href="#ref-for-a-new-promise">5. Requesting hit test</a> <a href="#ref-for-a-new-promise①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-reject">
@@ -2261,7 +2514,14 @@ Parts of this work may be from another specification document.  If so, those par
   <aside class="dfn-panel" data-for="term-for-resolve">
    <a href="https://heycam.github.io/webidl/#resolve">https://heycam.github.io/webidl/#resolve</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-resolve">5. Requesting hit test</a>
+    <li><a href="#ref-for-resolve">5. Requesting hit test</a> <a href="#ref-for-resolve①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-xrinputsource">
+   <a href="https://immersive-web.github.io/webxr/#xrinputsource">https://immersive-web.github.io/webxr/#xrinputsource</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrinputsource">2.3. XRTransientInputHitTestOptionsInit</a>
+    <li><a href="#ref-for-xrinputsource①">4.2. XRTransientInputHitTestResult</a> <a href="#ref-for-xrinputsource②">(2)</a> <a href="#ref-for-xrinputsource③">(3)</a> <a href="#ref-for-xrinputsource④">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrpose">
@@ -2276,22 +2536,33 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-xrspace">2.2. XRHitTestOptionsInit</a> <a href="#ref-for-xrspace①">(2)</a>
     <li><a href="#ref-for-xrspace②">3.1. XRHitTestSource</a>
     <li><a href="#ref-for-xrspace③">4.1. XRHitTestResult</a> <a href="#ref-for-xrspace④">(2)</a>
-    <li><a href="#ref-for-xrspace⑤">5. Requesting hit test</a> <a href="#ref-for-xrspace⑥">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-xrinputsource-profiles">
+   <a href="https://immersive-web.github.io/webxr/#dom-xrinputsource-profiles">https://immersive-web.github.io/webxr/#dom-xrinputsource-profiles</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrinputsource-profiles">6. Computing hit test results</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-xrframe-session">
    <a href="https://immersive-web.github.io/webxr/#dom-xrframe-session">https://immersive-web.github.io/webxr/#dom-xrframe-session</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-xrframe-session①">6. Computing hit test results</a> <a href="#ref-for-dom-xrframe-session②">(2)</a>
+    <li><a href="#ref-for-dom-xrframe-session①">6. Computing hit test results</a> <a href="#ref-for-dom-xrframe-session②">(2)</a> <a href="#ref-for-dom-xrframe-session③">(3)</a> <a href="#ref-for-dom-xrframe-session④">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-xrinputsource-targetrayspace">
+   <a href="https://immersive-web.github.io/webxr/#dom-xrinputsource-targetrayspace">https://immersive-web.github.io/webxr/#dom-xrinputsource-targetrayspace</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrinputsource-targetrayspace">6. Computing hit test results</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrframe-interface">
    <a href="https://www.w3.org/TR/webxr/#xrframe-interface">https://www.w3.org/TR/webxr/#xrframe-interface</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrframe-interface">4.1. XRHitTestResult</a> <a href="#ref-for-xrframe-interface①">(2)</a>
-    <li><a href="#ref-for-xrframe-interface②">5. Requesting hit test</a> <a href="#ref-for-xrframe-interface③">(2)</a>
-    <li><a href="#ref-for-xrframe-interface④">6. Computing hit test results</a>
-    <li><a href="#ref-for-xrframe-interface⑤">7. Obtaining hit test results</a> <a href="#ref-for-xrframe-interface⑥">(2)</a>
+    <li><a href="#ref-for-xrframe-interface②">4.2. XRTransientInputHitTestResult</a> <a href="#ref-for-xrframe-interface③">(2)</a>
+    <li><a href="#ref-for-xrframe-interface④">6. Computing hit test results</a> <a href="#ref-for-xrframe-interface⑤">(2)</a> <a href="#ref-for-xrframe-interface⑥">(3)</a>
+    <li><a href="#ref-for-xrframe-interface⑦">7. Obtaining hit test results</a> <a href="#ref-for-xrframe-interface⑧">(2)</a> <a href="#ref-for-xrframe-interface⑨">(3)</a> <a href="#ref-for-xrframe-interface①⓪">(4)</a> <a href="#ref-for-xrframe-interface①①">(5)</a> <a href="#ref-for-xrframe-interface①②">(6)</a> <a href="#ref-for-xrframe-interface①③">(7)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrrigidtransform-interface">
@@ -2304,8 +2575,15 @@ Parts of this work may be from another specification document.  If so, those par
    <a href="https://www.w3.org/TR/webxr/#xrsession-interface">https://www.w3.org/TR/webxr/#xrsession-interface</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrsession-interface">3.1. XRHitTestSource</a>
-    <li><a href="#ref-for-xrsession-interface①">5. Requesting hit test</a> <a href="#ref-for-xrsession-interface②">(2)</a> <a href="#ref-for-xrsession-interface③">(3)</a> <a href="#ref-for-xrsession-interface④">(4)</a>
-    <li><a href="#ref-for-xrsession-interface⑤">6. Computing hit test results</a> <a href="#ref-for-xrsession-interface⑥">(2)</a>
+    <li><a href="#ref-for-xrsession-interface①">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-xrsession-interface②">5. Requesting hit test</a> <a href="#ref-for-xrsession-interface③">(2)</a> <a href="#ref-for-xrsession-interface④">(3)</a> <a href="#ref-for-xrsession-interface⑤">(4)</a> <a href="#ref-for-xrsession-interface⑥">(5)</a> <a href="#ref-for-xrsession-interface⑦">(6)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-xrframe-active">
+   <a href="https://www.w3.org/TR/webxr/#xrframe-active">https://www.w3.org/TR/webxr/#xrframe-active</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrframe-active">4.1. XRHitTestResult</a>
+    <li><a href="#ref-for-xrframe-active①">7. Obtaining hit test results</a> <a href="#ref-for-xrframe-active②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrspace-effective-origin">
@@ -2320,16 +2598,23 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-identity-transform">4.1. XRHitTestResult</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-list-of-animation-frame-callbacks">
-   <a href="https://www.w3.org/TR/webxr/#list-of-animation-frame-callbacks">https://www.w3.org/TR/webxr/#list-of-animation-frame-callbacks</a><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="term-for-xrinputsource-input-profile-name">
+   <a href="https://www.w3.org/TR/webxr/#xrinputsource-input-profile-name">https://www.w3.org/TR/webxr/#xrinputsource-input-profile-name</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-list-of-animation-frame-callbacks">6. Computing hit test results</a>
+    <li><a href="#ref-for-xrinputsource-input-profile-name">2.3. XRTransientInputHitTestOptionsInit</a>
+    <li><a href="#ref-for-xrinputsource-input-profile-name①">3.2. XRTransientInputHitTestSource</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-list-of-active-xr-input-sources">
+   <a href="https://www.w3.org/TR/webxr/#list-of-active-xr-input-sources">https://www.w3.org/TR/webxr/#list-of-active-xr-input-sources</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-list-of-active-xr-input-sources">6. Computing hit test results</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrsession-list-of-frame-updates">
    <a href="https://www.w3.org/TR/webxr/#xrsession-list-of-frame-updates">https://www.w3.org/TR/webxr/#xrsession-list-of-frame-updates</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-xrsession-list-of-frame-updates">5. Requesting hit test</a>
+    <li><a href="#ref-for-xrsession-list-of-frame-updates">5. Requesting hit test</a> <a href="#ref-for-xrsession-list-of-frame-updates①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-xrrigidtransform-matrix">
@@ -2343,6 +2628,7 @@ Parts of this work may be from another specification document.  If so, those par
    <ul>
     <li><a href="#ref-for-xrspace-native-origin">3.1. XRHitTestSource</a> <a href="#ref-for-xrspace-native-origin①">(2)</a> <a href="#ref-for-xrspace-native-origin②">(3)</a>
     <li><a href="#ref-for-xrspace-native-origin③">4.1. XRHitTestResult</a>
+    <li><a href="#ref-for-xrspace-native-origin④">6. Computing hit test results</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-normalize">
@@ -2369,17 +2655,11 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-xrspace-session">4.1. XRHitTestResult</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-xr-animation-frame">
-   <a href="https://www.w3.org/TR/webxr/#xr-animation-frame">https://www.w3.org/TR/webxr/#xr-animation-frame</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-xr-animation-frame">6. Computing hit test results</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="term-for-xrsession-xr-device">
    <a href="https://www.w3.org/TR/webxr/#xrsession-xr-device">https://www.w3.org/TR/webxr/#xrsession-xr-device</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrsession-xr-device">4.1. XRHitTestResult</a>
-    <li><a href="#ref-for-xrsession-xr-device①">6. Computing hit test results</a>
+    <li><a href="#ref-for-xrsession-xr-device①">6. Computing hit test results</a> <a href="#ref-for-xrsession-xr-device②">(2)</a>
    </ul>
   </aside>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
@@ -2407,13 +2687,13 @@ Parts of this work may be from another specification document.  If so, those par
    <li>
     <a data-link-type="biblio">[WebIDL]</a> defines the following terms:
     <ul>
+     <li><span class="dfn-paneled" id="term-for-idl-DOMString" style="color:initial">DOMString</span>
      <li><span class="dfn-paneled" id="term-for-Exposed" style="color:initial">Exposed</span>
      <li><span class="dfn-paneled" id="term-for-idl-Float32Array" style="color:initial">Float32Array</span>
      <li><span class="dfn-paneled" id="term-for-invalidstateerror" style="color:initial">InvalidStateError</span>
      <li><span class="dfn-paneled" id="term-for-operationerror" style="color:initial">OperationError</span>
      <li><span class="dfn-paneled" id="term-for-SameObject" style="color:initial">SameObject</span>
      <li><span class="dfn-paneled" id="term-for-SecureContext" style="color:initial">SecureContext</span>
-     <li><span class="dfn-paneled" id="term-for-exceptiondef-typeerror" style="color:initial">TypeError</span>
      <li><span class="dfn-paneled" id="term-for-a-new-promise" style="color:initial">a new promise</span>
      <li><span class="dfn-paneled" id="term-for-reject" style="color:initial">reject</span>
      <li><span class="dfn-paneled" id="term-for-resolve" style="color:initial">resolve</span>
@@ -2421,9 +2701,12 @@ Parts of this work may be from another specification document.  If so, those par
    <li>
     <a data-link-type="biblio">[webxr]</a> defines the following terms:
     <ul>
+     <li><span class="dfn-paneled" id="term-for-xrinputsource" style="color:initial">XRInputSource</span>
      <li><span class="dfn-paneled" id="term-for-xrpose" style="color:initial">XRPose</span>
      <li><span class="dfn-paneled" id="term-for-xrspace" style="color:initial">XRSpace</span>
+     <li><span class="dfn-paneled" id="term-for-dom-xrinputsource-profiles" style="color:initial">profiles</span>
      <li><span class="dfn-paneled" id="term-for-dom-xrframe-session" style="color:initial">session</span>
+     <li><span class="dfn-paneled" id="term-for-dom-xrinputsource-targetrayspace" style="color:initial">targetRaySpace</span>
     </ul>
    <li>
     <a data-link-type="biblio">[webxr device api - level 1]</a> defines the following terms:
@@ -2431,9 +2714,11 @@ Parts of this work may be from another specification document.  If so, those par
      <li><span class="dfn-paneled" id="term-for-xrframe-interface" style="color:initial">XRFrame</span>
      <li><span class="dfn-paneled" id="term-for-xrrigidtransform-interface" style="color:initial">XRRigidTransform</span>
      <li><span class="dfn-paneled" id="term-for-xrsession-interface" style="color:initial">XRSession</span>
+     <li><span class="dfn-paneled" id="term-for-xrframe-active" style="color:initial">active</span>
      <li><span class="dfn-paneled" id="term-for-xrspace-effective-origin" style="color:initial">effective origin</span>
      <li><span class="dfn-paneled" id="term-for-identity-transform" style="color:initial">identity transform</span>
-     <li><span class="dfn-paneled" id="term-for-list-of-animation-frame-callbacks" style="color:initial">list of animation frame callbacks</span>
+     <li><span class="dfn-paneled" id="term-for-xrinputsource-input-profile-name" style="color:initial">input profile name</span>
+     <li><span class="dfn-paneled" id="term-for-list-of-active-xr-input-sources" style="color:initial">list of active xr input sources</span>
      <li><span class="dfn-paneled" id="term-for-xrsession-list-of-frame-updates" style="color:initial">list of frame updates</span>
      <li><span class="dfn-paneled" id="term-for-dom-xrrigidtransform-matrix" style="color:initial">matrix <small>(for XRRigidTransform)</small></span>
      <li><span class="dfn-paneled" id="term-for-xrspace-native-origin" style="color:initial">native origin</span>
@@ -2441,7 +2726,6 @@ Parts of this work may be from another specification document.  If so, those par
      <li><span class="dfn-paneled" id="term-for-xrspace-origin-offset" style="color:initial">origin offset</span>
      <li><span class="dfn-paneled" id="term-for-populate-the-pose" style="color:initial">populate the pose</span>
      <li><span class="dfn-paneled" id="term-for-xrspace-session" style="color:initial">session <small>(for XRSpace)</small></span>
-     <li><span class="dfn-paneled" id="term-for-xr-animation-frame" style="color:initial">xr animation frame</span>
      <li><span class="dfn-paneled" id="term-for-xrsession-xr-device" style="color:initial">xr device <small>(for XRSession)</small></span>
     </ul>
   </ul>
@@ -2464,47 +2748,65 @@ Parts of this work may be from another specification document.  If so, those par
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl highlight def"><c- b>enum</c-> <a href="#enumdef-xrhittesttrackabletype"><code><c- g>XRHitTestTrackableType</c-></code></a> {
   <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point③"><c- s>"point"</c-></a>,
-  <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane④"><c- s>"plane"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane⑤"><c- s>"plane"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh③"><c- s>"mesh"</c-></a>
 };
 
 <c- b>dictionary</c-> <a href="#dictdef-xrhittestoptionsinit"><code><c- g>XRHitTestOptionsInit</c-></code></a> {
-  <c- b>required</c-> <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace⑦"><c- n>XRSpace</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRSpace " href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space④"><c- g>space</c-></a>;
+  <c- b>required</c-> <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace⑤"><c- n>XRSpace</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRSpace " href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space③"><c- g>space</c-></a>;
   <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype①①"><c- n>XRHitTestTrackableType</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="FrozenArray<XRHitTestTrackableType> " href="#dom-xrhittestoptionsinit-entitytypes" id="ref-for-dom-xrhittestoptionsinit-entitytypes③"><c- g>entityTypes</c-></a>;
-  <a class="n" data-link-type="idl-name" href="#xrray" id="ref-for-xrray①④"><c- n>XRRay</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRRay " href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray⑤"><c- g>offsetRay</c-></a>;
+  <a class="n" data-link-type="idl-name" href="#xrray" id="ref-for-xrray①⑧"><c- n>XRRay</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRRay " href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray⑤"><c- g>offsetRay</c-></a>;
 };
 
-[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext③"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+<c- b>dictionary</c-> <a href="#dictdef-xrtransientinputhittestoptionsinit"><code><c- g>XRTransientInputHitTestOptionsInit</c-></code></a> {
+  <c- b>required</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①"><c- b>DOMString</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-xrtransientinputhittestoptionsinit-profile" id="ref-for-dom-xrtransientinputhittestoptionsinit-profile③"><c- g>profile</c-></a>;
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype③①"><c- n>XRHitTestTrackableType</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="FrozenArray<XRHitTestTrackableType> " href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes③"><c- g>entityTypes</c-></a>;
+  <a class="n" data-link-type="idl-name" href="#xrray" id="ref-for-xrray③①"><c- n>XRRay</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRRay " href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray④"><c- g>offsetRay</c-></a>;
+};
+
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext⑤"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a href="#xrhittestsource"><code><c- g>XRHitTestSource</c-></code></a> {
   <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-xrhittestsource-cancel" id="ref-for-dom-xrhittestsource-cancel②"><c- g>cancel</c-></a>();
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext①①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+<c- b>interface</c-> <a href="#xrtransientinputhittestsource"><code><c- g>XRTransientInputHitTestSource</c-></code></a> {
+  <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-xrtransientinputhittestsource-cancel" id="ref-for-dom-xrtransientinputhittestsource-cancel②"><c- g>cancel</c-></a>();
+};
+
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext②①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a href="#xrhittestresult"><code><c- g>XRHitTestResult</c-></code></a> {
   <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrpose" id="ref-for-xrpose③"><c- n>XRPose</c-></a>? <a class="idl-code" data-link-type="method" href="#dom-xrhittestresult-getpose" id="ref-for-dom-xrhittestresult-getpose②"><c- g>getPose</c-></a>(<a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace③①"><c- n>XRSpace</c-></a> <a href="#dom-xrhittestresult-getpose-basespace-basespace"><code><c- g>baseSpace</c-></code></a>);
 };
 
-<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface①①"><c- g>XRSession</c-></a> {
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext③①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+<c- b>interface</c-> <a href="#xrtransientinputhittestresult"><code><c- g>XRTransientInputHitTestResult</c-></code></a> {
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject④"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrinputsource" id="ref-for-xrinputsource①①"><c- n>XRInputSource</c-></a> <a data-readonly data-type="XRInputSource" href="#dom-xrtransientinputhittestresult-inputsource"><code><c- g>inputSource</c-></code></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult" id="ref-for-xrhittestresult⑤①"><c- n>XRHitTestResult</c-></a>> <a data-readonly data-type="FrozenArray<XRHitTestResult>" href="#dom-xrtransientinputhittestresult-results"><code><c- g>results</c-></code></a>;
+};
+
+<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface②①"><c- g>XRSession</c-></a> {
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource⑨①"><c- n>XRHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsource" id="ref-for-dom-xrsession-requesthittestsource②"><c- g>requestHitTestSource</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit③①"><c- n>XRHitTestOptionsInit</c-></a> <a href="#dom-xrsession-requesthittestsource-options-options"><code><c- g>options</c-></code></a>);
+  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource⑨①"><c- n>XRTransientInputHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsourcefortransientinput" id="ref-for-dom-xrsession-requesthittestsourcefortransientinput①"><c- g>requestHitTestSourceForTransientInput</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit③①"><c- n>XRTransientInputHitTestOptionsInit</c-></a> <a href="#dom-xrsession-requesthittestsourcefortransientinput-options-options"><code><c- g>options</c-></code></a>);
 };
 
-<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface②①"><c- g>XRFrame</c-></a> {
-  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult" id="ref-for-xrhittestresult⑤①"><c- n>XRHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresults" id="ref-for-dom-xrframe-gethittestresults②"><c- g>getHitTestResults</c-></a>(<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource①⓪①"><c- n>XRHitTestSource</c-></a> <a href="#dom-xrframe-gethittestresults-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code></a>);
+<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑦①"><c- g>XRFrame</c-></a> {
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult" id="ref-for-xrhittestresult⑧①"><c- n>XRHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresults" id="ref-for-dom-xrframe-gethittestresults②"><c- g>getHitTestResults</c-></a>(<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource①⓪①"><c- n>XRHitTestSource</c-></a> <a href="#dom-xrframe-gethittestresults-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code></a>);
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestresult" id="ref-for-xrtransientinputhittestresult③①"><c- n>XRTransientInputHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresultsfortransientinput" id="ref-for-dom-xrframe-gethittestresultsfortransientinput②"><c- g>getHitTestResultsForTransientInput</c-></a>(<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource①⓪①"><c- n>XRTransientInputHitTestSource</c-></a> <a href="#dom-xrframe-gethittestresultsfortransientinput-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code></a>);
 };
 
-[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext②①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②①"><c- g>Exposed</c-></a>=<c- n>Window</c->,
- <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray①①"><c- g>Constructor</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit②"><c- n>DOMPointInit</c-></a> <a href="#dom-xrray-xrray-origin-direction-origin"><code><c- g>origin</c-></code></a>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit①①"><c- n>DOMPointInit</c-></a> <a href="#dom-xrray-xrray-origin-direction-direction"><code><c- g>direction</c-></code></a>),
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext④①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④①"><c- g>Exposed</c-></a>=<c- n>Window</c->,
+ <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray②①"><c- g>Constructor</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit②"><c- n>DOMPointInit</c-></a> <a href="#dom-xrray-xrray-origin-direction-origin"><code><c- g>origin</c-></code></a>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit①①"><c- n>DOMPointInit</c-></a> <a href="#dom-xrray-xrray-origin-direction-direction"><code><c- g>direction</c-></code></a>),
  <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray-transform" id="ref-for-dom-xrray-xrray-transform①"><c- g>Constructor</c-></a>(<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webxr/#xrrigidtransform-interface" id="ref-for-xrrigidtransform-interface①"><c- n>XRRigidTransform</c-></a> <a href="#dom-xrray-xrray-transform-transform"><code><c- g>transform</c-></code></a>)]
 <c- b>interface</c-> <a href="#xrray"><code><c- g>XRRay</c-></code></a> {
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject③"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly②"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin①①"><c- g>origin</c-></a>;
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject①①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly①①"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction①③"><c- g>direction</c-></a>;
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject②①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-Float32Array" id="ref-for-idl-Float32Array①"><c- b>Float32Array</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Float32Array" href="#dom-xrray-matrix" id="ref-for-dom-xrray-matrix②"><c- g>matrix</c-></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject①①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly②"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin①①"><c- g>origin</c-></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject②①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly①①"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction①③"><c- g>direction</c-></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject③①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-Float32Array" id="ref-for-idl-Float32Array①"><c- b>Float32Array</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Float32Array" href="#dom-xrray-matrix" id="ref-for-dom-xrray-matrix②"><c- g>matrix</c-></a>;
 };
 
 </pre>
   <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
-   <div class="issue"> Improve - this probably needs to ensure that frame is active, etc.<a href="#issue-e3d68193"> ↵ </a></div>
    <div class="issue"> Decide if we need to specify other axes of the coordinate system defined by hit test result’s native origin to maintain compatibility between different implementations &amp; differrent AR frameworks.<a href="#issue-4d2e55aa"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="enumdef-xrhittesttrackabletype">
@@ -2512,9 +2814,12 @@ Parts of this work may be from another specification document.  If so, those par
    <ul>
     <li><a href="#ref-for-enumdef-xrhittesttrackabletype">2.1. XRHitTestTrackableType</a>
     <li><a href="#ref-for-enumdef-xrhittesttrackabletype①">2.2. XRHitTestOptionsInit</a> <a href="#ref-for-enumdef-xrhittesttrackabletype②">(2)</a>
-    <li><a href="#ref-for-enumdef-xrhittesttrackabletype③">3.1. XRHitTestSource</a>
-    <li><a href="#ref-for-enumdef-xrhittesttrackabletype④">4.1. XRHitTestResult</a>
-    <li><a href="#ref-for-enumdef-xrhittesttrackabletype⑤">9.2. Native entity type</a> <a href="#ref-for-enumdef-xrhittesttrackabletype⑥">(2)</a>
+    <li><a href="#ref-for-enumdef-xrhittesttrackabletype③">2.3. XRTransientInputHitTestOptionsInit</a> <a href="#ref-for-enumdef-xrhittesttrackabletype④">(2)</a>
+    <li><a href="#ref-for-enumdef-xrhittesttrackabletype⑤">3.1. XRHitTestSource</a>
+    <li><a href="#ref-for-enumdef-xrhittesttrackabletype⑥">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-enumdef-xrhittesttrackabletype⑦">4.1. XRHitTestResult</a>
+    <li><a href="#ref-for-enumdef-xrhittesttrackabletype⑧">4.2. XRTransientInputHitTestResult</a>
+    <li><a href="#ref-for-enumdef-xrhittesttrackabletype⑨">9.2. Native entity type</a> <a href="#ref-for-enumdef-xrhittesttrackabletype①⓪">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrhittesttrackabletype-point">
@@ -2529,7 +2834,8 @@ Parts of this work may be from another specification document.  If so, those par
    <ul>
     <li><a href="#ref-for-dom-xrhittesttrackabletype-plane">2.1. XRHitTestTrackableType</a>
     <li><a href="#ref-for-dom-xrhittesttrackabletype-plane①">2.2. XRHitTestOptionsInit</a>
-    <li><a href="#ref-for-dom-xrhittesttrackabletype-plane②">9.2. Native entity type</a> <a href="#ref-for-dom-xrhittesttrackabletype-plane③">(2)</a>
+    <li><a href="#ref-for-dom-xrhittesttrackabletype-plane②">2.3. XRTransientInputHitTestOptionsInit</a>
+    <li><a href="#ref-for-dom-xrhittesttrackabletype-plane③">9.2. Native entity type</a> <a href="#ref-for-dom-xrhittesttrackabletype-plane④">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrhittesttrackabletype-mesh">
@@ -2550,7 +2856,7 @@ Parts of this work may be from another specification document.  If so, those par
    <b><a href="#dom-xrhittestoptionsinit-space">#dom-xrhittestoptionsinit-space</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-xrhittestoptionsinit-space">2.2. XRHitTestOptionsInit</a> <a href="#ref-for-dom-xrhittestoptionsinit-space①">(2)</a>
-    <li><a href="#ref-for-dom-xrhittestoptionsinit-space②">5. Requesting hit test</a> <a href="#ref-for-dom-xrhittestoptionsinit-space③">(2)</a>
+    <li><a href="#ref-for-dom-xrhittestoptionsinit-space②">5. Requesting hit test</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrhittestoptionsinit-entitytypes">
@@ -2569,28 +2875,67 @@ Parts of this work may be from another specification document.  If so, those par
    <b><a href="#xrhittestoptionsinit-effective-entitytypes">#xrhittestoptionsinit-effective-entitytypes</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrhittestoptionsinit-effective-entitytypes">2.2. XRHitTestOptionsInit</a>
-    <li><a href="#ref-for-xrhittestoptionsinit-effective-entitytypes①">5. Requesting hit test</a>
+    <li><a href="#ref-for-xrhittestoptionsinit-effective-entitytypes①">5. Requesting hit test</a> <a href="#ref-for-xrhittestoptionsinit-effective-entitytypes②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrhittestoptionsinit-effective-offsetray">
    <b><a href="#xrhittestoptionsinit-effective-offsetray">#xrhittestoptionsinit-effective-offsetray</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrhittestoptionsinit-effective-offsetray">2.2. XRHitTestOptionsInit</a>
-    <li><a href="#ref-for-xrhittestoptionsinit-effective-offsetray①">5. Requesting hit test</a>
+    <li><a href="#ref-for-xrhittestoptionsinit-effective-offsetray①">5. Requesting hit test</a> <a href="#ref-for-xrhittestoptionsinit-effective-offsetray②">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dictdef-xrtransientinputhittestoptionsinit">
+   <b><a href="#dictdef-xrtransientinputhittestoptionsinit">#dictdef-xrtransientinputhittestoptionsinit</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-xrtransientinputhittestoptionsinit">2.3. XRTransientInputHitTestOptionsInit</a> <a href="#ref-for-dictdef-xrtransientinputhittestoptionsinit①">(2)</a> <a href="#ref-for-dictdef-xrtransientinputhittestoptionsinit②">(3)</a>
+    <li><a href="#ref-for-dictdef-xrtransientinputhittestoptionsinit③">5. Requesting hit test</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrtransientinputhittestoptionsinit-profile">
+   <b><a href="#dom-xrtransientinputhittestoptionsinit-profile">#dom-xrtransientinputhittestoptionsinit-profile</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrtransientinputhittestoptionsinit-profile">2.3. XRTransientInputHitTestOptionsInit</a> <a href="#ref-for-dom-xrtransientinputhittestoptionsinit-profile①">(2)</a>
+    <li><a href="#ref-for-dom-xrtransientinputhittestoptionsinit-profile②">5. Requesting hit test</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrtransientinputhittestoptionsinit-entitytypes">
+   <b><a href="#dom-xrtransientinputhittestoptionsinit-entitytypes">#dom-xrtransientinputhittestoptionsinit-entitytypes</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes">2.3. XRTransientInputHitTestOptionsInit</a> <a href="#ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes①">(2)</a> <a href="#ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrtransientinputhittestoptionsinit-offsetray">
+   <b><a href="#dom-xrtransientinputhittestoptionsinit-offsetray">#dom-xrtransientinputhittestoptionsinit-offsetray</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrtransientinputhittestoptionsinit-offsetray">2.3. XRTransientInputHitTestOptionsInit</a> <a href="#ref-for-dom-xrtransientinputhittestoptionsinit-offsetray①">(2)</a> <a href="#ref-for-dom-xrtransientinputhittestoptionsinit-offsetray②">(3)</a> <a href="#ref-for-dom-xrtransientinputhittestoptionsinit-offsetray③">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestoptionsinit-effective-entitytypes">
+   <b><a href="#xrtransientinputhittestoptionsinit-effective-entitytypes">#xrtransientinputhittestoptionsinit-effective-entitytypes</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestoptionsinit-effective-entitytypes">2.3. XRTransientInputHitTestOptionsInit</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestoptionsinit-effective-offsetray">
+   <b><a href="#xrtransientinputhittestoptionsinit-effective-offsetray">#xrtransientinputhittestoptionsinit-effective-offsetray</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestoptionsinit-effective-offsetray">2.3. XRTransientInputHitTestOptionsInit</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrhittestsource">
    <b><a href="#xrhittestsource">#xrhittestsource</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrhittestsource">3.1. XRHitTestSource</a> <a href="#ref-for-xrhittestsource①">(2)</a> <a href="#ref-for-xrhittestsource②">(3)</a> <a href="#ref-for-xrhittestsource③">(4)</a> <a href="#ref-for-xrhittestsource④">(5)</a> <a href="#ref-for-xrhittestsource⑤">(6)</a> <a href="#ref-for-xrhittestsource⑥">(7)</a> <a href="#ref-for-xrhittestsource⑦">(8)</a> <a href="#ref-for-xrhittestsource⑧">(9)</a>
-    <li><a href="#ref-for-xrhittestsource⑨">5. Requesting hit test</a> <a href="#ref-for-xrhittestsource①⓪">(2)</a> <a href="#ref-for-xrhittestsource①①">(3)</a>
-    <li><a href="#ref-for-xrhittestsource①②">7. Obtaining hit test results</a>
+    <li><a href="#ref-for-xrhittestsource⑨">5. Requesting hit test</a>
+    <li><a href="#ref-for-xrhittestsource①⓪">7. Obtaining hit test results</a> <a href="#ref-for-xrhittestsource①①">(2)</a> <a href="#ref-for-xrhittestsource①②">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrhittestsource-session">
    <b><a href="#xrhittestsource-session">#xrhittestsource-session</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrhittestsource-session">3.1. XRHitTestSource</a> <a href="#ref-for-xrhittestsource-session①">(2)</a> <a href="#ref-for-xrhittestsource-session②">(3)</a>
+    <li><a href="#ref-for-xrhittestsource-session③">3.2. XRTransientInputHitTestSource</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrhittestsource-native-origin">
@@ -2638,11 +2983,71 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-cancel-a-hit-test-source">3.1. XRHitTestSource</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestsource">
+   <b><a href="#xrtransientinputhittestsource">#xrtransientinputhittestsource</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestsource">3.2. XRTransientInputHitTestSource</a> <a href="#ref-for-xrtransientinputhittestsource①">(2)</a> <a href="#ref-for-xrtransientinputhittestsource②">(3)</a> <a href="#ref-for-xrtransientinputhittestsource③">(4)</a> <a href="#ref-for-xrtransientinputhittestsource④">(5)</a> <a href="#ref-for-xrtransientinputhittestsource⑤">(6)</a> <a href="#ref-for-xrtransientinputhittestsource⑥">(7)</a> <a href="#ref-for-xrtransientinputhittestsource⑦">(8)</a> <a href="#ref-for-xrtransientinputhittestsource⑧">(9)</a>
+    <li><a href="#ref-for-xrtransientinputhittestsource⑨">5. Requesting hit test</a>
+    <li><a href="#ref-for-xrtransientinputhittestsource①⓪">7. Obtaining hit test results</a> <a href="#ref-for-xrtransientinputhittestsource①①">(2)</a> <a href="#ref-for-xrtransientinputhittestsource①②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestsource-session">
+   <b><a href="#xrtransientinputhittestsource-session">#xrtransientinputhittestsource-session</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestsource-session">3.2. XRTransientInputHitTestSource</a> <a href="#ref-for-xrtransientinputhittestsource-session①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestsource-profile">
+   <b><a href="#xrtransientinputhittestsource-profile">#xrtransientinputhittestsource-profile</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestsource-profile">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-xrtransientinputhittestsource-profile①">6. Computing hit test results</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestsource-entity-types">
+   <b><a href="#xrtransientinputhittestsource-entity-types">#xrtransientinputhittestsource-entity-types</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestsource-entity-types">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-xrtransientinputhittestsource-entity-types①">6. Computing hit test results</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestsource-offset-ray">
+   <b><a href="#xrtransientinputhittestsource-offset-ray">#xrtransientinputhittestsource-offset-ray</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestsource-offset-ray">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-xrtransientinputhittestsource-offset-ray①">6. Computing hit test results</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestsource-active">
+   <b><a href="#xrtransientinputhittestsource-active">#xrtransientinputhittestsource-active</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestsource-active">3.2. XRTransientInputHitTestSource</a> <a href="#ref-for-xrtransientinputhittestsource-active①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="create-a-hit-test-source-for-transient-input">
+   <b><a href="#create-a-hit-test-source-for-transient-input">#create-a-hit-test-source-for-transient-input</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-create-a-hit-test-source-for-transient-input">5. Requesting hit test</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrtransientinputhittestsource-cancel">
+   <b><a href="#dom-xrtransientinputhittestsource-cancel">#dom-xrtransientinputhittestsource-cancel</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrtransientinputhittestsource-cancel">3.2. XRTransientInputHitTestSource</a> <a href="#ref-for-dom-xrtransientinputhittestsource-cancel①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="cancel-a-hit-test-source-for-transient-input">
+   <b><a href="#cancel-a-hit-test-source-for-transient-input">#cancel-a-hit-test-source-for-transient-input</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-cancel-a-hit-test-source-for-transient-input">3.2. XRTransientInputHitTestSource</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="xrhittestresult">
    <b><a href="#xrhittestresult">#xrhittestresult</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrhittestresult">4.1. XRHitTestResult</a> <a href="#ref-for-xrhittestresult①">(2)</a> <a href="#ref-for-xrhittestresult②">(3)</a> <a href="#ref-for-xrhittestresult③">(4)</a> <a href="#ref-for-xrhittestresult④">(5)</a>
-    <li><a href="#ref-for-xrhittestresult⑤">5. Requesting hit test</a> <a href="#ref-for-xrhittestresult⑥">(2)</a>
+    <li><a href="#ref-for-xrhittestresult⑤">4.2. XRTransientInputHitTestResult</a> <a href="#ref-for-xrhittestresult⑥">(2)</a> <a href="#ref-for-xrhittestresult⑦">(3)</a>
+    <li><a href="#ref-for-xrhittestresult⑧">7. Obtaining hit test results</a> <a href="#ref-for-xrhittestresult⑨">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrhittestresult-frame">
@@ -2660,13 +3065,45 @@ Parts of this work may be from another specification document.  If so, those par
   <aside class="dfn-panel" data-for="create-a-hit-test-result">
    <b><a href="#create-a-hit-test-result">#create-a-hit-test-result</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-create-a-hit-test-result">6. Computing hit test results</a>
+    <li><a href="#ref-for-create-a-hit-test-result">4.2. XRTransientInputHitTestResult</a>
+    <li><a href="#ref-for-create-a-hit-test-result①">6. Computing hit test results</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrhittestresult-getpose">
    <b><a href="#dom-xrhittestresult-getpose">#dom-xrhittestresult-getpose</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-xrhittestresult-getpose">4.1. XRHitTestResult</a> <a href="#ref-for-dom-xrhittestresult-getpose①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestresult">
+   <b><a href="#xrtransientinputhittestresult">#xrtransientinputhittestresult</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestresult">4.2. XRTransientInputHitTestResult</a> <a href="#ref-for-xrtransientinputhittestresult①">(2)</a> <a href="#ref-for-xrtransientinputhittestresult②">(3)</a>
+    <li><a href="#ref-for-xrtransientinputhittestresult③">7. Obtaining hit test results</a> <a href="#ref-for-xrtransientinputhittestresult④">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrtransientinputhittestresult-inputsource">
+   <b><a href="#dom-xrtransientinputhittestresult-inputsource">#dom-xrtransientinputhittestresult-inputsource</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrtransientinputhittestresult-inputsource">4.2. XRTransientInputHitTestResult</a> <a href="#ref-for-dom-xrtransientinputhittestresult-inputsource①">(2)</a> <a href="#ref-for-dom-xrtransientinputhittestresult-inputsource②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrtransientinputhittestresult-results">
+   <b><a href="#dom-xrtransientinputhittestresult-results">#dom-xrtransientinputhittestresult-results</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrtransientinputhittestresult-results">4.2. XRTransientInputHitTestResult</a> <a href="#ref-for-dom-xrtransientinputhittestresult-results①">(2)</a> <a href="#ref-for-dom-xrtransientinputhittestresult-results②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrtransientinputhittestresult-frame">
+   <b><a href="#xrtransientinputhittestresult-frame">#xrtransientinputhittestresult-frame</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrtransientinputhittestresult-frame">4.2. XRTransientInputHitTestResult</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="create-a-hit-test-result-for-transient-input">
+   <b><a href="#create-a-hit-test-result-for-transient-input">#create-a-hit-test-result-for-transient-input</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-create-a-hit-test-result-for-transient-input">6. Computing hit test results</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrsession-set-of-active-hit-test-sources">
@@ -2677,11 +3114,12 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-xrsession-set-of-active-hit-test-sources③">6. Computing hit test results</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="xrframe-map-of-hit-test-sources-to-hit-test-results">
-   <b><a href="#xrframe-map-of-hit-test-sources-to-hit-test-results">#xrframe-map-of-hit-test-sources-to-hit-test-results</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="xrsession-set-of-active-hit-test-sources-for-transient-input">
+   <b><a href="#xrsession-set-of-active-hit-test-sources-for-transient-input">#xrsession-set-of-active-hit-test-sources-for-transient-input</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results">6. Computing hit test results</a>
-    <li><a href="#ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results①">7. Obtaining hit test results</a>
+    <li><a href="#ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input">3.2. XRTransientInputHitTestSource</a> <a href="#ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input①">(2)</a>
+    <li><a href="#ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input②">5. Requesting hit test</a>
+    <li><a href="#ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input③">6. Computing hit test results</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="request-hit-test">
@@ -2696,18 +3134,54 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-dom-xrsession-requesthittestsource">5. Requesting hit test</a> <a href="#ref-for-dom-xrsession-requesthittestsource①">(2)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dom-xrsession-requesthittestsourcefortransientinput">
+   <b><a href="#dom-xrsession-requesthittestsourcefortransientinput">#dom-xrsession-requesthittestsourcefortransientinput</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrsession-requesthittestsourcefortransientinput">5. Requesting hit test</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="compute-all-hit-test-results">
+   <b><a href="#compute-all-hit-test-results">#compute-all-hit-test-results</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-compute-all-hit-test-results">5. Requesting hit test</a> <a href="#ref-for-compute-all-hit-test-results①">(2)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="compute-hit-test-results">
    <b><a href="#compute-hit-test-results">#compute-hit-test-results</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-compute-hit-test-results">5. Requesting hit test</a>
-    <li><a href="#ref-for-compute-hit-test-results①">6. Computing hit test results</a>
+    <li><a href="#ref-for-compute-hit-test-results">6. Computing hit test results</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="compute-hit-test-results-for-transient-input">
+   <b><a href="#compute-hit-test-results-for-transient-input">#compute-hit-test-results-for-transient-input</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-compute-hit-test-results-for-transient-input">6. Computing hit test results</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrframe-map-of-hit-test-sources-to-hit-test-results">
+   <b><a href="#xrframe-map-of-hit-test-sources-to-hit-test-results">#xrframe-map-of-hit-test-sources-to-hit-test-results</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results">6. Computing hit test results</a>
+    <li><a href="#ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results①">7. Obtaining hit test results</a> <a href="#ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results②">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input">
+   <b><a href="#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input">#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input">6. Computing hit test results</a>
+    <li><a href="#ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input①">7. Obtaining hit test results</a> <a href="#ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input②">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrframe-gethittestresults">
    <b><a href="#dom-xrframe-gethittestresults">#dom-xrframe-gethittestresults</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-xrframe-gethittestresults">5. Requesting hit test</a>
-    <li><a href="#ref-for-dom-xrframe-gethittestresults①">7. Obtaining hit test results</a>
+    <li><a href="#ref-for-dom-xrframe-gethittestresults">7. Obtaining hit test results</a> <a href="#ref-for-dom-xrframe-gethittestresults①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrframe-gethittestresultsfortransientinput">
+   <b><a href="#dom-xrframe-gethittestresultsfortransientinput">#dom-xrframe-gethittestresultsfortransientinput</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrframe-gethittestresultsfortransientinput">7. Obtaining hit test results</a> <a href="#ref-for-dom-xrframe-gethittestresultsfortransientinput①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrray-matrix">
@@ -2720,15 +3194,18 @@ Parts of this work may be from another specification document.  If so, those par
    <b><a href="#xrray">#xrray</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-xrray">2.2. XRHitTestOptionsInit</a> <a href="#ref-for-xrray①">(2)</a> <a href="#ref-for-xrray②">(3)</a>
-    <li><a href="#ref-for-xrray③">3.1. XRHitTestSource</a>
-    <li><a href="#ref-for-xrray④">8.1. XRRay</a> <a href="#ref-for-xrray⑤">(2)</a> <a href="#ref-for-xrray⑥">(3)</a> <a href="#ref-for-xrray⑦">(4)</a> <a href="#ref-for-xrray⑧">(5)</a> <a href="#ref-for-xrray⑨">(6)</a> <a href="#ref-for-xrray①⓪">(7)</a> <a href="#ref-for-xrray①①">(8)</a> <a href="#ref-for-xrray①②">(9)</a> <a href="#ref-for-xrray①③">(10)</a>
+    <li><a href="#ref-for-xrray③">2.3. XRTransientInputHitTestOptionsInit</a> <a href="#ref-for-xrray④">(2)</a> <a href="#ref-for-xrray⑤">(3)</a>
+    <li><a href="#ref-for-xrray⑥">3.1. XRHitTestSource</a>
+    <li><a href="#ref-for-xrray⑦">3.2. XRTransientInputHitTestSource</a>
+    <li><a href="#ref-for-xrray⑧">8.1. XRRay</a> <a href="#ref-for-xrray⑨">(2)</a> <a href="#ref-for-xrray①⓪">(3)</a> <a href="#ref-for-xrray①①">(4)</a> <a href="#ref-for-xrray①②">(5)</a> <a href="#ref-for-xrray①③">(6)</a> <a href="#ref-for-xrray①④">(7)</a> <a href="#ref-for-xrray①⑤">(8)</a> <a href="#ref-for-xrray①⑥">(9)</a> <a href="#ref-for-xrray①⑦">(10)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrray-xrray">
    <b><a href="#dom-xrray-xrray">#dom-xrray-xrray</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-xrray-xrray">2.2. XRHitTestOptionsInit</a>
-    <li><a href="#ref-for-dom-xrray-xrray①">8.1. XRRay</a>
+    <li><a href="#ref-for-dom-xrray-xrray①">2.3. XRTransientInputHitTestOptionsInit</a>
+    <li><a href="#ref-for-dom-xrray-xrray②">8.1. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrray-xrray-transform">
@@ -2770,7 +3247,7 @@ Parts of this work may be from another specification document.  If so, those par
   <aside class="dfn-panel" data-for="native-hit-test">
    <b><a href="#native-hit-test">#native-hit-test</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-native-hit-test">6. Computing hit test results</a>
+    <li><a href="#ref-for-native-hit-test">6. Computing hit test results</a> <a href="#ref-for-native-hit-test①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="native-entity-type">
@@ -2789,9 +3266,10 @@ Parts of this work may be from another specification document.  If so, those par
    <b><a href="#native-hit-test-result">#native-hit-test-result</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-native-hit-test-result">4.1. XRHitTestResult</a>
-    <li><a href="#ref-for-native-hit-test-result①">6. Computing hit test results</a>
-    <li><a href="#ref-for-native-hit-test-result②">9.2. Native entity type</a>
-    <li><a href="#ref-for-native-hit-test-result③">9.3. Native hit test result</a>
+    <li><a href="#ref-for-native-hit-test-result①">4.2. XRTransientInputHitTestResult</a>
+    <li><a href="#ref-for-native-hit-test-result②">6. Computing hit test results</a> <a href="#ref-for-native-hit-test-result③">(2)</a>
+    <li><a href="#ref-for-native-hit-test-result④">9.2. Native entity type</a>
+    <li><a href="#ref-for-native-hit-test-result⑤">9.3. Native hit test result</a>
    </ul>
   </aside>
 <script>/* script-var-click-highlighting */
