@@ -24,12 +24,13 @@ spec:webxr device api - level 1; type:dfn; for:/; text:xr device
 <pre class="anchors">
 spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
     for: XRSpace;
-        type: dfn; text: session; url: xrspace-session
+        type: dfn; text: effective origin; url: xrspace-effective-origin
         type: dfn; text: native origin; url: xrspace-native-origin
         type: dfn; text: origin offset; url: xrspace-origin-offset
-        type: dfn; text: effective origin; url: xrspace-effective-origin
+        type: dfn; text: session; url: xrspace-session
     type: interface; text: XRSession; url: xrsession-interface
     for: XRSession;
+        type: dfn; text: list of enabled features; url: xr-session-list-of-enabled-features
         type: dfn; text: list of frame updates; url: xrsession-list-of-frame-updates
         type: dfn; text: XR device; url: xrsession-xr-device
     type: interface; text: XRFrame; url: xrframe-interface
@@ -41,12 +42,18 @@ spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
         type: attribute; text: matrix; url: dom-xrrigidtransform-matrix
     for: XRInputSource;
         type: dfn; text: input profile name; url: xrinputsource-input-profile-name
+    type: callback; text: XRFrameRequestCallback; url: callbackdef-xrframerequestcallback
+    type: dfn; text: capable of supporting; url: capable-of-supporting
+    type: dfn; text: feature descriptor; url: feature-descriptor
+    type: dfn; text: identity transform; url: identity-transform
+    type: dfn; text: inline XR device; url: inline-xr-device
     type: dfn; text: list of active XR input sources; url: list-of-active-xr-input-sources
-    type: dfn; text: XR device; url: xr-device
+    type: dfn; text: list of animation frame callbacks; url: list-of-animation-frame-callbacks
     type: dfn; text: matrix; url: matrix
     type: dfn; text: normalize; url: normalize
     type: dfn; text: populate the pose; url: populate-the-pose
-    type: dfn; text: identity transform; url: identity-transform
+    type: dfn; text: XR animation frame; url: xr-animation-frame
+    type: dfn; text: XR device; url: xr-device
 spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     type: method; text: IsDetachedBuffer; url: sec-isdetachedbuffer
 </pre>
@@ -97,6 +104,16 @@ Terminology {#terminology}
 -----------
 
 Hit testing, as understood by this document, is an act of checking if an idealised mathematical ray (half-line) intersects with real world as understood by the underlying Augmented Reality hardware & software. Ray intersections against virtual objects created by the application consuming the API are explicitly out of scope of the hit test API.
+
+Initialization {#hit-test-initialization}
+==============
+
+Feature descriptor {#hit-test-feature-descriptor}
+------------------
+
+In order for the applications to signal their interest in performing hit testing during a session, the session must be requested with appropriate [=feature descriptor=]. The string <dfn>hit-test</dfn> is introduced by this module as a new valid feature descriptor for hit test feature.
+
+A device is [=capable of supporting=] the hit test feature if the device exposes a [=native hit test=] capability. The [=inline XR device=] MUST NOT be treated as [=capable of supporting=] the hit test feature.
 
 Hit test options {#hit-test-options}
 ================
@@ -364,8 +381,9 @@ The application can <dfn>request hit test</dfn> using {{XRSession}}'s {{XRSessio
 
 The <dfn method for="XRSession">requestHitTestSource(|options|)</dfn> method, when invoked on an {{XRSession}} |session|, MUST run the following steps:
 
-  1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
   1. Let |promise| be [=a new Promise=].
+  1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/list of enabled features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
+  1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
   1. [=Create a hit test source=], |hitTestSource|, with |session|, |options|' {{XRHitTestOptionsInit/space}}, |options|' [=XRHitTestOptionsInit/effective entityTypes=] and |options|' [=XRHitTestOptionsInit/effective offsetRay=].
   1. If |hitTestSource| is <code>null</code>, [=/reject=] |promise| with an {{OperationError}} and abort these steps.
   1. Store created |hitTestSource| in |session|'s [=set of active hit test sources=].
@@ -377,8 +395,9 @@ The <dfn method for="XRSession">requestHitTestSource(|options|)</dfn> method, wh
 
 The <dfn method for="XRSession">requestHitTestSourceForTransientInput(|options|)</dfn> method, when invoked on an {{XRSession}} |session|, MUST run the following steps:
 
-  1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
   1. Let |promise| be [=a new Promise=].
+  1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/list of enabled features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
+  1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
   1. [=Create a hit test source for transient input=], |hitTestSource|, with |session|, |options|' {{XRTransientInputHitTestOptionsInit/profile}}, |options|' [=XRHitTestOptionsInit/effective entityTypes=] and |options|' [=XRHitTestOptionsInit/effective offsetRay=].
   1. If |hitTestSource| is <code>null</code>, [=/reject=] |promise| with an {{OperationError}} and abort these steps.
   1. Store created |hitTestSource| in |session|'s [=set of active hit test sources for transient input=].
