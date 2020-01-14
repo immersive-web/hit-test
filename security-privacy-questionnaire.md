@@ -40,8 +40,8 @@ after a certain number, the requests are being superfluous.
 This feature of WebXR has to be listed when requesting an XR session which
 allows the user agent to show a prompt specifically requesting user approval.
 
-However, it's worth noting that a WebXR module will expose planes in the user
-environment and another one meshes. These specifications will expose even
+However, it's worth noting that a planned WebXR module will expose planes in the
+user environment and another one meshes. These specifications will expose even
 further details about the user environment than what hit tests can do.
 
 **Does this specification introduce new state for an origin that persists
