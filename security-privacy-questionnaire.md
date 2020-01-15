@@ -7,9 +7,8 @@ WebXR Hit Test Module specification.
 **What information might this feature expose to Web sites or other parties,
 and for what purposes is that exposure necessary?**
 
-This feature will help a web site to map the user environment. Hit tests, in the
-context of VR will only help map the 3D environment. However, in the context of
-AR, it will help map the real world around the user.
+This feature will help a web site to map the user environment with a somewhat
+low level of accuracy.
 
 Hit tests can be requested for a pre-defined ray which will allow the creation
 of a reticle. This is a typical use case in AR. The other way to request a hit
