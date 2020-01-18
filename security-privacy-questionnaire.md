@@ -99,7 +99,7 @@ The specification does not mandate a different behaviour.
 **Does this specification have a "Security Considerations" and "Privacy
 Considerations" section?**
 
-Incoming...
+Yes.
 
 **Does this specification allow downgrading default security characteristics?**
 

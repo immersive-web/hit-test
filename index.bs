@@ -375,6 +375,8 @@ The {{XRSession}} is extended to contain an associated <dfn for="XRSession">set 
 
 The {{XRSession}} is extended to contain an associated <dfn for="XRSession">set of active hit test sources for transient input</dfn> that will be used when computing hit test results for transient input.
 
+The application is considered to make an <dfn>unreasonable number of requests</dfn> when the total number of active hit test sources or recently made requests is considered too high for a legitimate use of the API. This is an OPTIONAL privacy measure that the user agent MAY take to avoid abuse.
+
 The application can <dfn>request hit test</dfn> using {{XRSession}}'s {{XRSession/requestHitTestSource()}} method.
 
 <div class="algorithm" data-algorithm="request-hit-test-source">
@@ -383,6 +385,7 @@ The <dfn method for="XRSession">requestHitTestSource(|options|)</dfn> method, wh
 
   1. Let |promise| be [=a new Promise=].
   1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/list of enabled features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
+  1. The user agent MAY [=/reject=] |promise| with {{NotAllowedError}} and abort these steps if there is a [=unreasonable number of requests=].
   1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
   1. [=Create a hit test source=], |hitTestSource|, with |session|, |options|' {{XRHitTestOptionsInit/space}}, |options|' [=XRHitTestOptionsInit/effective entityTypes=] and |options|' [=XRHitTestOptionsInit/effective offsetRay=].
   1. If |hitTestSource| is <code>null</code>, [=/reject=] |promise| with an {{OperationError}} and abort these steps.
@@ -397,6 +400,7 @@ The <dfn method for="XRSession">requestHitTestSourceForTransientInput(|options|)
 
   1. Let |promise| be [=a new Promise=].
   1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/list of enabled features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
+  1. The user agent MAY [=/reject=] |promise| with {{NotAllowedError}} and abort these steps if there is a [=unreasonable number of requests=].
   1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
   1. [=Create a hit test source for transient input=], |hitTestSource|, with |session|, |options|' {{XRTransientInputHitTestOptionsInit/profile}}, |options|' [=XRHitTestOptionsInit/effective entityTypes=] and |options|' [=XRHitTestOptionsInit/effective offsetRay=].
   1. If |hitTestSource| is <code>null</code>, [=/reject=] |promise| with an {{OperationError}} and abort these steps.
@@ -632,6 +636,21 @@ Native hit test result {#native-hit-test-result-section}
 The information about position and orientation of the intersection point should be contained in [=native hit test result=]'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface's normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector).
 
 Issue: Decide if we need to specify other axes of the coordinate system defined by hit test result's native origin to maintain compatibility between different implementations & differrent AR frameworks.
+
+Privacy & Security Considerations {#privacy-security}
+=================================
+
+<section class="non-normative">
+
+The hit test API can be used to map the user environment with more or less
+precision by sending hit test rays in multiple directions. Hit test has to be
+declared when creating an XR session as a [=feature descriptor=] which will
+allow the user agent to notify the user of the potential privacy implications of
+allowing the hit test API to be used by the website. Furthermore, the user agent
+is allowed to deny hit test requests when it considers that an [=unreasonable
+number of requests=] have been made for a genuine non-privacy invasive usage.
+
+</section>
 
 Acknowledgements {#ack}
 ================
