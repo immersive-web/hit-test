@@ -1221,7 +1221,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version f4aea3b553110477acb6e7a2deab228b66128fdc" name="generator">
+  <meta content="Bikeshed version 811139e88557b020c23cfc4db749a6220e4f7dcb" name="generator">
   <link href="https://immersive-web.github.io/hit-test/" rel="canonical">
   <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
   <link href="favicon-96x96.png" rel="icon" sizes="96x96" type="image/png">
@@ -1590,7 +1590,8 @@ Parts of this work may be from another specification document.  If so, those par
       <li><a href="#native-entity-type-section"><span class="secno">10.2</span> <span class="content">Native entity type</span></a>
       <li><a href="#native-hit-test-result-section"><span class="secno">10.3</span> <span class="content">Native hit test result</span></a>
      </ol>
-    <li><a href="#ack"><span class="secno">11</span> <span class="content">Acknowledgements</span></a>
+    <li><a href="#privacy-security"><span class="secno">11</span> <span class="content">Privacy &amp; Security Considerations</span></a>
+    <li><a href="#ack"><span class="secno">12</span> <span class="content">Acknowledgements</span></a>
     <li><a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
     <li>
      <a href="#index"><span class="secno"></span> <span class="content">Index</span></a>
@@ -1841,6 +1842,7 @@ Parts of this work may be from another specification document.  If so, those par
 </pre>
    <p>The <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface③">XRSession</a></code> is extended to contain an associated <dfn class="dfn-paneled" data-dfn-for="XRSession" data-dfn-type="dfn" data-noexport id="xrsession-set-of-active-hit-test-sources">set of active hit test sources</dfn> that will be used when computing hit test results.</p>
    <p>The <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface④">XRSession</a></code> is extended to contain an associated <dfn class="dfn-paneled" data-dfn-for="XRSession" data-dfn-type="dfn" data-noexport id="xrsession-set-of-active-hit-test-sources-for-transient-input">set of active hit test sources for transient input</dfn> that will be used when computing hit test results for transient input.</p>
+   <p>The application is considered to make an <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="unreasonable-number-of-requests">unreasonable number of requests</dfn> when the total number of active hit test sources or recently made requests is considered too high for a legitimate use of the API. This is an OPTIONAL privacy measure that the user agent MAY take to avoid abuse.</p>
    <p>The application can <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="request-hit-test">request hit test</dfn> using <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface⑤">XRSession</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-xrsession-requesthittestsource" id="ref-for-dom-xrsession-requesthittestsource①">requestHitTestSource()</a></code> method.</p>
    <div class="algorithm" data-algorithm="request-hit-test-source">
     <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRSession" data-dfn-type="method" data-export id="dom-xrsession-requesthittestsource"><code>requestHitTestSource(<var>options</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface⑥">XRSession</a></code> <var>session</var>, MUST run the following steps:</p>
@@ -1850,11 +1852,13 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p>If <a data-link-type="dfn" href="#hit-test" id="ref-for-hit-test">hit-test</a> feature descriptor is not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain">contained</a> in the <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-session-list-of-enabled-features" id="ref-for-xr-session-list-of-enabled-features">list of enabled features</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror">NotSupportedError</a></code> and abort these steps.</p>
      <li data-md>
+      <p>The user agent MAY <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject①">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notallowederror" id="ref-for-notallowederror">NotAllowedError</a></code> and abort these steps if there is a <a data-link-type="dfn" href="#unreasonable-number-of-requests" id="ref-for-unreasonable-number-of-requests">unreasonable number of requests</a>.</p>
+     <li data-md>
       <p>Add <a data-link-type="dfn" href="#compute-all-hit-test-results" id="ref-for-compute-all-hit-test-results">compute all hit test results</a> algorithm to <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrsession-list-of-frame-updates" id="ref-for-xrsession-list-of-frame-updates">list of frame updates</a> if it is not already present there.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="#create-a-hit-test-source" id="ref-for-create-a-hit-test-source">Create a hit test source</a>, <var>hitTestSource</var>, with <var>session</var>, <var>options</var>’ <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space②">space</a></code>, <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-entitytypes" id="ref-for-xrhittestoptionsinit-effective-entitytypes①">effective entityTypes</a> and <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-offsetray" id="ref-for-xrhittestoptionsinit-effective-offsetray①">effective offsetRay</a>.</p>
      <li data-md>
-      <p>If <var>hitTestSource</var> is <code>null</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject①">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#operationerror" id="ref-for-operationerror">OperationError</a></code> and abort these steps.</p>
+      <p>If <var>hitTestSource</var> is <code>null</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject②">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#operationerror" id="ref-for-operationerror">OperationError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Store created <var>hitTestSource</var> in <var>session</var>’s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources" id="ref-for-xrsession-set-of-active-hit-test-sources②">set of active hit test sources</a>.</p>
      <li data-md>
@@ -1867,13 +1871,15 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p>Let <var>promise</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-new-promise" id="ref-for-a-new-promise①">a new Promise</a>.</p>
      <li data-md>
-      <p>If <a data-link-type="dfn" href="#hit-test" id="ref-for-hit-test①">hit-test</a> feature descriptor is not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain①">contained</a> in the <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-session-list-of-enabled-features" id="ref-for-xr-session-list-of-enabled-features①">list of enabled features</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject②">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror①">NotSupportedError</a></code> and abort these steps.</p>
+      <p>If <a data-link-type="dfn" href="#hit-test" id="ref-for-hit-test①">hit-test</a> feature descriptor is not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain①">contained</a> in the <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-session-list-of-enabled-features" id="ref-for-xr-session-list-of-enabled-features①">list of enabled features</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject③">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror①">NotSupportedError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>The user agent MAY <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject④">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notallowederror" id="ref-for-notallowederror①">NotAllowedError</a></code> and abort these steps if there is a <a data-link-type="dfn" href="#unreasonable-number-of-requests" id="ref-for-unreasonable-number-of-requests①">unreasonable number of requests</a>.</p>
      <li data-md>
       <p>Add <a data-link-type="dfn" href="#compute-all-hit-test-results" id="ref-for-compute-all-hit-test-results①">compute all hit test results</a> algorithm to <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrsession-list-of-frame-updates" id="ref-for-xrsession-list-of-frame-updates①">list of frame updates</a> if it is not already present there.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="#create-a-hit-test-source-for-transient-input" id="ref-for-create-a-hit-test-source-for-transient-input">Create a hit test source for transient input</a>, <var>hitTestSource</var>, with <var>session</var>, <var>options</var>’ <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-profile" id="ref-for-dom-xrtransientinputhittestoptionsinit-profile②">profile</a></code>, <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-entitytypes" id="ref-for-xrhittestoptionsinit-effective-entitytypes②">effective entityTypes</a> and <var>options</var>’ <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-offsetray" id="ref-for-xrhittestoptionsinit-effective-offsetray②">effective offsetRay</a>.</p>
      <li data-md>
-      <p>If <var>hitTestSource</var> is <code>null</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject③">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#operationerror" id="ref-for-operationerror①">OperationError</a></code> and abort these steps.</p>
+      <p>If <var>hitTestSource</var> is <code>null</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject⑤">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#operationerror" id="ref-for-operationerror①">OperationError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Store created <var>hitTestSource</var> in <var>session</var>’s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources-for-transient-input" id="ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input②">set of active hit test sources for transient input</a>.</p>
      <li data-md>
@@ -2131,7 +2137,17 @@ Parts of this work may be from another specification document.  If so, those par
    <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="native hit test result|native hit test results" data-noexport id="native-hit-test-result">Native hit test results</dfn> returned from XR device should contain the position of the intersection point with user’s environment. Depending on the native entity type and the information available to the XR device, the result should also contain orientation defined in such a way to allow the user agent to compute a surface normal to the user’s environment at the intersection point.</p>
    <p>The information about position and orientation of the intersection point should be contained in <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result⑤">native hit test result</a>'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface’s normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector).</p>
    <p class="issue" id="issue-4d2e55aa"><a class="self-link" href="#issue-4d2e55aa"></a> Decide if we need to specify other axes of the coordinate system defined by hit test result’s native origin to maintain compatibility between different implementations &amp; differrent AR frameworks.</p>
-   <h2 class="heading settled" data-level="11" id="ack"><span class="secno">11. </span><span class="content">Acknowledgements</span><a class="self-link" href="#ack"></a></h2>
+   <h2 class="heading settled" data-level="11" id="privacy-security"><span class="secno">11. </span><span class="content">Privacy &amp; Security Considerations</span><a class="self-link" href="#privacy-security"></a></h2>
+   <section class="non-normative">
+    <p>The hit test API can be used to map the user environment with more or less
+precision by sending hit test rays in multiple directions. Hit test has to be
+declared when creating an XR session as a <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#feature-descriptor" id="ref-for-feature-descriptor①">feature descriptor</a> which will
+allow the user agent to notify the user of the potential privacy implications of
+allowing the hit test API to be used by the website. Furthermore, the user agent
+is allowed to deny hit test requests when it considers that an <a data-link-type="dfn" href="#unreasonable-number-of-requests" id="ref-for-unreasonable-number-of-requests②">unreasonable
+number of requests</a> have been made for a genuine non-privacy invasive usage.</p>
+   </section>
+   <h2 class="heading settled" data-level="12" id="ack"><span class="secno">12. </span><span class="content">Acknowledgements</span><a class="self-link" href="#ack"></a></h2>
    <p>The following individuals have contributed to the design of the WebXR Hit Test specification:</p>
   </main>
   <div data-fill-with="conformance">
@@ -2398,6 +2414,7 @@ Parts of this work may be from another specification document.  If so, those par
    <li><a href="#xrsession-set-of-active-hit-test-sources">set of active hit test sources</a><span>, in §6</span>
    <li><a href="#xrsession-set-of-active-hit-test-sources-for-transient-input">set of active hit test sources for transient input</a><span>, in §6</span>
    <li><a href="#dom-xrhittestoptionsinit-space">space</a><span>, in §3.2</span>
+   <li><a href="#unreasonable-number-of-requests">unreasonable number of requests</a><span>, in §6</span>
    <li><a href="#dictdef-xrhittestoptionsinit">XRHitTestOptionsInit</a><span>, in §3.2</span>
    <li><a href="#xrhittestresult">XRHitTestResult</a><span>, in §5.1</span>
    <li><a href="#xrhittestsource">XRHitTestSource</a><span>, in §4.1</span>
@@ -2496,6 +2513,12 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-invalidstateerror③">8. Obtaining hit test results</a> <a href="#ref-for-invalidstateerror④">(2)</a> <a href="#ref-for-invalidstateerror⑤">(3)</a> <a href="#ref-for-invalidstateerror⑥">(4)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-notallowederror">
+   <a href="https://heycam.github.io/webidl/#notallowederror">https://heycam.github.io/webidl/#notallowederror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-notallowederror">6. Requesting hit test</a> <a href="#ref-for-notallowederror①">(2)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-notsupportederror">
    <a href="https://heycam.github.io/webidl/#notsupportederror">https://heycam.github.io/webidl/#notsupportederror</a><b>Referenced in:</b>
    <ul>
@@ -2534,7 +2557,7 @@ Parts of this work may be from another specification document.  If so, those par
   <aside class="dfn-panel" data-for="term-for-reject">
    <a href="https://heycam.github.io/webidl/#reject">https://heycam.github.io/webidl/#reject</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-reject">6. Requesting hit test</a> <a href="#ref-for-reject①">(2)</a> <a href="#ref-for-reject②">(3)</a> <a href="#ref-for-reject③">(4)</a>
+    <li><a href="#ref-for-reject">6. Requesting hit test</a> <a href="#ref-for-reject①">(2)</a> <a href="#ref-for-reject②">(3)</a> <a href="#ref-for-reject③">(4)</a> <a href="#ref-for-reject④">(5)</a> <a href="#ref-for-reject⑤">(6)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-resolve">
@@ -2628,6 +2651,7 @@ Parts of this work may be from another specification document.  If so, those par
    <a href="https://www.w3.org/TR/webxr/#feature-descriptor">https://www.w3.org/TR/webxr/#feature-descriptor</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-feature-descriptor">2.1. Feature descriptor</a>
+    <li><a href="#ref-for-feature-descriptor①">11. Privacy &amp; Security Considerations</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-identity-transform">
@@ -2742,6 +2766,7 @@ Parts of this work may be from another specification document.  If so, those par
      <li><span class="dfn-paneled" id="term-for-Exposed" style="color:initial">Exposed</span>
      <li><span class="dfn-paneled" id="term-for-idl-Float32Array" style="color:initial">Float32Array</span>
      <li><span class="dfn-paneled" id="term-for-invalidstateerror" style="color:initial">InvalidStateError</span>
+     <li><span class="dfn-paneled" id="term-for-notallowederror" style="color:initial">NotAllowedError</span>
      <li><span class="dfn-paneled" id="term-for-notsupportederror" style="color:initial">NotSupportedError</span>
      <li><span class="dfn-paneled" id="term-for-operationerror" style="color:initial">OperationError</span>
      <li><span class="dfn-paneled" id="term-for-SameObject" style="color:initial">SameObject</span>
@@ -3182,6 +3207,13 @@ Parts of this work may be from another specification document.  If so, those par
     <li><a href="#ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input">4.2. XRTransientInputHitTestSource</a> <a href="#ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input①">(2)</a>
     <li><a href="#ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input②">6. Requesting hit test</a>
     <li><a href="#ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input③">7. Computing hit test results</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="unreasonable-number-of-requests">
+   <b><a href="#unreasonable-number-of-requests">#unreasonable-number-of-requests</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-unreasonable-number-of-requests">6. Requesting hit test</a> <a href="#ref-for-unreasonable-number-of-requests①">(2)</a>
+    <li><a href="#ref-for-unreasonable-number-of-requests②">11. Privacy &amp; Security Considerations</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="request-hit-test">
