@@ -67,12 +67,10 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     content: "This section is non-normative.";
     font-style: italic;
   }
-
   .tg {
     border-collapse: collapse;
     border-spacing: 0;
   }
-
   .tg th {
     border-style: solid;
     border-width: 1px;
@@ -82,7 +80,6 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     font-weight: bold;
     border-color: grey;
   }
-
   .tg td {
     padding: 4px 5px;
     background-color: rgb(221, 238, 255);
@@ -93,7 +90,6 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     overflow: hidden;
     word-break: normal;
   }
-
   .unstable::before {
     content: "This section is not stable";
     display: block;
@@ -101,7 +97,6 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     text-align: right;
     color: red;
   }
-
   .unstable {
     border: thin solid pink;
     border-radius: .5em;
@@ -111,11 +106,9 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     background-repeat: repeat;
     background-color: #FFF4F4;
   }
-
   .unstable h3:first-of-type {
     margin-top: 0.5rem;
   }
-
   .unstable.example:not(.no-marker)::before {
     content: "Example " counter(example) " (Unstable)";
     float: none;
