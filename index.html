@@ -1221,7 +1221,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 811139e88557b020c23cfc4db749a6220e4f7dcb" name="generator">
+  <meta content="Bikeshed version 8dfdf2ed5fc6ab13df001e8912368d1a94aa49dd" name="generator">
   <link href="https://immersive-web.github.io/hit-test/" rel="canonical">
   <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
   <link href="favicon-96x96.png" rel="icon" sizes="96x96" type="image/png">
@@ -1252,6 +1252,29 @@ Possible extra rowspan handling
     border-color: grey;
     overflow: hidden;
     word-break: normal;
+  }
+  .unstable::before {
+    content: "This section is not stable";
+    display: block;
+    font-weight: bold;
+    text-align: right;
+    color: red;
+  }
+  .unstable {
+    border: thin solid pink;
+    border-radius: .5em;
+    padding: .5em;
+    margin: .5em calc(-0.5em - 1px);
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='290'><text transform='rotate(-45)' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='70' y='210' opacity='.1'>Unstable</text></svg>");
+    background-repeat: repeat;
+    background-color: #FFF4F4;
+  }
+  .unstable h3:first-of-type {
+    margin-top: 0.5rem;
+  }
+  .unstable.example:not(.no-marker)::before {
+    content: "Example " counter(example) " (Unstable)";
+    float: none;
   }
 </style>
 <style>/* style-md-lists */
@@ -1511,7 +1534,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebXR Hit Test Module</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-01-17">17 January 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-01-23">23 January 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1532,7 +1555,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
    <div data-fill-with="warning"></div>
    <p class="copyright" data-fill-with="copyright"><a href="http://creativecommons.org/publicdomain/zero/1.0/" rel="license"><img alt="CC0" src="https://licensebuttons.net/p/zero/1.0/80x15.png"></a> To the extent possible under law, the editors have waived all copyright
 and related or neighboring rights to this work.
-In addition, as of 17 January 2020,
+In addition, as of 23 January 2020,
 the editors have made this specification available under the <a href="http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0" rel="license">Open Web Foundation Agreement Version 1.0</a>,
 which is available at http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0.
 Parts of this work may be from another specification document.  If so, those parts are instead covered by the license of that specification document. </p>
@@ -1621,21 +1644,23 @@ Parts of this work may be from another specification document.  If so, those par
    <p>A device is <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#capable-of-supporting" id="ref-for-capable-of-supporting">capable of supporting</a> the hit test feature if the device exposes a <a data-link-type="dfn" href="#native-hit-test" id="ref-for-native-hit-test">native hit test</a> capability. The <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#inline-xr-device" id="ref-for-inline-xr-device">inline XR device</a> MUST NOT be treated as <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#capable-of-supporting" id="ref-for-capable-of-supporting①">capable of supporting</a> the hit test feature.</p>
    <h2 class="heading settled" data-level="3" id="hit-test-options"><span class="secno">3. </span><span class="content">Hit test options</span><a class="self-link" href="#hit-test-options"></a></h2>
    <h3 class="heading settled" data-level="3.1" id="hit-test-trackable-type-enum"><span class="secno">3.1. </span><span class="content">XRHitTestTrackableType</span><a class="self-link" href="#hit-test-trackable-type-enum"></a></h3>
-   <p>An <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype">XRHitTestTrackableType</a></code> enum specifies the type of entity that can be used for the purposes of hit test source creation.</p>
+   <section class="unstable">
+    <p>An <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype">XRHitTestTrackableType</a></code> enum specifies the type of entity that can be used for the purposes of hit test source creation.</p>
 <pre class="idl highlight def"><c- b>enum</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="enum" data-export id="enumdef-xrhittesttrackabletype"><code><c- g>XRHitTestTrackableType</c-></code></dfn> {
   <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point"><c- s>"point"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane"><c- s>"plane"</c-></a>,
   <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh"><c- s>"mesh"</c-></a>
 };
 </pre>
-   <ul>
-    <li data-md>
-     <p>A hit test trackable of type <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestTrackableType" data-dfn-type="enum-value" data-export id="dom-xrhittesttrackabletype-point"><code>"point"</code></dfn> indicates that the hit test results will be computed based on the feature points detected by the underlying Augmented Reality system.</p>
-    <li data-md>
-     <p>A hit test trackable of type <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestTrackableType" data-dfn-type="enum-value" data-export id="dom-xrhittesttrackabletype-plane"><code>"plane"</code></dfn> indicates that the hit test results will be computed based on the planes detected by the underlying Augmented Reality system.</p>
-    <li data-md>
-     <p>A hit test trackable of type <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestTrackableType" data-dfn-type="enum-value" data-export id="dom-xrhittesttrackabletype-mesh"><code>"mesh"</code></dfn> indicates that the hit test results will be computed based on the meshes detected by the underlying Augmented Reality system.</p>
-   </ul>
+    <ul>
+     <li data-md>
+      <p>A hit test trackable of type <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestTrackableType" data-dfn-type="enum-value" data-export id="dom-xrhittesttrackabletype-point"><code>"point"</code></dfn> indicates that the hit test results will be computed based on the feature points detected by the underlying Augmented Reality system.</p>
+     <li data-md>
+      <p>A hit test trackable of type <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestTrackableType" data-dfn-type="enum-value" data-export id="dom-xrhittesttrackabletype-plane"><code>"plane"</code></dfn> indicates that the hit test results will be computed based on the planes detected by the underlying Augmented Reality system.</p>
+     <li data-md>
+      <p>A hit test trackable of type <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestTrackableType" data-dfn-type="enum-value" data-export id="dom-xrhittesttrackabletype-mesh"><code>"mesh"</code></dfn> indicates that the hit test results will be computed based on the meshes detected by the underlying Augmented Reality system.</p>
+    </ul>
+   </section>
    <h3 class="heading settled" data-level="3.2" id="hit-test-options-dictionary"><span class="secno">3.2. </span><span class="content">XRHitTestOptionsInit</span><a class="self-link" href="#hit-test-options-dictionary"></a></h3>
    <p>An <code class="idl"><a data-link-type="idl" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit">XRHitTestOptionsInit</a></code> dictionary represents a set of configurable values that affect the behavior of the hit test being performed.</p>
 <pre class="idl highlight def"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-xrhittestoptionsinit"><code><c- g>XRHitTestOptionsInit</c-></code></dfn> {
@@ -1645,9 +1670,9 @@ Parts of this work may be from another specification document.  If so, those par
 };
 </pre>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrhittestoptionsinit-space"><code>space</code></dfn> dictionary member specifies <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace①">XRSpace</a></code> relative to which the <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray①">offsetRay</a></code> is specified.</p>
-   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrhittestoptionsinit-entitytypes"><code>entityTypes</code></dfn> dictionary member specifies array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype②">XRHitTestTrackableTypes</a> that will be used to compute results of the hit test.</p>
+   <section class="unstable"> The <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrhittestoptionsinit-entitytypes"><code>entityTypes</code></dfn> dictionary member specifies array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype②">XRHitTestTrackableTypes</a> that will be used to compute results of the hit test. </section>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrhittestoptionsinit-offsetray"><code>offsetRay</code></dfn> dictionary member specifies <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①">XRRay</a></code> that will be used to perform hit test. The <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray②">offsetRay</a></code> will be interpreted as if expressed in a coordinate system defined by <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space①">space</a></code>.</p>
-   <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit①">XRHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrhittestoptionsinit-effective-entitytypes">effective entityTypes</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-entitytypes" id="ref-for-dom-xrhittestoptionsinit-entitytypes①">entityTypes</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-entitytypes" id="ref-for-dom-xrhittestoptionsinit-entitytypes②">entityTypes</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-entitytypes" id="ref-for-xrhittestoptionsinit-effective-entitytypes">effective entityTypes</a> is set to an array containing single element, <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane①">"plane"</a></code>.</p>
+   <section class="unstable"> The <code class="idl"><a data-link-type="idl" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit①">XRHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrhittestoptionsinit-effective-entitytypes">effective entityTypes</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-entitytypes" id="ref-for-dom-xrhittestoptionsinit-entitytypes①">entityTypes</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-entitytypes" id="ref-for-dom-xrhittestoptionsinit-entitytypes②">entityTypes</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-entitytypes" id="ref-for-xrhittestoptionsinit-effective-entitytypes">effective entityTypes</a> is set to an array containing single element, <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane①">"plane"</a></code>. </section>
    <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit②">XRHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrhittestoptionsinit-effective-offsetray">effective offsetRay</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray③">offsetRay</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray④">offsetRay</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrhittestoptionsinit-effective-offsetray" id="ref-for-xrhittestoptionsinit-effective-offsetray">effective offsetRay</a> is set to an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray②">XRRay</a></code> constructed by invoking <code class="idl"><a data-link-type="idl" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray">XRRay()</a></code> without any parameters.</p>
    <h3 class="heading settled" data-level="3.3" id="transient-input-hit-test-options-dictionary"><span class="secno">3.3. </span><span class="content">XRTransientInputHitTestOptionsInit</span><a class="self-link" href="#transient-input-hit-test-options-dictionary"></a></h3>
    <p>An <code class="idl"><a data-link-type="idl" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit">XRTransientInputHitTestOptionsInit</a></code> dictionary represents a set of configurable values that affect the behavior of the hit test for transient input that is being performed.</p>
@@ -1658,9 +1683,9 @@ Parts of this work may be from another specification document.  If so, those par
 };
 </pre>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrtransientinputhittestoptionsinit-profile"><code>profile</code></dfn> dictionary member specifies an <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrinputsource-input-profile-name" id="ref-for-xrinputsource-input-profile-name">input profile name</a> of the transient input source that will be used to compute hit test results.</p>
-   <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrtransientinputhittestoptionsinit-entitytypes"><code>entityTypes</code></dfn> dictionary member specifies array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype④">XRHitTestTrackableTypes</a> that will be used to compute results of the hit test.</p>
+   <section class="unstable"> The <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrtransientinputhittestoptionsinit-entitytypes"><code>entityTypes</code></dfn> dictionary member specifies array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype④">XRHitTestTrackableTypes</a> that will be used to compute results of the hit test. </section>
    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dict-member" data-export id="dom-xrtransientinputhittestoptionsinit-offsetray"><code>offsetRay</code></dfn> dictionary member specifies <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray④">XRRay</a></code> that will be used to perform hit test. The <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray①">offsetRay</a></code> will be interpreted as if expressed in a coordinate system defined by <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrinputsource" id="ref-for-xrinputsource">XRInputSource</a></code> whose profile matches the passed in <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-profile" id="ref-for-dom-xrtransientinputhittestoptionsinit-profile①">profile</a></code> when computing hit test results for transient input sources.</p>
-   <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit①">XRTransientInputHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestoptionsinit-effective-entitytypes">effective entityTypes</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes①">entityTypes</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes②">entityTypes</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrtransientinputhittestoptionsinit-effective-entitytypes" id="ref-for-xrtransientinputhittestoptionsinit-effective-entitytypes">effective entityTypes</a> is set to an array containing single element, <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane②">"plane"</a></code>.</p>
+   <section class="unstable"> The <code class="idl"><a data-link-type="idl" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit①">XRTransientInputHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestoptionsinit-effective-entitytypes">effective entityTypes</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes①">entityTypes</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes②">entityTypes</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrtransientinputhittestoptionsinit-effective-entitytypes" id="ref-for-xrtransientinputhittestoptionsinit-effective-entitytypes">effective entityTypes</a> is set to an array containing single element, <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane②">"plane"</a></code>. </section>
    <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit②">XRTransientInputHitTestOptionsInit</a></code> dictionary has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestOptionsInit" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestoptionsinit-effective-offsetray">effective offsetRay</dfn> which is set to <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray②">offsetRay</a></code> if it was provided at dictionary construction time. If the <code class="idl"><a data-link-type="idl" href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray③">offsetRay</a></code> was not provided at construction time, the <a data-link-type="dfn" href="#xrtransientinputhittestoptionsinit-effective-offsetray" id="ref-for-xrtransientinputhittestoptionsinit-effective-offsetray">effective offsetRay</a> is set to an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑤">XRRay</a></code> constructed by invoking <code class="idl"><a data-link-type="idl" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray①">XRRay()</a></code> without any parameters.</p>
    <h2 class="heading settled" data-level="4" id="hit-test-source"><span class="secno">4. </span><span class="content">Hit test source</span><a class="self-link" href="#hit-test-source"></a></h2>
    <h3 class="heading settled" data-level="4.1" id="hit-test-source-interface"><span class="secno">4.1. </span><span class="content">XRHitTestSource</span><a class="self-link" href="#hit-test-source-interface"></a></h3>
@@ -1672,7 +1697,7 @@ Parts of this work may be from another specification document.  If so, those par
    <p>The <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource">XRHitTestSource</a></code> object serves as a handle to an active subscription to hit test.</p>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource①">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-session">session</dfn> which stores an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface">XRSession</a></code> that was used to create the hit test source.</p>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource②">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-native-origin">native origin</dfn> which stores information sufficient to identify the <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrspace-native-origin" id="ref-for-xrspace-native-origin">native origin</a> of an <code class="idl"><a data-link-type="idl" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace②">XRSpace</a></code> that was used to <a data-link-type="dfn" href="#request-hit-test" id="ref-for-request-hit-test">request hit test</a>. This information will be subsequently used when computing hit test results.</p>
-   <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource③">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-entity-types">entity types</dfn>, which is an array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑤">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results.</p>
+   <section class="unstable"> Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource③">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-entity-types">entity types</dfn>, which is an array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑤">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results. </section>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource④">XRHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-offset-ray">offset ray</dfn>, which is an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑥">XRRay</a></code> that will be used when computing hit test results.</p>
    <p><code class="idl"><a data-link-type="idl" href="#xrhittestsource" id="ref-for-xrhittestsource⑤">XRHitTestSource</a></code> is considered <dfn class="dfn-paneled" data-dfn-for="XRHitTestSource" data-dfn-type="dfn" data-noexport id="xrhittestsource-active">active</dfn> for as long as it’s present in <a data-link-type="dfn" href="#xrhittestsource-session" id="ref-for-xrhittestsource-session">session</a>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources" id="ref-for-xrsession-set-of-active-hit-test-sources">set of active hit test sources</a>.</p>
    <div class="algorithm" data-algorithm="create-hit-test-source">
@@ -1714,7 +1739,7 @@ Parts of this work may be from another specification document.  If so, those par
    <p>The <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource">XRTransientInputHitTestSource</a></code> object serves as a handle to an active subscription to hit test for transient input sources.</p>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource①">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-session">session</dfn> which stores an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface①">XRSession</a></code> that was used to create the hit test source.</p>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource②">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-profile">profile</dfn> which stores <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrinputsource-input-profile-name" id="ref-for-xrinputsource-input-profile-name①">input profile name</a> of an input source. This information will be subsequently used when computing hit test results for transient input sources.</p>
-   <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource③">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-entity-types">entity types</dfn>, which is an array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑥">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results.</p>
+   <section class="unstable"> Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource③">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-entity-types">entity types</dfn>, which is an array of <a class="idl-code" data-link-type="enum" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑥">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results. </section>
    <p>Each <code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource④">XRTransientInputHitTestSource</a></code> has an associated <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-offset-ray">offset ray</dfn>, which is an <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑦">XRRay</a></code> that will be used when computing hit test results.</p>
    <p><code class="idl"><a data-link-type="idl" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource⑤">XRTransientInputHitTestSource</a></code> is considered <dfn class="dfn-paneled" data-dfn-for="XRTransientInputHitTestSource" data-dfn-type="dfn" data-noexport id="xrtransientinputhittestsource-active">active</dfn> for as long as it’s present in <a data-link-type="dfn" href="#xrtransientinputhittestsource-session" id="ref-for-xrtransientinputhittestsource-session">session</a>'s <a data-link-type="dfn" href="#xrsession-set-of-active-hit-test-sources-for-transient-input" id="ref-for-xrsession-set-of-active-hit-test-sources-for-transient-input">set of active hit test sources for transient input</a>.</p>
    <div class="algorithm" data-algorithm="create-hit-test-source-transient">
@@ -2101,38 +2126,40 @@ Parts of this work may be from another specification document.  If so, those par
    </ul>
    <p class="note" role="note"><span>Note:</span> For devices that do not expose the hit test functionality natively, it might still be possible for user agents to implement this specification by leveraging other ways of obtaining the information about user’s environment that might be exposed by the XR device.</p>
    <h3 class="heading settled" data-level="10.2" id="native-entity-type-section"><span class="secno">10.2. </span><span class="content">Native entity type</span><a class="self-link" href="#native-entity-type-section"></a></h3>
-   <p><a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result④">Native hit test results</a> returned by <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-device" id="ref-for-xr-device③">XR device</a> should contain information about the <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="native entity type" data-noexport id="native-entity-type">type of the entity</dfn> used to compute the result. Such native types might consist of, but not be limited to:</p>
-   <ul>
-    <li data-md>
-     <p>Point - signifies that hit test result was computed based on characteristic points found in user’s environment.</p>
-    <li data-md>
-     <p>Plane - signifies that hit test result was computed based on planes detected in user’s environment.</p>
-    <li data-md>
-     <p>Mesh - signifies that the hit test result was computed based on meshes detected in user’s environment.</p>
-   </ul>
-   <div class="algorithm" data-algorithm="convert-native-type-to-trackable-type">
-    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="convert-from-native-entity-type">convert from native entity type</dfn> into <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑨">XRHitTestTrackableType</a></code>, the user agent MUST run the following steps:</p>
-    <ol>
+   <section class="unstable">
+     <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result④">Native hit test results</a> returned by <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-device" id="ref-for-xr-device③">XR device</a> should contain information about the <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="native entity type" data-noexport id="native-entity-type">type of the entity</dfn> used to compute the result. Such native types might consist of, but not be limited to: 
+    <ul>
      <li data-md>
-      <p>Let <var>nativeEntityType</var> be the native entity type to be converted.</p>
+      <p>Point - signifies that hit test result was computed based on characteristic points found in user’s environment.</p>
      <li data-md>
-      <p>Let <var>entityType</var> be a new <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype①⓪">XRHitTestTrackableType</a></code>.</p>
+      <p>Plane - signifies that hit test result was computed based on planes detected in user’s environment.</p>
      <li data-md>
-      <p>Initialize <var>entityType</var> as follows:</p>
-      <dl class="switch">
-       <dt>If <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point①">"point"</a></code>
-       <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point②">"point"</a></code>.
-       <dt>Else, if <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane③">"plane"</a></code>
-       <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane④">"plane"</a></code>.
-       <dt>Else, if <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh①">"mesh"</a></code>
-       <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh②">"mesh"</a></code>.
-       <dt>Else
-       <dd>Set <var>entityType</var> to <code>null</code>
-      </dl>
-     <li data-md>
-      <p>Return <var>entityType</var>.</p>
-    </ol>
-   </div>
+      <p>Mesh - signifies that the hit test result was computed based on meshes detected in user’s environment.</p>
+    </ul>
+    <div class="algorithm" data-algorithm="convert-native-type-to-trackable-type">
+     <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="convert-from-native-entity-type">convert from native entity type</dfn> into <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype⑨">XRHitTestTrackableType</a></code>, the user agent MUST run the following steps:</p>
+     <ol>
+      <li data-md>
+       <p>Let <var>nativeEntityType</var> be the native entity type to be converted.</p>
+      <li data-md>
+       <p>Let <var>entityType</var> be a new <code class="idl"><a data-link-type="idl" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype①⓪">XRHitTestTrackableType</a></code>.</p>
+      <li data-md>
+       <p>Initialize <var>entityType</var> as follows:</p>
+       <dl class="switch">
+        <dt>If <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point①">"point"</a></code>
+        <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point②">"point"</a></code>.
+        <dt>Else, if <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane③">"plane"</a></code>
+        <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane④">"plane"</a></code>.
+        <dt>Else, if <var>nativeEntityType</var> contains type that corresponds to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh①">"mesh"</a></code>
+        <dd>Set <var>entityType</var> to <code class="idl"><a data-link-type="idl" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh②">"mesh"</a></code>.
+        <dt>Else
+        <dd>Set <var>entityType</var> to <code>null</code>
+       </dl>
+      <li data-md>
+       <p>Return <var>entityType</var>.</p>
+     </ol>
+    </div>
+   </section>
    <h3 class="heading settled" data-level="10.3" id="native-hit-test-result-section"><span class="secno">10.3. </span><span class="content">Native hit test result</span><a class="self-link" href="#native-hit-test-result-section"></a></h3>
    <p><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="native hit test result|native hit test results" data-noexport id="native-hit-test-result">Native hit test results</dfn> returned from XR device should contain the position of the intersection point with user’s environment. Depending on the native entity type and the information available to the XR device, the result should also contain orientation defined in such a way to allow the user agent to compute a surface normal to the user’s environment at the intersection point.</p>
    <p>The information about position and orientation of the intersection point should be contained in <a data-link-type="dfn" href="#native-hit-test-result" id="ref-for-native-hit-test-result⑤">native hit test result</a>'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface’s normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector).</p>
