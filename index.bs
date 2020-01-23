@@ -14,8 +14,15 @@ Mailing List Archives: https://lists.w3.org/Archives/Public/public-immersive-web
 
 Editor: Piotr Bialecki 114482, Google http://google.com/, bialpio@google.com
 
+Warning: custom
+Custom Warning Title: Unstable API
+Custom Warning Text:
+  <b>Parts of the API represented in this document are unstable and may change at any time.</b>
+  <p>The relevant unstable sections are marked as such.</p>
+
 Abstract: Describes a method for performing hit tests against real world geometry to be used with the WebXR Device API.
 </pre>
+
 
 <pre class="link-defaults">
 spec:webxr device api - level 1; type:dfn; for:/; text:xr device
@@ -66,10 +73,12 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     content: "This section is non-normative.";
     font-style: italic;
   }
+
   .tg {
     border-collapse: collapse;
     border-spacing: 0;
   }
+
   .tg th {
     border-style: solid;
     border-width: 1px;
@@ -79,6 +88,7 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     font-weight: bold;
     border-color: grey;
   }
+
   .tg td {
     padding: 4px 5px;
     background-color: rgb(221, 238, 255);
@@ -88,6 +98,33 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     border-color: grey;
     overflow: hidden;
     word-break: normal;
+  }
+
+  .unstable::before {
+    content: "This section is not stable";
+    display: block;
+    font-weight: bold;
+    text-align: right;
+    color: red;
+  }
+
+  .unstable {
+    border: thin solid pink;
+    border-radius: .5em;
+    padding: .5em;
+    margin: .5em calc(-0.5em - 1px);
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='290'><text transform='rotate(-45)' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='70' y='210' opacity='.1'>Unstable</text></svg>");
+    background-repeat: repeat;
+    background-color: #FFF4F4;
+  }
+
+  .unstable h3:first-of-type {
+    margin-top: 0.5rem;
+  }
+
+  .unstable.example:not(.no-marker)::before {
+    content: "Example " counter(example) " (Unstable)";
+    float: none;
   }
 </style>
 
@@ -121,6 +158,8 @@ Hit test options {#hit-test-options}
 XRHitTestTrackableType {#hit-test-trackable-type-enum}
 ----------------------
 
+<section class="unstable">
+
 An {{XRHitTestTrackableType}} enum specifies the type of entity that can be used for the purposes of hit test source creation.
 
 <script type="idl">
@@ -134,6 +173,8 @@ enum XRHitTestTrackableType {
 - A hit test trackable of type <dfn enum-value for="XRHitTestTrackableType">"point"</dfn> indicates that the hit test results will be computed based on the feature points detected by the underlying Augmented Reality system.
 - A hit test trackable of type <dfn enum-value for="XRHitTestTrackableType">"plane"</dfn> indicates that the hit test results will be computed based on the planes detected by the underlying Augmented Reality system.
 - A hit test trackable of type <dfn enum-value for="XRHitTestTrackableType">"mesh"</dfn> indicates that the hit test results will be computed based on the meshes detected by the underlying Augmented Reality system.
+
+</section>
 
 XRHitTestOptionsInit {#hit-test-options-dictionary}
 --------------------
@@ -150,11 +191,15 @@ dictionary XRHitTestOptionsInit {
 
 The <dfn dict-member for="XRHitTestOptionsInit">space</dfn> dictionary member specifies {{XRSpace}} relative to which the {{XRHitTestOptionsInit/offsetRay}} is specified.
 
+<section class="unstable">
 The <dfn dict-member for="XRHitTestOptionsInit">entityTypes</dfn> dictionary member specifies array of <a enum lt="XRHitTestTrackableType">XRHitTestTrackableTypes</a> that will be used to compute results of the hit test.
+</section>
 
 The <dfn dict-member for="XRHitTestOptionsInit">offsetRay</dfn> dictionary member specifies {{XRRay}} that will be used to perform hit test. The {{XRHitTestOptionsInit/offsetRay}} will be interpreted as if expressed in a coordinate system defined by {{XRHitTestOptionsInit/space}}.
 
+<section class="unstable">
 The {{XRHitTestOptionsInit}} dictionary has an associated <dfn for="XRHitTestOptionsInit">effective entityTypes</dfn> which is set to {{XRHitTestOptionsInit/entityTypes}} if it was provided at dictionary construction time. If the {{XRHitTestOptionsInit/entityTypes}} was not provided at construction time, the [=XRHitTestOptionsInit/effective entityTypes=] is set to an array containing single element, {{XRHitTestTrackableType/"plane"}}.
+</section>
 
 The {{XRHitTestOptionsInit}} dictionary has an associated <dfn for="XRHitTestOptionsInit">effective offsetRay</dfn> which is set to {{XRHitTestOptionsInit/offsetRay}} if it was provided at dictionary construction time. If the {{XRHitTestOptionsInit/offsetRay}} was not provided at construction time, the [=XRHitTestOptionsInit/effective offsetRay=] is set to an {{XRRay}} constructed by invoking {{XRRay/XRRay()}} without any parameters.
 
@@ -173,11 +218,15 @@ dictionary XRTransientInputHitTestOptionsInit {
 
 The <dfn dict-member for="XRTransientInputHitTestOptionsInit">profile</dfn> dictionary member specifies an [=XRInputSource/input profile name=] of the transient input source that will be used to compute hit test results.
 
+<section class="unstable">
 The <dfn dict-member for="XRTransientInputHitTestOptionsInit">entityTypes</dfn> dictionary member specifies array of <a enum lt="XRHitTestTrackableType">XRHitTestTrackableTypes</a> that will be used to compute results of the hit test.
+</section>
 
 The <dfn dict-member for="XRTransientInputHitTestOptionsInit">offsetRay</dfn> dictionary member specifies {{XRRay}} that will be used to perform hit test. The {{XRTransientInputHitTestOptionsInit/offsetRay}} will be interpreted as if expressed in a coordinate system defined by {{XRInputSource}} whose profile matches the passed in {{XRTransientInputHitTestOptionsInit/profile}} when computing hit test results for transient input sources.
 
+<section class="unstable">
 The {{XRTransientInputHitTestOptionsInit}} dictionary has an associated <dfn for="XRTransientInputHitTestOptionsInit">effective entityTypes</dfn> which is set to {{XRTransientInputHitTestOptionsInit/entityTypes}} if it was provided at dictionary construction time. If the {{XRTransientInputHitTestOptionsInit/entityTypes}} was not provided at construction time, the [=XRTransientInputHitTestOptionsInit/effective entityTypes=] is set to an array containing single element, {{XRHitTestTrackableType/"plane"}}.
+</section>
 
 The {{XRTransientInputHitTestOptionsInit}} dictionary has an associated <dfn for="XRTransientInputHitTestOptionsInit">effective offsetRay</dfn> which is set to {{XRTransientInputHitTestOptionsInit/offsetRay}} if it was provided at dictionary construction time. If the {{XRTransientInputHitTestOptionsInit/offsetRay}} was not provided at construction time, the [=XRTransientInputHitTestOptionsInit/effective offsetRay=] is set to an {{XRRay}} constructed by invoking {{XRRay/XRRay()}} without any parameters.
 
@@ -200,7 +249,9 @@ Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">session</d
 
 Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">native origin</dfn> which stores information sufficient to identify the [=XRSpace/native origin=] of an {{XRSpace}} that was used to [=request hit test=]. This information will be subsequently used when computing hit test results.
 
+<section class="unstable">
 Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">entity types</dfn>, which is an array of <a enum lt="XRHitTestTrackableType">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results.
+</section>
 
 Each {{XRHitTestSource}} has an associated <dfn for="XRHitTestSource">offset ray</dfn>, which is an {{XRRay}} that will be used when computing hit test results.
 
@@ -248,7 +299,9 @@ Each {{XRTransientInputHitTestSource}} has an associated <dfn for="XRTransientIn
 
 Each {{XRTransientInputHitTestSource}} has an associated <dfn for="XRTransientInputHitTestSource">profile</dfn> which stores [=XRInputSource/input profile name=] of an input source. This information will be subsequently used when computing hit test results for transient input sources.
 
+<section class="unstable">
 Each {{XRTransientInputHitTestSource}} has an associated <dfn for="XRTransientInputHitTestSource">entity types</dfn>, which is an array of <a enum lt="XRHitTestTrackableType">XRHitTestTrackableTypes</a> describing which entity types will be considered when computing hit test results.
+</section>
 
 Each {{XRTransientInputHitTestSource}} has an associated <dfn for="XRTransientInputHitTestSource">offset ray</dfn>, which is an {{XRRay}} that will be used when computing hit test results.
 
@@ -602,7 +655,7 @@ Note: For devices that do not expose the hit test functionality natively, it mig
 
 Native entity type {#native-entity-type-section}
 ------------------
-
+<section class="unstable">
 [=Native hit test results=] returned by [=XR device=] should contain information about the <dfn lt="native entity type">type of the entity</dfn> used to compute the result. Such native types might consist of, but not be limited to:
 - Point - signifies that hit test result was computed based on characteristic points found in user's environment.
 - Plane - signifies that hit test result was computed based on planes detected in user's environment.
@@ -627,6 +680,7 @@ To <dfn>convert from native entity type</dfn> into {{XRHitTestTrackableType}}, t
   1. Return |entityType|.
 
 </div>
+</section>
 
 Native hit test result {#native-hit-test-result-section}
 ----------------------
