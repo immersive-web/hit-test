@@ -14,12 +14,6 @@ Mailing List Archives: https://lists.w3.org/Archives/Public/public-immersive-web
 
 Editor: Piotr Bialecki 114482, Google http://google.com/, bialpio@google.com
 
-Warning: custom
-Custom Warning Title: Unstable API
-Custom Warning Text:
-  <b>Parts of the API represented in this document are unstable and may change at any time.</b>
-  <p>The relevant unstable sections are marked as such.</p>
-
 Abstract: Describes a method for performing hit tests against real world geometry to be used with the WebXR Device API.
 </pre>
 
