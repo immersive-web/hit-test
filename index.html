@@ -1221,7 +1221,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 8dfdf2ed5fc6ab13df001e8912368d1a94aa49dd" name="generator">
+  <meta content="Bikeshed version 8bc2fccb49a45a0af18c5e75ce18049d75f824b6" name="generator">
   <link href="https://immersive-web.github.io/hit-test/" rel="canonical">
   <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
   <link href="favicon-96x96.png" rel="icon" sizes="96x96" type="image/png">
@@ -1534,7 +1534,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebXR Hit Test Module</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-01-23">23 January 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-01-24">24 January 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1555,7 +1555,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
    <div data-fill-with="warning"></div>
    <p class="copyright" data-fill-with="copyright"><a href="http://creativecommons.org/publicdomain/zero/1.0/" rel="license"><img alt="CC0" src="https://licensebuttons.net/p/zero/1.0/80x15.png"></a> To the extent possible under law, the editors have waived all copyright
 and related or neighboring rights to this work.
-In addition, as of 23 January 2020,
+In addition, as of 24 January 2020,
 the editors have made this specification available under the <a href="http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0" rel="license">Open Web Foundation Agreement Version 1.0</a>,
 which is available at http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0.
 Parts of this work may be from another specification document.  If so, those parts are instead covered by the license of that specification document. </p>
@@ -1642,6 +1642,7 @@ Parts of this work may be from another specification document.  If so, those par
    <h3 class="heading settled" data-level="2.1" id="hit-test-feature-descriptor"><span class="secno">2.1. </span><span class="content">Feature descriptor</span><a class="self-link" href="#hit-test-feature-descriptor"></a></h3>
    <p>In order for the applications to signal their interest in performing hit testing during a session, the session must be requested with appropriate <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#feature-descriptor" id="ref-for-feature-descriptor">feature descriptor</a>. The string <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="hit-test">hit-test</dfn> is introduced by this module as a new valid feature descriptor for hit test feature.</p>
    <p>A device is <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#capable-of-supporting" id="ref-for-capable-of-supporting">capable of supporting</a> the hit test feature if the device exposes a <a data-link-type="dfn" href="#native-hit-test" id="ref-for-native-hit-test">native hit test</a> capability. The <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#inline-xr-device" id="ref-for-inline-xr-device">inline XR device</a> MUST NOT be treated as <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#capable-of-supporting" id="ref-for-capable-of-supporting①">capable of supporting</a> the hit test feature.</p>
+   <p>The hit test feature is subject to <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#feature-policy" id="ref-for-feature-policy">feature policy</a> and requires <code>"xr-spatial-tracking"</code> policy to be allowed on the requesting document’s origin.</p>
    <h2 class="heading settled" data-level="3" id="hit-test-options"><span class="secno">3. </span><span class="content">Hit test options</span><a class="self-link" href="#hit-test-options"></a></h2>
    <h3 class="heading settled" data-level="3.1" id="hit-test-trackable-type-enum"><span class="secno">3.1. </span><span class="content">XRHitTestTrackableType</span><a class="self-link" href="#hit-test-trackable-type-enum"></a></h3>
    <section class="unstable">
@@ -1875,7 +1876,9 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p>Let <var>promise</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-new-promise" id="ref-for-a-new-promise">a new Promise</a>.</p>
      <li data-md>
-      <p>If <a data-link-type="dfn" href="#hit-test" id="ref-for-hit-test">hit-test</a> feature descriptor is not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain">contained</a> in the <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-session-list-of-enabled-features" id="ref-for-xr-session-list-of-enabled-features">list of enabled features</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror">NotSupportedError</a></code> and abort these steps.</p>
+      <p>If <a data-link-type="dfn" href="#hit-test" id="ref-for-hit-test">hit-test</a> feature descriptor is not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain">contained</a> in the <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrsession-list-of-enabled-features" id="ref-for-xrsession-list-of-enabled-features">list of enabled features</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror">NotSupportedError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>If <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#ended" id="ref-for-ended">ended</a> value is <code>true</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror③">InvalidStateError</a></code> and abort these steps.</p>
      <li data-md>
       <p>The user agent MAY <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject①">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notallowederror" id="ref-for-notallowederror">NotAllowedError</a></code> and abort these steps if there is a <a data-link-type="dfn" href="#unreasonable-number-of-requests" id="ref-for-unreasonable-number-of-requests">unreasonable number of requests</a>.</p>
      <li data-md>
@@ -1896,7 +1899,9 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p>Let <var>promise</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-new-promise" id="ref-for-a-new-promise①">a new Promise</a>.</p>
      <li data-md>
-      <p>If <a data-link-type="dfn" href="#hit-test" id="ref-for-hit-test①">hit-test</a> feature descriptor is not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain①">contained</a> in the <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xr-session-list-of-enabled-features" id="ref-for-xr-session-list-of-enabled-features①">list of enabled features</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject③">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror①">NotSupportedError</a></code> and abort these steps.</p>
+      <p>If <a data-link-type="dfn" href="#hit-test" id="ref-for-hit-test①">hit-test</a> feature descriptor is not <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain①">contained</a> in the <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrsession-list-of-enabled-features" id="ref-for-xrsession-list-of-enabled-features①">list of enabled features</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject③">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror①">NotSupportedError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>If <var>session</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#ended" id="ref-for-ended①">ended</a> value is <code>true</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror④">InvalidStateError</a></code> and abort these steps.</p>
      <li data-md>
       <p>The user agent MAY <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject④">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notallowederror" id="ref-for-notallowederror①">NotAllowedError</a></code> and abort these steps if there is a <a data-link-type="dfn" href="#unreasonable-number-of-requests" id="ref-for-unreasonable-number-of-requests①">unreasonable number of requests</a>.</p>
      <li data-md>
@@ -1994,9 +1999,9 @@ Parts of this work may be from another specification document.  If so, those par
     <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="XRFrame" data-dfn-type="method" data-export id="dom-xrframe-gethittestresults"><code>getHitTestResults(<var>hitTestSource</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface①①">XRFrame</a></code> <var>frame</var>, the user agent MUST run the following steps:</p>
     <ol>
      <li data-md>
-      <p>If <var>frame</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrframe-active" id="ref-for-xrframe-active①">active</a> boolean is <code>false</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror③">InvalidStateError</a></code> and abort these steps.</p>
+      <p>If <var>frame</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrframe-active" id="ref-for-xrframe-active①">active</a> boolean is <code>false</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑤">InvalidStateError</a></code> and abort these steps.</p>
      <li data-md>
-      <p>Check that the entry for <var>hitTestSource</var> is present in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results①">map of hit test sources to hit test results</a>. If the entry is not present, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror④">InvalidStateError</a></code> and abort these steps.</p>
+      <p>Check that the entry for <var>hitTestSource</var> is present in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results①">map of hit test sources to hit test results</a>. If the entry is not present, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑥">InvalidStateError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Look up an entry for <var>hitTestSource</var> in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results②">map of hit test sources to hit test results</a> and assign it to <var>results</var>.</p>
      <li data-md>
@@ -2008,9 +2013,9 @@ Parts of this work may be from another specification document.  If so, those par
     <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="XRFrame" data-dfn-type="method" data-export id="dom-xrframe-gethittestresultsfortransientinput"><code>getHitTestResultsForTransientInput(<var>hitTestSource</var>)</code></dfn> method, when invoked on an <code class="idl"><a data-link-type="idl" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface①③">XRFrame</a></code> <var>frame</var>, the user agent MUST run the following steps:</p>
     <ol>
      <li data-md>
-      <p>If <var>frame</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrframe-active" id="ref-for-xrframe-active②">active</a> boolean is <code>false</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑤">InvalidStateError</a></code> and abort these steps.</p>
+      <p>If <var>frame</var>’s <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#xrframe-active" id="ref-for-xrframe-active②">active</a> boolean is <code>false</code>, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑦">InvalidStateError</a></code> and abort these steps.</p>
      <li data-md>
-      <p>Check that the entry for <var>hitTestSource</var> is present in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input①">map of hit test sources to hit test results for transient input</a>. If the entry is not present, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑥">InvalidStateError</a></code> and abort these steps.</p>
+      <p>Check that the entry for <var>hitTestSource</var> is present in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input①">map of hit test sources to hit test results for transient input</a>. If the entry is not present, throw an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror⑧">InvalidStateError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Look up an entry for <var>hitTestSource</var> in <var>frame</var>’s <a data-link-type="dfn" href="#xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input" id="ref-for-xrframe-map-of-hit-test-sources-to-hit-test-results-for-transient-input②">map of hit test sources to hit test results for transient input</a> and assign it to <var>results</var>.</p>
      <li data-md>
@@ -2537,7 +2542,8 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <li><a href="#ref-for-invalidstateerror">4.1. XRHitTestSource</a>
     <li><a href="#ref-for-invalidstateerror①">4.2. XRTransientInputHitTestSource</a>
     <li><a href="#ref-for-invalidstateerror②">5.1. XRHitTestResult</a>
-    <li><a href="#ref-for-invalidstateerror③">8. Obtaining hit test results</a> <a href="#ref-for-invalidstateerror④">(2)</a> <a href="#ref-for-invalidstateerror⑤">(3)</a> <a href="#ref-for-invalidstateerror⑥">(4)</a>
+    <li><a href="#ref-for-invalidstateerror③">6. Requesting hit test</a> <a href="#ref-for-invalidstateerror④">(2)</a>
+    <li><a href="#ref-for-invalidstateerror⑤">8. Obtaining hit test results</a> <a href="#ref-for-invalidstateerror⑥">(2)</a> <a href="#ref-for-invalidstateerror⑦">(3)</a> <a href="#ref-for-invalidstateerror⑧">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-notallowederror">
@@ -2674,11 +2680,23 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <li><a href="#ref-for-xrspace-effective-origin">4.1. XRHitTestSource</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-ended">
+   <a href="https://www.w3.org/TR/webxr/#ended">https://www.w3.org/TR/webxr/#ended</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-ended">6. Requesting hit test</a> <a href="#ref-for-ended①">(2)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-feature-descriptor">
    <a href="https://www.w3.org/TR/webxr/#feature-descriptor">https://www.w3.org/TR/webxr/#feature-descriptor</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-feature-descriptor">2.1. Feature descriptor</a>
     <li><a href="#ref-for-feature-descriptor①">11. Privacy &amp; Security Considerations</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-feature-policy">
+   <a href="https://www.w3.org/TR/webxr/#feature-policy">https://www.w3.org/TR/webxr/#feature-policy</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-feature-policy">2.1. Feature descriptor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-identity-transform">
@@ -2706,10 +2724,10 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <li><a href="#ref-for-list-of-active-xr-input-sources">7. Computing hit test results</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-xr-session-list-of-enabled-features">
-   <a href="https://www.w3.org/TR/webxr/#xr-session-list-of-enabled-features">https://www.w3.org/TR/webxr/#xr-session-list-of-enabled-features</a><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="term-for-xrsession-list-of-enabled-features">
+   <a href="https://www.w3.org/TR/webxr/#xrsession-list-of-enabled-features">https://www.w3.org/TR/webxr/#xrsession-list-of-enabled-features</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-xr-session-list-of-enabled-features">6. Requesting hit test</a> <a href="#ref-for-xr-session-list-of-enabled-features①">(2)</a>
+    <li><a href="#ref-for-xrsession-list-of-enabled-features">6. Requesting hit test</a> <a href="#ref-for-xrsession-list-of-enabled-features①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrsession-list-of-frame-updates">
@@ -2821,12 +2839,14 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
      <li><span class="dfn-paneled" id="term-for-xrframe-active" style="color:initial">active</span>
      <li><span class="dfn-paneled" id="term-for-capable-of-supporting" style="color:initial">capable of supporting</span>
      <li><span class="dfn-paneled" id="term-for-xrspace-effective-origin" style="color:initial">effective origin</span>
+     <li><span class="dfn-paneled" id="term-for-ended" style="color:initial">ended</span>
      <li><span class="dfn-paneled" id="term-for-feature-descriptor" style="color:initial">feature descriptor</span>
+     <li><span class="dfn-paneled" id="term-for-feature-policy" style="color:initial">feature policy</span>
      <li><span class="dfn-paneled" id="term-for-identity-transform" style="color:initial">identity transform</span>
      <li><span class="dfn-paneled" id="term-for-inline-xr-device" style="color:initial">inline xr device</span>
      <li><span class="dfn-paneled" id="term-for-xrinputsource-input-profile-name" style="color:initial">input profile name</span>
      <li><span class="dfn-paneled" id="term-for-list-of-active-xr-input-sources" style="color:initial">list of active xr input sources</span>
-     <li><span class="dfn-paneled" id="term-for-xr-session-list-of-enabled-features" style="color:initial">list of enabled features</span>
+     <li><span class="dfn-paneled" id="term-for-xrsession-list-of-enabled-features" style="color:initial">list of enabled features</span>
      <li><span class="dfn-paneled" id="term-for-xrsession-list-of-frame-updates" style="color:initial">list of frame updates</span>
      <li><span class="dfn-paneled" id="term-for-dom-xrrigidtransform-matrix" style="color:initial">matrix <small>(for XRRigidTransform)</small></span>
      <li><span class="dfn-paneled" id="term-for-xrspace-native-origin" style="color:initial">native origin</span>
