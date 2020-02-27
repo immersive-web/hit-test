@@ -1221,7 +1221,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 8bc2fccb49a45a0af18c5e75ce18049d75f824b6" name="generator">
+  <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
   <link href="https://immersive-web.github.io/hit-test/" rel="canonical">
   <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
   <link href="favicon-96x96.png" rel="icon" sizes="96x96" type="image/png">
@@ -1534,7 +1534,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebXR Hit Test Module</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-01-24">24 January 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-02-27">27 February 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1555,7 +1555,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
    <div data-fill-with="warning"></div>
    <p class="copyright" data-fill-with="copyright"><a href="http://creativecommons.org/publicdomain/zero/1.0/" rel="license"><img alt="CC0" src="https://licensebuttons.net/p/zero/1.0/80x15.png"></a> To the extent possible under law, the editors have waived all copyright
 and related or neighboring rights to this work.
-In addition, as of 24 January 2020,
+In addition, as of 27 February 2020,
 the editors have made this specification available under the <a href="http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0" rel="license">Open Web Foundation Agreement Version 1.0</a>,
 which is available at http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0.
 Parts of this work may be from another specification document.  If so, those parts are instead covered by the license of that specification document. </p>
@@ -2072,6 +2072,8 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p><a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#normalize" id="ref-for-normalize①">Normalize</a> the <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-x" id="ref-for-dom-dompointreadonly-x③">x</a></code>, <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-y" id="ref-for-dom-dompointreadonly-y③">y</a></code>, and <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-z" id="ref-for-dom-dompointreadonly-z③">z</a></code> components of <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction⑦">direction</a></code>.</p>
      <li data-md>
+      <p>Initialize <var>ray</var>’s <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix①">matrix</a> to <code>null</code>.</p>
+     <li data-md>
       <p>Return <var>ray</var>.</p>
     </ol>
    </div>
@@ -2083,10 +2085,10 @@ Parts of this work may be from another specification document.  If so, those par
     <p>To <dfn class="dfn-paneled" data-dfn-for="XRRay" data-dfn-type="dfn" data-noexport id="xrray-obtain-the-matrix">obtain the matrix</dfn> for a given <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①⑥">XRRay</a></code> <var>ray</var></p>
     <ol>
      <li data-md>
-      <p>If <var>ray</var>’s <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix①">matrix</a> is not <code>null</code>, perform the following steps:</p>
+      <p>If <var>ray</var>’s <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix②">matrix</a> is not <code>null</code>, perform the following steps:</p>
       <ol>
        <li data-md>
-        <p>If the operation <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-isdetachedbuffer" id="ref-for-sec-isdetachedbuffer">IsDetachedBuffer</a></code> on <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix②">matrix</a> is <code>false</code>, return <var>ray</var>’s <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix③">matrix</a>.</p>
+        <p>If the operation <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-isdetachedbuffer" id="ref-for-sec-isdetachedbuffer">IsDetachedBuffer</a></code> on <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix③">matrix</a> is <code>false</code>, return <var>ray</var>’s <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix④">matrix</a>.</p>
       </ol>
      <li data-md>
       <p>Let <var>z</var> be the vector <code>[0, 0, -1]</code>.</p>
@@ -2109,7 +2111,7 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p>Let <var>matrix</var> be the result of premultiplying <var>rotation</var> from the left onto <var>translation</var> (i.e. <code>translation * rotation</code>) in column-vector notation.</p>
      <li data-md>
-      <p>Set <var>ray</var>’s <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix④">matrix</a> to <var>matrix</var>.</p>
+      <p>Set <var>ray</var>’s <a data-link-type="dfn" href="#xrray-matrix" id="ref-for-xrray-matrix⑤">matrix</a> to <var>matrix</var>.</p>
      <li data-md>
       <p>Return <var>matrix</var>.</p>
     </ol>
@@ -3328,7 +3330,7 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
   <aside class="dfn-panel" data-for="xrray-matrix">
    <b><a href="#xrray-matrix">#xrray-matrix</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-xrray-matrix">9.1. XRRay</a> <a href="#ref-for-xrray-matrix①">(2)</a> <a href="#ref-for-xrray-matrix②">(3)</a> <a href="#ref-for-xrray-matrix③">(4)</a> <a href="#ref-for-xrray-matrix④">(5)</a>
+    <li><a href="#ref-for-xrray-matrix">9.1. XRRay</a> <a href="#ref-for-xrray-matrix①">(2)</a> <a href="#ref-for-xrray-matrix②">(3)</a> <a href="#ref-for-xrray-matrix③">(4)</a> <a href="#ref-for-xrray-matrix④">(5)</a> <a href="#ref-for-xrray-matrix⑤">(6)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrray">
