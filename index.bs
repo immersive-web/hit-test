@@ -565,10 +565,11 @@ interface XRRay {
 The <dfn constructor for="XRRay">XRRay(|origin|, |direction|)</dfn> constructor MUST perform the following steps when invoked:
 
   1. Let |ray| be a new {{XRRay}}.
+  1. If |direction|'s {{DOMPointReadOnly/x}}, {{DOMPointReadOnly/y}}, and {{DOMPointReadOnly/z}} values are all zero, throw a {{TypeError}} and abort these steps.
   1. Initialize |ray|'s {{XRRay/origin}} to <code>{ x: 0.0, y: 0.0, z: 0.0, w: 1.0 }</code>.
   1. Initialize |ray|'s {{XRRay/direction}} to <code>{ x: 0.0, y: 0.0, z: -1.0, w: 0.0 }</code>.
   1. Initialize |ray|'s {{XRRay/origin}}’s {{DOMPointReadOnly/x}} value to |origin|'s {{DOMPointInit/x}}, {{DOMPointReadOnly/y}} value to |origin|'s {{DOMPointInit/y}}, and {{DOMPointReadOnly/z}} value to |origin|'s {{DOMPointInit/z}}.
-  1. If at least one of |direction|'s {{DOMPointReadOnly/x}}, {{DOMPointReadOnly/y}}, and {{DOMPointReadOnly/z}} values are non-zero, initialize |ray|'s {{XRRay/direction}}’s {{DOMPointReadOnly/x}} value to |direction|'s {{DOMPointInit/x}}, {{DOMPointReadOnly/y}} value to |direction|'s {{DOMPointInit/y}}, and {{DOMPointReadOnly/z}} value to |direction|'s {{DOMPointInit/z}}.
+ initialize |ray|'s {{XRRay/direction}}’s {{DOMPointReadOnly/x}} value to |direction|'s {{DOMPointInit/x}}, {{DOMPointReadOnly/y}} value to |direction|'s {{DOMPointInit/y}}, and {{DOMPointReadOnly/z}} value to |direction|'s {{DOMPointInit/z}}.
   1. [=Normalize=] the {{DOMPointReadOnly/x}}, {{DOMPointReadOnly/y}}, and {{DOMPointReadOnly/z}} components of |ray|'s {{XRRay/direction}}.
   1. Initialize |ray|'s [=XRRay/matrix=] to <code>null</code>.
   1. Return |ray|.
