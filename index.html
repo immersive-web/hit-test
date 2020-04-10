@@ -1221,7 +1221,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 5721fde7f6b8111f662b83b678f9e181a9838206" name="generator">
+  <meta content="Bikeshed version d4d56a96, updated Fri Apr 10 11:10:34 2020 -0700" name="generator">
   <link href="https://immersive-web.github.io/hit-test/" rel="canonical">
   <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
   <link href="favicon-96x96.png" rel="icon" sizes="96x96" type="image/png">
@@ -1277,102 +1277,6 @@ Possible extra rowspan handling
     float: none;
   }
 </style>
-<style>/* style-md-lists */
-
-/* This is a weird hack for me not yet following the commonmark spec
-   regarding paragraph and lists. */
-[data-md] > :first-child {
-    margin-top: 0;
-}
-[data-md] > :last-child {
-    margin-bottom: 0;
-}</style>
-<style>/* style-selflinks */
-
-.heading, .issue, .note, .example, li, dt {
-    position: relative;
-}
-a.self-link {
-    position: absolute;
-    top: 0;
-    left: calc(-1 * (3.5rem - 26px));
-    width: calc(3.5rem - 26px);
-    height: 2em;
-    text-align: center;
-    border: none;
-    transition: opacity .2s;
-    opacity: .5;
-}
-a.self-link:hover {
-    opacity: 1;
-}
-.heading > a.self-link {
-    font-size: 83%;
-}
-li > a.self-link {
-    left: calc(-1 * (3.5rem - 26px) - 2em);
-}
-dfn > a.self-link {
-    top: auto;
-    left: auto;
-    opacity: 0;
-    width: 1.5em;
-    height: 1.5em;
-    background: gray;
-    color: white;
-    font-style: normal;
-    transition: opacity .2s, background-color .2s, color .2s;
-}
-dfn:hover > a.self-link {
-    opacity: 1;
-}
-dfn > a.self-link:hover {
-    color: black;
-}
-
-a.self-link::before            { content: "¶"; }
-.heading > a.self-link::before { content: "§"; }
-dfn > a.self-link::before      { content: "#"; }</style>
-<style>/* style-counters */
-
-body {
-    counter-reset: example figure issue;
-}
-.issue {
-    counter-increment: issue;
-}
-.issue:not(.no-marker)::before {
-    content: "Issue " counter(issue);
-}
-
-.example {
-    counter-increment: example;
-}
-.example:not(.no-marker)::before {
-    content: "Example " counter(example);
-}
-.invalid.example:not(.no-marker)::before,
-.illegal.example:not(.no-marker)::before {
-    content: "Invalid Example" counter(example);
-}
-
-figcaption {
-    counter-increment: figure;
-}
-figcaption:not(.no-marker)::before {
-    content: "Figure " counter(figure) " ";
-}</style>
-<style>/* style-var-click-highlighting */
-
-    var { cursor: pointer; }
-    var.selected0 { background-color: #F4D200; box-shadow: 0 0 0 2px #F4D200; }
-    var.selected1 { background-color: #FF87A2; box-shadow: 0 0 0 2px #FF87A2; }
-    var.selected2 { background-color: #96E885; box-shadow: 0 0 0 2px #96E885; }
-    var.selected3 { background-color: #3EEED2; box-shadow: 0 0 0 2px #3EEED2; }
-    var.selected4 { background-color: #EACFB6; box-shadow: 0 0 0 2px #EACFB6; }
-    var.selected5 { background-color: #82DDFF; box-shadow: 0 0 0 2px #82DDFF; }
-    var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
-    </style>
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -1435,6 +1339,35 @@ pre .property::before, pre .property::after {
 [data-link-type=biblio] {
     white-space: pre;
 }</style>
+<style>/* style-counters */
+
+body {
+    counter-reset: example figure issue;
+}
+.issue {
+    counter-increment: issue;
+}
+.issue:not(.no-marker)::before {
+    content: "Issue " counter(issue);
+}
+
+.example {
+    counter-increment: example;
+}
+.example:not(.no-marker)::before {
+    content: "Example " counter(example);
+}
+.invalid.example:not(.no-marker)::before,
+.illegal.example:not(.no-marker)::before {
+    content: "Invalid Example" counter(example);
+}
+
+figcaption {
+    counter-increment: figure;
+}
+figcaption:not(.no-marker)::before {
+    content: "Figure " counter(figure) " ";
+}</style>
 <style>/* style-dfn-panel */
 
 .dfn-panel {
@@ -1472,6 +1405,62 @@ pre .property::before, pre .property::after {
 
 .dfn-paneled { cursor: pointer; }
 </style>
+<style>/* style-md-lists */
+
+/* This is a weird hack for me not yet following the commonmark spec
+   regarding paragraph and lists. */
+[data-md] > :first-child {
+    margin-top: 0;
+}
+[data-md] > :last-child {
+    margin-bottom: 0;
+}</style>
+<style>/* style-selflinks */
+
+.heading, .issue, .note, .example, li, dt {
+    position: relative;
+}
+a.self-link {
+    position: absolute;
+    top: 0;
+    left: calc(-1 * (3.5rem - 26px));
+    width: calc(3.5rem - 26px);
+    height: 2em;
+    text-align: center;
+    border: none;
+    transition: opacity .2s;
+    opacity: .5;
+}
+a.self-link:hover {
+    opacity: 1;
+}
+.heading > a.self-link {
+    font-size: 83%;
+}
+li > a.self-link {
+    left: calc(-1 * (3.5rem - 26px) - 2em);
+}
+dfn > a.self-link {
+    top: auto;
+    left: auto;
+    opacity: 0;
+    width: 1.5em;
+    height: 1.5em;
+    background: gray;
+    color: white;
+    font-style: normal;
+    transition: opacity .2s, background-color .2s, color .2s;
+}
+dfn:hover > a.self-link {
+    opacity: 1;
+}
+dfn > a.self-link:hover {
+    color: black;
+}
+
+a.self-link::before            { content: "¶"; }
+.heading > a.self-link::before { content: "§"; }
+dfn > a.self-link::before      { content: "#"; }</style>
 <style>/* style-syntax-highlighting */
 pre.idl.highlight { color: #708090; }
 .highlight:not(.idl) { background: hsl(24, 20%, 95%); }
@@ -1530,11 +1519,22 @@ c-[vg] { color: #0077aa } /* Name.Variable.Global */
 c-[vi] { color: #0077aa } /* Name.Variable.Instance */
 c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
 </style>
+<style>/* style-var-click-highlighting */
+
+    var { cursor: pointer; }
+    var.selected0 { background-color: #F4D200; box-shadow: 0 0 0 2px #F4D200; }
+    var.selected1 { background-color: #FF87A2; box-shadow: 0 0 0 2px #FF87A2; }
+    var.selected2 { background-color: #96E885; box-shadow: 0 0 0 2px #96E885; }
+    var.selected3 { background-color: #3EEED2; box-shadow: 0 0 0 2px #3EEED2; }
+    var.selected4 { background-color: #EACFB6; box-shadow: 0 0 0 2px #EACFB6; }
+    var.selected5 { background-color: #82DDFF; box-shadow: 0 0 0 2px #82DDFF; }
+    var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
+    </style>
  <body class="h-entry">
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebXR Hit Test Module</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-02-27">27 February 2020</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-04-10">10 April 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1555,7 +1555,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
    <div data-fill-with="warning"></div>
    <p class="copyright" data-fill-with="copyright"><a href="http://creativecommons.org/publicdomain/zero/1.0/" rel="license"><img alt="CC0" src="https://licensebuttons.net/p/zero/1.0/80x15.png"></a> To the extent possible under law, the editors have waived all copyright
 and related or neighboring rights to this work.
-In addition, as of 27 February 2020,
+In addition, as of 10 April 2020,
 the editors have made this specification available under the <a href="http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0" rel="license">Open Web Foundation Agreement Version 1.0</a>,
 which is available at http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0.
 Parts of this work may be from another specification document.  If so, those parts are instead covered by the license of that specification document. </p>
@@ -1604,7 +1604,8 @@ Parts of this work may be from another specification document.  If so, those par
     <li>
      <a href="#geometric-primitives"><span class="secno">9</span> <span class="content">Geometric primitives</span></a>
      <ol class="toc">
-      <li><a href="#xrray-interface"><span class="secno">9.1</span> <span class="content">XRRay</span></a>
+      <li><a href="#xr-ray-direction-init-dictionary"><span class="secno">9.1</span> <span class="content">XRRayDirectionInit</span></a>
+      <li><a href="#xrray-interface"><span class="secno">9.2</span> <span class="content">XRRay</span></a>
      </ol>
     <li>
      <a href="#native-device-concepts"><span class="secno">10</span> <span class="content">Native device concepts</span></a>
@@ -2023,20 +2024,29 @@ Parts of this work may be from another specification document.  If so, those par
     </ol>
    </div>
    <h2 class="heading settled" data-level="9" id="geometric-primitives"><span class="secno">9. </span><span class="content">Geometric primitives</span><a class="self-link" href="#geometric-primitives"></a></h2>
-   <h3 class="heading settled" data-level="9.1" id="xrray-interface"><span class="secno">9.1. </span><span class="content">XRRay</span><a class="self-link" href="#xrray-interface"></a></h3>
+   <h3 class="heading settled" data-level="9.1" id="xr-ray-direction-init-dictionary"><span class="secno">9.1. </span><span class="content">XRRayDirectionInit</span><a class="self-link" href="#xr-ray-direction-init-dictionary"></a></h3>
+   <p>An <code class="idl"><a data-link-type="idl" href="#dictdef-xrraydirectioninit" id="ref-for-dictdef-xrraydirectioninit">XRRayDirectionInit</a></code> dictionary represents a direction vector to be passed to the <code class="idl"><a data-link-type="idl" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray②">XRRay(origin, direction)</a></code> constructor.</p>
+<pre class="idl highlight def"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-xrraydirectioninit"><code><c- g>XRRayDirectionInit</c-></code></dfn> {
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double"><c- b>double</c-></a> <dfn class="dfn-paneled idl-code" data-default="0" data-dfn-for="XRRayDirectionInit" data-dfn-type="dict-member" data-export data-type="double " id="dom-xrraydirectioninit-x"><code><c- g>x</c-></code></dfn> = 0;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double①"><c- b>double</c-></a> <dfn class="dfn-paneled idl-code" data-default="0" data-dfn-for="XRRayDirectionInit" data-dfn-type="dict-member" data-export data-type="double " id="dom-xrraydirectioninit-y"><code><c- g>y</c-></code></dfn> = 0;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double②"><c- b>double</c-></a> <dfn class="dfn-paneled idl-code" data-default="-1" data-dfn-for="XRRayDirectionInit" data-dfn-type="dict-member" data-export data-type="double " id="dom-xrraydirectioninit-z"><code><c- g>z</c-></code></dfn> = -1;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double" id="ref-for-idl-double③"><c- b>double</c-></a> <dfn class="dfn-paneled idl-code" data-default="0" data-dfn-for="XRRayDirectionInit" data-dfn-type="dict-member" data-export data-type="double " id="dom-xrraydirectioninit-w"><code><c- g>w</c-></code></dfn> = 0;
+};
+</pre>
+   <h3 class="heading settled" data-level="9.2" id="xrray-interface"><span class="secno">9.2. </span><span class="content">XRRay</span><a class="self-link" href="#xrray-interface"></a></h3>
    <p>An <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑧">XRRay</a></code> is a geometric ray described by an <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin">origin</a></code> point and <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction">direction</a></code> vector.</p>
    <p>An <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray⑨">XRRay</a></code> contains a <dfn class="dfn-paneled" data-dfn-for="XRRay" data-dfn-type="dfn" data-noexport id="xrray-matrix">matrix</dfn> which is a <a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#matrix" id="ref-for-matrix">matrix</a>.</p>
-<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext④"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>Window</c->,
- <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray②"><c- g>Constructor</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit"><c- n>DOMPointInit</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(origin, direction)" data-dfn-type="argument" data-export id="dom-xrray-xrray-origin-direction-origin"><code><c- g>origin</c-></code><a class="self-link" href="#dom-xrray-xrray-origin-direction-origin"></a></dfn>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit①"><c- n>DOMPointInit</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(origin, direction)" data-dfn-type="argument" data-export id="dom-xrray-xrray-origin-direction-direction"><code><c- g>direction</c-></code><a class="self-link" href="#dom-xrray-xrray-origin-direction-direction"></a></dfn>),
- <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray-transform" id="ref-for-dom-xrray-xrray-transform"><c- g>Constructor</c-></a>(<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webxr/#xrrigidtransform-interface" id="ref-for-xrrigidtransform-interface"><c- n>XRRigidTransform</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(transform)" data-dfn-type="argument" data-export id="dom-xrray-xrray-transform-transform"><code><c- g>transform</c-></code><a class="self-link" href="#dom-xrray-xrray-transform-transform"></a></dfn>)]
+<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext④"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="xrray"><code><c- g>XRRay</c-></code></dfn> {
+  <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray③"><c- g>constructor</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit"><c- n>DOMPointInit</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(origin, direction), XRRay/constructor(origin, direction), XRRay/XRRay(origin), XRRay/constructor(origin), XRRay/XRRay(), XRRay/constructor()" data-dfn-type="argument" data-export id="dom-xrray-xrray-origin-direction-origin"><code><c- g>origin</c-></code><a class="self-link" href="#dom-xrray-xrray-origin-direction-origin"></a></dfn> = {}, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-xrraydirectioninit" id="ref-for-dictdef-xrraydirectioninit①"><c- n>XRRayDirectionInit</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(origin, direction), XRRay/constructor(origin, direction), XRRay/XRRay(origin), XRRay/constructor(origin), XRRay/XRRay(), XRRay/constructor()" data-dfn-type="argument" data-export id="dom-xrray-xrray-origin-direction-direction"><code><c- g>direction</c-></code><a class="self-link" href="#dom-xrray-xrray-origin-direction-direction"></a></dfn> = {});
+  <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray-transform" id="ref-for-dom-xrray-xrray-transform"><c- g>constructor</c-></a>(<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webxr/#xrrigidtransform-interface" id="ref-for-xrrigidtransform-interface"><c- n>XRRigidTransform</c-></a> <dfn class="idl-code" data-dfn-for="XRRay/XRRay(transform), XRRay/constructor(transform)" data-dfn-type="argument" data-export id="dom-xrray-xrray-transform-transform"><code><c- g>transform</c-></code><a class="self-link" href="#dom-xrray-xrray-transform-transform"></a></dfn>);
   [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin①"><c- g>origin</c-></a>;
   [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject②"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly①"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction①"><c- g>direction</c-></a>;
   [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject③"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-Float32Array" id="ref-for-idl-Float32Array"><c- b>Float32Array</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Float32Array" href="#dom-xrray-matrix" id="ref-for-dom-xrray-matrix"><c- g>matrix</c-></a>;
 };
 </pre>
    <div class="algorithm" data-algorithm="construct-ray-origin-direction">
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="constructor" data-export data-lt="XRRay(origin, direction)|XRRay(origin)|XRRay()" id="dom-xrray-xrray"><code>XRRay(<var>origin</var>, <var>direction</var>)</code></dfn> constructor MUST perform the following steps when invoked:</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="constructor" data-export data-lt="XRRay(origin, direction)|constructor(origin, direction)|XRRay(origin)|constructor(origin)|XRRay()|constructor()" id="dom-xrray-xrray"><code>XRRay(<var>origin</var>, <var>direction</var>)</code></dfn> constructor MUST perform the following steps when invoked:</p>
     <ol>
      <li data-md>
       <p>Let <var>ray</var> be a new <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①⓪">XRRay</a></code>.</p>
@@ -2045,9 +2055,15 @@ Parts of this work may be from another specification document.  If so, those par
      <li data-md>
       <p>Initialize <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction②">direction</a></code> to <code>{ x: 0.0, y: 0.0, z: -1.0, w: 0.0 }</code>.</p>
      <li data-md>
-      <p>If <var>origin</var> was set, initialize <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin③">origin</a></code>’s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-x" id="ref-for-dom-dompointreadonly-x">x</a></code> value to <var>origin</var>’s x dictionary member, <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-y" id="ref-for-dom-dompointreadonly-y">y</a></code> value to <var>origin</var>’s y dictionary member, and <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-z" id="ref-for-dom-dompointreadonly-z">z</a></code> value to <var>origin</var>’s z dictionary member.</p>
+      <p>If all of <var>direction</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrraydirectioninit-x" id="ref-for-dom-xrraydirectioninit-x">x</a></code>, <code class="idl"><a data-link-type="idl" href="#dom-xrraydirectioninit-y" id="ref-for-dom-xrraydirectioninit-y">y</a></code>, and <code class="idl"><a data-link-type="idl" href="#dom-xrraydirectioninit-z" id="ref-for-dom-xrraydirectioninit-z">z</a></code> are zero, throw a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror">TypeError</a></code> and abort these steps.</p>
      <li data-md>
-      <p>If <var>direction</var> was set, initialize <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction③">direction</a></code>’s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-x" id="ref-for-dom-dompointreadonly-x①">x</a></code> value to <var>direction</var>’s x dictionary member, <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-y" id="ref-for-dom-dompointreadonly-y①">y</a></code> value to <var>direction</var>’s y dictionary member, and <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-z" id="ref-for-dom-dompointreadonly-z①">z</a></code> value to <var>direction</var>’s z dictionary member.</p>
+      <p>If <var>direction</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrraydirectioninit-w" id="ref-for-dom-xrraydirectioninit-w">w</a></code> is not 0.0, throw a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror①">TypeError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>If <var>origin</var>’s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointinit-w" id="ref-for-dom-dompointinit-w">w</a></code> is not 1.0, throw a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror②">TypeError</a></code> and abort these steps.</p>
+     <li data-md>
+      <p>Initialize <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin③">origin</a></code>’s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-x" id="ref-for-dom-dompointreadonly-x">x</a></code> value to <var>origin</var>’s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointinit-x" id="ref-for-dom-dompointinit-x">x</a></code>, <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-y" id="ref-for-dom-dompointreadonly-y">y</a></code> value to <var>origin</var>’s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointinit-y" id="ref-for-dom-dompointinit-y">y</a></code>, and <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-z" id="ref-for-dom-dompointreadonly-z">z</a></code> value to <var>origin</var>’s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointinit-z" id="ref-for-dom-dompointinit-z">z</a></code>.</p>
+     <li data-md>
+      <p>Initialize <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction③">direction</a></code>’s <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-x" id="ref-for-dom-dompointreadonly-x①">x</a></code> value to <var>direction</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrraydirectioninit-x" id="ref-for-dom-xrraydirectioninit-x①">x</a></code>, <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-y" id="ref-for-dom-dompointreadonly-y①">y</a></code> value to <var>direction</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrraydirectioninit-y" id="ref-for-dom-xrraydirectioninit-y①">y</a></code>, and <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-z" id="ref-for-dom-dompointreadonly-z①">z</a></code> value to <var>direction</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrraydirectioninit-z" id="ref-for-dom-xrraydirectioninit-z①">z</a></code>.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="https://www.w3.org/TR/webxr/#normalize" id="ref-for-normalize">Normalize</a> the <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-x" id="ref-for-dom-dompointreadonly-x②">x</a></code>, <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-y" id="ref-for-dom-dompointreadonly-y②">y</a></code>, and <code class="idl"><a data-link-type="idl" href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-z" id="ref-for-dom-dompointreadonly-z②">z</a></code> components of <var>ray</var>’s <code class="idl"><a data-link-type="idl" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction④">direction</a></code>.</p>
      <li data-md>
@@ -2057,7 +2073,7 @@ Parts of this work may be from another specification document.  If so, those par
     </ol>
    </div>
    <div class="algorithm" data-algorithm="construct-ray-transform">
-    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="constructor" data-export id="dom-xrray-xrray-transform"><code>XRRay(<var>transform</var>)</code></dfn> constructor MUST perform the following steps when invoked:</p>
+    <p>The <dfn class="dfn-paneled idl-code" data-dfn-for="XRRay" data-dfn-type="constructor" data-export data-lt="XRRay(transform)|constructor(transform)" id="dom-xrray-xrray-transform"><code>XRRay(<var>transform</var>)</code></dfn> constructor MUST perform the following steps when invoked:</p>
     <ol>
      <li data-md>
       <p>Let <var>ray</var> be a new <code class="idl"><a data-link-type="idl" href="#xrray" id="ref-for-xrray①①">XRRay</a></code>.</p>
@@ -2350,13 +2366,17 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
    <li><a href="#compute-all-hit-test-results">compute all hit test results</a><span>, in §7</span>
    <li><a href="#compute-hit-test-results">compute hit test results</a><span>, in §7</span>
    <li><a href="#compute-hit-test-results-for-transient-input">compute hit test results for transient input</a><span>, in §7</span>
+   <li><a href="#dom-xrray-xrray">constructor()</a><span>, in §9.2</span>
+   <li><a href="#dom-xrray-xrray">constructor(origin)</a><span>, in §9.2</span>
+   <li><a href="#dom-xrray-xrray">constructor(origin, direction)</a><span>, in §9.2</span>
+   <li><a href="#dom-xrray-xrray-transform">constructor(transform)</a><span>, in §9.2</span>
    <li><a href="#convert-from-native-entity-type">convert from native entity type</a><span>, in §10.2</span>
    <li><a href="#create-a-hit-test-result">create a hit test result</a><span>, in §5.1</span>
    <li><a href="#create-a-hit-test-result-for-transient-input">create a hit test result for transient input</a><span>, in §5.2</span>
    <li><a href="#create-a-hit-test-source">create a hit test source</a><span>, in §4.1</span>
    <li><a href="#create-a-hit-test-source-for-transient-input">create a hit test source for transient input</a><span>, in §4.2</span>
-   <li><a href="#dom-xrray-direction">direction</a><span>, in §9.1</span>
-   <li><a href="#distance-along-the-ray">distance along the ray</a><span>, in §9.1</span>
+   <li><a href="#dom-xrray-direction">direction</a><span>, in §9.2</span>
+   <li><a href="#distance-along-the-ray">distance along the ray</a><span>, in §9.2</span>
    <li>
     effective entityTypes
     <ul>
@@ -2397,8 +2417,8 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
    <li>
     matrix
     <ul>
-     <li><a href="#dom-xrray-matrix">attribute for XRRay</a><span>, in §9.1</span>
-     <li><a href="#xrray-matrix">dfn for XRRay</a><span>, in §9.1</span>
+     <li><a href="#dom-xrray-matrix">attribute for XRRay</a><span>, in §9.2</span>
+     <li><a href="#xrray-matrix">dfn for XRRay</a><span>, in §9.2</span>
     </ul>
    <li><a href="#dom-xrhittesttrackabletype-mesh">"mesh"</a><span>, in §3.1</span>
    <li><a href="#native-entity-type">native entity type</a><span>, in §10.2</span>
@@ -2413,7 +2433,7 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     </ul>
    <li><a href="#obtain-hit-test-results">obtain hit test results</a><span>, in §8</span>
    <li><a href="#obtain-hit-test-results-for-transient-input">obtain hit test results for transient input</a><span>, in §8</span>
-   <li><a href="#xrray-obtain-the-matrix">obtain the matrix</a><span>, in §9.1</span>
+   <li><a href="#xrray-obtain-the-matrix">obtain the matrix</a><span>, in §9.2</span>
    <li>
     offset ray
     <ul>
@@ -2426,7 +2446,7 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
      <li><a href="#dom-xrhittestoptionsinit-offsetray">dict-member for XRHitTestOptionsInit</a><span>, in §3.2</span>
      <li><a href="#dom-xrtransientinputhittestoptionsinit-offsetray">dict-member for XRTransientInputHitTestOptionsInit</a><span>, in §3.3</span>
     </ul>
-   <li><a href="#dom-xrray-origin">origin</a><span>, in §9.1</span>
+   <li><a href="#dom-xrray-origin">origin</a><span>, in §9.2</span>
    <li><a href="#dom-xrhittesttrackabletype-plane">"plane"</a><span>, in §3.1</span>
    <li><a href="#dom-xrhittesttrackabletype-point">"point"</a><span>, in §3.1</span>
    <li>
@@ -2449,59 +2469,64 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
    <li><a href="#xrsession-set-of-active-hit-test-sources-for-transient-input">set of active hit test sources for transient input</a><span>, in §6</span>
    <li><a href="#dom-xrhittestoptionsinit-space">space</a><span>, in §3.2</span>
    <li><a href="#unreasonable-number-of-requests">unreasonable number of requests</a><span>, in §6</span>
+   <li><a href="#dom-xrraydirectioninit-w">w</a><span>, in §9.1</span>
+   <li><a href="#dom-xrraydirectioninit-x">x</a><span>, in §9.1</span>
    <li><a href="#dictdef-xrhittestoptionsinit">XRHitTestOptionsInit</a><span>, in §3.2</span>
    <li><a href="#xrhittestresult">XRHitTestResult</a><span>, in §5.1</span>
    <li><a href="#xrhittestsource">XRHitTestSource</a><span>, in §4.1</span>
    <li><a href="#enumdef-xrhittesttrackabletype">XRHitTestTrackableType</a><span>, in §3.1</span>
-   <li><a href="#xrray">XRRay</a><span>, in §9.1</span>
-   <li><a href="#dom-xrray-xrray">XRRay()</a><span>, in §9.1</span>
-   <li><a href="#dom-xrray-xrray">XRRay(origin)</a><span>, in §9.1</span>
-   <li><a href="#dom-xrray-xrray">XRRay(origin, direction)</a><span>, in §9.1</span>
-   <li><a href="#dom-xrray-xrray-transform">XRRay(transform)</a><span>, in §9.1</span>
+   <li><a href="#xrray">XRRay</a><span>, in §9.2</span>
+   <li><a href="#dom-xrray-xrray">XRRay()</a><span>, in §9.2</span>
+   <li><a href="#dictdef-xrraydirectioninit">XRRayDirectionInit</a><span>, in §9.1</span>
+   <li><a href="#dom-xrray-xrray">XRRay(origin)</a><span>, in §9.2</span>
+   <li><a href="#dom-xrray-xrray">XRRay(origin, direction)</a><span>, in §9.2</span>
+   <li><a href="#dom-xrray-xrray-transform">XRRay(transform)</a><span>, in §9.2</span>
    <li><a href="#dictdef-xrtransientinputhittestoptionsinit">XRTransientInputHitTestOptionsInit</a><span>, in §3.3</span>
    <li><a href="#xrtransientinputhittestresult">XRTransientInputHitTestResult</a><span>, in §5.2</span>
    <li><a href="#xrtransientinputhittestsource">XRTransientInputHitTestSource</a><span>, in §4.2</span>
+   <li><a href="#dom-xrraydirectioninit-y">y</a><span>, in §9.1</span>
+   <li><a href="#dom-xrraydirectioninit-z">z</a><span>, in §9.1</span>
   </ul>
   <aside class="dfn-panel" data-for="term-for-sec-isdetachedbuffer">
    <a href="https://tc39.github.io/ecma262/#sec-isdetachedbuffer">https://tc39.github.io/ecma262/#sec-isdetachedbuffer</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sec-isdetachedbuffer">9.1. XRRay</a>
+    <li><a href="#ref-for-sec-isdetachedbuffer">9.2. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dictdef-dompointinit">
    <a href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit">https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dictdef-dompointinit">9.1. XRRay</a> <a href="#ref-for-dictdef-dompointinit①">(2)</a>
+    <li><a href="#ref-for-dictdef-dompointinit">9.2. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dompointreadonly">
    <a href="https://drafts.fxtf.org/geometry-1/#dompointreadonly">https://drafts.fxtf.org/geometry-1/#dompointreadonly</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dompointreadonly">9.1. XRRay</a> <a href="#ref-for-dompointreadonly①">(2)</a>
+    <li><a href="#ref-for-dompointreadonly">9.2. XRRay</a> <a href="#ref-for-dompointreadonly①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-dompointreadonly-w">
    <a href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-w">https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-w</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-dompointreadonly-w">9.1. XRRay</a> <a href="#ref-for-dom-dompointreadonly-w①">(2)</a>
+    <li><a href="#ref-for-dom-dompointreadonly-w">9.2. XRRay</a> <a href="#ref-for-dom-dompointreadonly-w①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-dompointreadonly-x">
    <a href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-x">https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-x</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-dompointreadonly-x">9.1. XRRay</a> <a href="#ref-for-dom-dompointreadonly-x①">(2)</a> <a href="#ref-for-dom-dompointreadonly-x②">(3)</a> <a href="#ref-for-dom-dompointreadonly-x③">(4)</a>
+    <li><a href="#ref-for-dom-dompointreadonly-x">9.2. XRRay</a> <a href="#ref-for-dom-dompointreadonly-x①">(2)</a> <a href="#ref-for-dom-dompointreadonly-x②">(3)</a> <a href="#ref-for-dom-dompointreadonly-x③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-dompointreadonly-y">
    <a href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-y">https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-y</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-dompointreadonly-y">9.1. XRRay</a> <a href="#ref-for-dom-dompointreadonly-y①">(2)</a> <a href="#ref-for-dom-dompointreadonly-y②">(3)</a> <a href="#ref-for-dom-dompointreadonly-y③">(4)</a>
+    <li><a href="#ref-for-dom-dompointreadonly-y">9.2. XRRay</a> <a href="#ref-for-dom-dompointreadonly-y①">(2)</a> <a href="#ref-for-dom-dompointreadonly-y②">(3)</a> <a href="#ref-for-dom-dompointreadonly-y③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-dompointreadonly-z">
    <a href="https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-z">https://drafts.fxtf.org/geometry-1/#dom-dompointreadonly-z</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-dompointreadonly-z">9.1. XRRay</a> <a href="#ref-for-dom-dompointreadonly-z①">(2)</a> <a href="#ref-for-dom-dompointreadonly-z②">(3)</a> <a href="#ref-for-dom-dompointreadonly-z③">(4)</a>
+    <li><a href="#ref-for-dom-dompointreadonly-z">9.2. XRRay</a> <a href="#ref-for-dom-dompointreadonly-z①">(2)</a> <a href="#ref-for-dom-dompointreadonly-z②">(3)</a> <a href="#ref-for-dom-dompointreadonly-z③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-list-contain">
@@ -2529,13 +2554,13 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <li><a href="#ref-for-Exposed①">4.2. XRTransientInputHitTestSource</a>
     <li><a href="#ref-for-Exposed②">5.1. XRHitTestResult</a>
     <li><a href="#ref-for-Exposed③">5.2. XRTransientInputHitTestResult</a>
-    <li><a href="#ref-for-Exposed④">9.1. XRRay</a>
+    <li><a href="#ref-for-Exposed④">9.2. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-Float32Array">
    <a href="https://heycam.github.io/webidl/#idl-Float32Array">https://heycam.github.io/webidl/#idl-Float32Array</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-Float32Array">9.1. XRRay</a>
+    <li><a href="#ref-for-idl-Float32Array">9.2. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-invalidstateerror">
@@ -2570,7 +2595,7 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
    <a href="https://heycam.github.io/webidl/#SameObject">https://heycam.github.io/webidl/#SameObject</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-SameObject">5.2. XRTransientInputHitTestResult</a>
-    <li><a href="#ref-for-SameObject①">9.1. XRRay</a> <a href="#ref-for-SameObject②">(2)</a> <a href="#ref-for-SameObject③">(3)</a>
+    <li><a href="#ref-for-SameObject①">9.2. XRRay</a> <a href="#ref-for-SameObject②">(2)</a> <a href="#ref-for-SameObject③">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-SecureContext">
@@ -2580,13 +2605,25 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <li><a href="#ref-for-SecureContext①">4.2. XRTransientInputHitTestSource</a>
     <li><a href="#ref-for-SecureContext②">5.1. XRHitTestResult</a>
     <li><a href="#ref-for-SecureContext③">5.2. XRTransientInputHitTestResult</a>
-    <li><a href="#ref-for-SecureContext④">9.1. XRRay</a>
+    <li><a href="#ref-for-SecureContext④">9.2. XRRay</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-exceptiondef-typeerror">
+   <a href="https://heycam.github.io/webidl/#exceptiondef-typeerror">https://heycam.github.io/webidl/#exceptiondef-typeerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-exceptiondef-typeerror">9.2. XRRay</a> <a href="#ref-for-exceptiondef-typeerror①">(2)</a> <a href="#ref-for-exceptiondef-typeerror②">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-a-new-promise">
    <a href="https://heycam.github.io/webidl/#a-new-promise">https://heycam.github.io/webidl/#a-new-promise</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-a-new-promise">6. Requesting hit test</a> <a href="#ref-for-a-new-promise①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-double">
+   <a href="https://heycam.github.io/webidl/#idl-double">https://heycam.github.io/webidl/#idl-double</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-double">9.1. XRRayDirectionInit</a> <a href="#ref-for-idl-double①">(2)</a> <a href="#ref-for-idl-double②">(3)</a> <a href="#ref-for-idl-double③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-reject">
@@ -2652,7 +2689,7 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
   <aside class="dfn-panel" data-for="term-for-xrrigidtransform-interface">
    <a href="https://www.w3.org/TR/webxr/#xrrigidtransform-interface">https://www.w3.org/TR/webxr/#xrrigidtransform-interface</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-xrrigidtransform-interface">9.1. XRRay</a>
+    <li><a href="#ref-for-xrrigidtransform-interface">9.2. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrsession-interface">
@@ -2741,7 +2778,7 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
   <aside class="dfn-panel" data-for="term-for-dom-xrrigidtransform-matrix">
    <a href="https://www.w3.org/TR/webxr/#dom-xrrigidtransform-matrix">https://www.w3.org/TR/webxr/#dom-xrrigidtransform-matrix</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-xrrigidtransform-matrix">9.1. XRRay</a> <a href="#ref-for-dom-xrrigidtransform-matrix①">(2)</a>
+    <li><a href="#ref-for-dom-xrrigidtransform-matrix">9.2. XRRay</a> <a href="#ref-for-dom-xrrigidtransform-matrix①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrspace-native-origin">
@@ -2755,7 +2792,7 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
   <aside class="dfn-panel" data-for="term-for-normalize">
    <a href="https://www.w3.org/TR/webxr/#normalize">https://www.w3.org/TR/webxr/#normalize</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-normalize">9.1. XRRay</a> <a href="#ref-for-normalize①">(2)</a>
+    <li><a href="#ref-for-normalize">9.2. XRRay</a> <a href="#ref-for-normalize①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-xrspace-origin-offset">
@@ -2795,10 +2832,10 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <ul>
      <li><span class="dfn-paneled" id="term-for-dictdef-dompointinit" style="color:initial">DOMPointInit</span>
      <li><span class="dfn-paneled" id="term-for-dompointreadonly" style="color:initial">DOMPointReadOnly</span>
-     <li><span class="dfn-paneled" id="term-for-dom-dompointreadonly-w" style="color:initial">w</span>
-     <li><span class="dfn-paneled" id="term-for-dom-dompointreadonly-x" style="color:initial">x</span>
-     <li><span class="dfn-paneled" id="term-for-dom-dompointreadonly-y" style="color:initial">y</span>
-     <li><span class="dfn-paneled" id="term-for-dom-dompointreadonly-z" style="color:initial">z</span>
+     <li><span class="dfn-paneled" id="term-for-dom-dompointreadonly-w" style="color:initial">w <small>(for DOMPointReadOnly)</small></span>
+     <li><span class="dfn-paneled" id="term-for-dom-dompointreadonly-x" style="color:initial">x <small>(for DOMPointReadOnly)</small></span>
+     <li><span class="dfn-paneled" id="term-for-dom-dompointreadonly-y" style="color:initial">y <small>(for DOMPointReadOnly)</small></span>
+     <li><span class="dfn-paneled" id="term-for-dom-dompointreadonly-z" style="color:initial">z <small>(for DOMPointReadOnly)</small></span>
     </ul>
    <li>
     <a data-link-type="biblio">[INFRA]</a> defines the following terms:
@@ -2818,7 +2855,9 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
      <li><span class="dfn-paneled" id="term-for-operationerror" style="color:initial">OperationError</span>
      <li><span class="dfn-paneled" id="term-for-SameObject" style="color:initial">SameObject</span>
      <li><span class="dfn-paneled" id="term-for-SecureContext" style="color:initial">SecureContext</span>
+     <li><span class="dfn-paneled" id="term-for-exceptiondef-typeerror" style="color:initial">TypeError</span>
      <li><span class="dfn-paneled" id="term-for-a-new-promise" style="color:initial">a new promise</span>
+     <li><span class="dfn-paneled" id="term-for-idl-double" style="color:initial">double</span>
      <li><span class="dfn-paneled" id="term-for-reject" style="color:initial">reject</span>
      <li><span class="dfn-paneled" id="term-for-resolve" style="color:initial">resolve</span>
     </ul>
@@ -2877,61 +2916,68 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl highlight def"><c- b>enum</c-> <a href="#enumdef-xrhittesttrackabletype"><code><c- g>XRHitTestTrackableType</c-></code></a> {
-  <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-point" id="ref-for-dom-xrhittesttrackabletype-point③"><c- s>"point"</c-></a>,
-  <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-plane" id="ref-for-dom-xrhittesttrackabletype-plane⑤"><c- s>"plane"</c-></a>,
-  <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-mesh" id="ref-for-dom-xrhittesttrackabletype-mesh③"><c- s>"mesh"</c-></a>
+  <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-point"><c- s>"point"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-plane"><c- s>"plane"</c-></a>,
+  <a class="idl-code" data-link-type="enum-value" href="#dom-xrhittesttrackabletype-mesh"><c- s>"mesh"</c-></a>
 };
 
 <c- b>dictionary</c-> <a href="#dictdef-xrhittestoptionsinit"><code><c- g>XRHitTestOptionsInit</c-></code></a> {
-  <c- b>required</c-> <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace⑤"><c- n>XRSpace</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRSpace " href="#dom-xrhittestoptionsinit-space" id="ref-for-dom-xrhittestoptionsinit-space③"><c- g>space</c-></a>;
-  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype①①"><c- n>XRHitTestTrackableType</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="FrozenArray<XRHitTestTrackableType> " href="#dom-xrhittestoptionsinit-entitytypes" id="ref-for-dom-xrhittestoptionsinit-entitytypes③"><c- g>entityTypes</c-></a>;
-  <a class="n" data-link-type="idl-name" href="#xrray" id="ref-for-xrray①⑧"><c- n>XRRay</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRRay " href="#dom-xrhittestoptionsinit-offsetray" id="ref-for-dom-xrhittestoptionsinit-offsetray⑤"><c- g>offsetRay</c-></a>;
+  <c- b>required</c-> <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrspace"><c- n>XRSpace</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRSpace " href="#dom-xrhittestoptionsinit-space"><c- g>space</c-></a>;
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#enumdef-xrhittesttrackabletype"><c- n>XRHitTestTrackableType</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="FrozenArray<XRHitTestTrackableType> " href="#dom-xrhittestoptionsinit-entitytypes"><c- g>entityTypes</c-></a>;
+  <a class="n" data-link-type="idl-name" href="#xrray"><c- n>XRRay</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRRay " href="#dom-xrhittestoptionsinit-offsetray"><c- g>offsetRay</c-></a>;
 };
 
 <c- b>dictionary</c-> <a href="#dictdef-xrtransientinputhittestoptionsinit"><code><c- g>XRTransientInputHitTestOptionsInit</c-></code></a> {
-  <c- b>required</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①"><c- b>DOMString</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-xrtransientinputhittestoptionsinit-profile" id="ref-for-dom-xrtransientinputhittestoptionsinit-profile③"><c- g>profile</c-></a>;
-  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#enumdef-xrhittesttrackabletype" id="ref-for-enumdef-xrhittesttrackabletype③①"><c- n>XRHitTestTrackableType</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="FrozenArray<XRHitTestTrackableType> " href="#dom-xrtransientinputhittestoptionsinit-entitytypes" id="ref-for-dom-xrtransientinputhittestoptionsinit-entitytypes③"><c- g>entityTypes</c-></a>;
-  <a class="n" data-link-type="idl-name" href="#xrray" id="ref-for-xrray③①"><c- n>XRRay</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRRay " href="#dom-xrtransientinputhittestoptionsinit-offsetray" id="ref-for-dom-xrtransientinputhittestoptionsinit-offsetray④"><c- g>offsetRay</c-></a>;
+  <c- b>required</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><c- b>DOMString</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-xrtransientinputhittestoptionsinit-profile"><c- g>profile</c-></a>;
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#enumdef-xrhittesttrackabletype"><c- n>XRHitTestTrackableType</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="FrozenArray<XRHitTestTrackableType> " href="#dom-xrtransientinputhittestoptionsinit-entitytypes"><c- g>entityTypes</c-></a>;
+  <a class="n" data-link-type="idl-name" href="#xrray"><c- n>XRRay</c-></a> <a class="idl-code" data-link-type="dict-member" data-type="XRRay " href="#dom-xrtransientinputhittestoptionsinit-offsetray"><c- g>offsetRay</c-></a>;
 };
 
-[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext⑤"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a href="#xrhittestsource"><code><c- g>XRHitTestSource</c-></code></a> {
-  <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-xrhittestsource-cancel" id="ref-for-dom-xrhittestsource-cancel②"><c- g>cancel</c-></a>();
+  <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-xrhittestsource-cancel"><c- g>cancel</c-></a>();
 };
 
-[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext①①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a href="#xrtransientinputhittestsource"><code><c- g>XRTransientInputHitTestSource</c-></code></a> {
-  <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-xrtransientinputhittestsource-cancel" id="ref-for-dom-xrtransientinputhittestsource-cancel②"><c- g>cancel</c-></a>();
+  <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-xrtransientinputhittestsource-cancel"><c- g>cancel</c-></a>();
 };
 
-[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext②①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a href="#xrhittestresult"><code><c- g>XRHitTestResult</c-></code></a> {
-  <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrpose" id="ref-for-xrpose③"><c- n>XRPose</c-></a>? <a class="idl-code" data-link-type="method" href="#dom-xrhittestresult-getpose" id="ref-for-dom-xrhittestresult-getpose②"><c- g>getPose</c-></a>(<a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrspace" id="ref-for-xrspace③①"><c- n>XRSpace</c-></a> <a href="#dom-xrhittestresult-getpose-basespace-basespace"><code><c- g>baseSpace</c-></code></a>);
+  <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrpose"><c- n>XRPose</c-></a>? <a class="idl-code" data-link-type="method" href="#dom-xrhittestresult-getpose"><c- g>getPose</c-></a>(<a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrspace"><c- n>XRSpace</c-></a> <a href="#dom-xrhittestresult-getpose-basespace-basespace"><code><c- g>baseSpace</c-></code></a>);
 };
 
-[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext③①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed③①"><c- g>Exposed</c-></a>=<c- n>Window</c->]
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a href="#xrtransientinputhittestresult"><code><c- g>XRTransientInputHitTestResult</c-></code></a> {
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject④"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrinputsource" id="ref-for-xrinputsource①①"><c- n>XRInputSource</c-></a> <a data-readonly data-type="XRInputSource" href="#dom-xrtransientinputhittestresult-inputsource"><code><c- g>inputSource</c-></code></a>;
-  <c- b>readonly</c-> <c- b>attribute</c-> <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult" id="ref-for-xrhittestresult⑤①"><c- n>XRHitTestResult</c-></a>> <a data-readonly data-type="FrozenArray<XRHitTestResult>" href="#dom-xrtransientinputhittestresult-results"><code><c- g>results</c-></code></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://immersive-web.github.io/webxr/#xrinputsource"><c- n>XRInputSource</c-></a> <a data-readonly data-type="XRInputSource" href="#dom-xrtransientinputhittestresult-inputsource"><code><c- g>inputSource</c-></code></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult"><c- n>XRHitTestResult</c-></a>> <a data-readonly data-type="FrozenArray<XRHitTestResult>" href="#dom-xrtransientinputhittestresult-results"><code><c- g>results</c-></code></a>;
 };
 
-<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrsession-interface" id="ref-for-xrsession-interface②①"><c- g>XRSession</c-></a> {
-  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource⑨①"><c- n>XRHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsource" id="ref-for-dom-xrsession-requesthittestsource②"><c- g>requestHitTestSource</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrhittestoptionsinit" id="ref-for-dictdef-xrhittestoptionsinit③①"><c- n>XRHitTestOptionsInit</c-></a> <a href="#dom-xrsession-requesthittestsource-options-options"><code><c- g>options</c-></code></a>);
-  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource⑨①"><c- n>XRTransientInputHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsourcefortransientinput" id="ref-for-dom-xrsession-requesthittestsourcefortransientinput①"><c- g>requestHitTestSourceForTransientInput</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrtransientinputhittestoptionsinit" id="ref-for-dictdef-xrtransientinputhittestoptionsinit③①"><c- n>XRTransientInputHitTestOptionsInit</c-></a> <a href="#dom-xrsession-requesthittestsourcefortransientinput-options-options"><code><c- g>options</c-></code></a>);
+<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrsession-interface"><c- g>XRSession</c-></a> {
+  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestsource"><c- n>XRHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsource"><c- g>requestHitTestSource</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrhittestoptionsinit"><c- n>XRHitTestOptionsInit</c-></a> <a href="#dom-xrsession-requesthittestsource-options-options"><code><c- g>options</c-></code></a>);
+  <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestsource"><c- n>XRTransientInputHitTestSource</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrsession-requesthittestsourcefortransientinput"><c- g>requestHitTestSourceForTransientInput</c-></a>(<a class="n" data-link-type="idl-name" href="#dictdef-xrtransientinputhittestoptionsinit"><c- n>XRTransientInputHitTestOptionsInit</c-></a> <a href="#dom-xrsession-requesthittestsourcefortransientinput-options-options"><code><c- g>options</c-></code></a>);
 };
 
-<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrframe-interface" id="ref-for-xrframe-interface⑦①"><c- g>XRFrame</c-></a> {
-  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult" id="ref-for-xrhittestresult⑧①"><c- n>XRHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresults" id="ref-for-dom-xrframe-gethittestresults②"><c- g>getHitTestResults</c-></a>(<a class="n" data-link-type="idl-name" href="#xrhittestsource" id="ref-for-xrhittestsource①⓪①"><c- n>XRHitTestSource</c-></a> <a href="#dom-xrframe-gethittestresults-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code></a>);
-  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestresult" id="ref-for-xrtransientinputhittestresult③①"><c- n>XRTransientInputHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresultsfortransientinput" id="ref-for-dom-xrframe-gethittestresultsfortransientinput②"><c- g>getHitTestResultsForTransientInput</c-></a>(<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestsource" id="ref-for-xrtransientinputhittestsource①⓪①"><c- n>XRTransientInputHitTestSource</c-></a> <a href="#dom-xrframe-gethittestresultsfortransientinput-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code></a>);
+<c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://www.w3.org/TR/webxr/#xrframe-interface"><c- g>XRFrame</c-></a> {
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrhittestresult"><c- n>XRHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresults"><c- g>getHitTestResults</c-></a>(<a class="n" data-link-type="idl-name" href="#xrhittestsource"><c- n>XRHitTestSource</c-></a> <a href="#dom-xrframe-gethittestresults-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code></a>);
+  <c- b>FrozenArray</c->&lt;<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestresult"><c- n>XRTransientInputHitTestResult</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-xrframe-gethittestresultsfortransientinput"><c- g>getHitTestResultsForTransientInput</c-></a>(<a class="n" data-link-type="idl-name" href="#xrtransientinputhittestsource"><c- n>XRTransientInputHitTestSource</c-></a> <a href="#dom-xrframe-gethittestresultsfortransientinput-hittestsource-hittestsource"><code><c- g>hitTestSource</c-></code></a>);
 };
 
-[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext④①"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④①"><c- g>Exposed</c-></a>=<c- n>Window</c->,
- <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray" id="ref-for-dom-xrray-xrray②①"><c- g>Constructor</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit②"><c- n>DOMPointInit</c-></a> <a href="#dom-xrray-xrray-origin-direction-origin"><code><c- g>origin</c-></code></a>, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit" id="ref-for-dictdef-dompointinit①①"><c- n>DOMPointInit</c-></a> <a href="#dom-xrray-xrray-origin-direction-direction"><code><c- g>direction</c-></code></a>),
- <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray-transform" id="ref-for-dom-xrray-xrray-transform①"><c- g>Constructor</c-></a>(<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webxr/#xrrigidtransform-interface" id="ref-for-xrrigidtransform-interface①"><c- n>XRRigidTransform</c-></a> <a href="#dom-xrray-xrray-transform-transform"><code><c- g>transform</c-></code></a>)]
+<c- b>dictionary</c-> <a href="#dictdef-xrraydirectioninit"><code><c- g>XRRayDirectionInit</c-></code></a> {
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double"><c- b>double</c-></a> <a data-default="0" data-type="double " href="#dom-xrraydirectioninit-x"><code><c- g>x</c-></code></a> = 0;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double"><c- b>double</c-></a> <a data-default="0" data-type="double " href="#dom-xrraydirectioninit-y"><code><c- g>y</c-></code></a> = 0;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double"><c- b>double</c-></a> <a data-default="-1" data-type="double " href="#dom-xrraydirectioninit-z"><code><c- g>z</c-></code></a> = -1;
+  <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-double"><c- b>double</c-></a> <a data-default="0" data-type="double " href="#dom-xrraydirectioninit-w"><code><c- g>w</c-></code></a> = 0;
+};
+
+[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->]
 <c- b>interface</c-> <a href="#xrray"><code><c- g>XRRay</c-></code></a> {
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject①①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly②"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-origin" id="ref-for-dom-xrray-origin①①"><c- g>origin</c-></a>;
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject②①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly" id="ref-for-dompointreadonly①①"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-direction" id="ref-for-dom-xrray-direction①③"><c- g>direction</c-></a>;
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject③①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-Float32Array" id="ref-for-idl-Float32Array①"><c- b>Float32Array</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Float32Array" href="#dom-xrray-matrix" id="ref-for-dom-xrray-matrix②"><c- g>matrix</c-></a>;
+  <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray"><c- g>constructor</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dictdef-dompointinit"><c- n>DOMPointInit</c-></a> <a href="#dom-xrray-xrray-origin-direction-origin"><code><c- g>origin</c-></code></a> = {}, <c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-xrraydirectioninit"><c- n>XRRayDirectionInit</c-></a> <a href="#dom-xrray-xrray-origin-direction-direction"><code><c- g>direction</c-></code></a> = {});
+  <a class="idl-code" data-link-type="constructor" href="#dom-xrray-xrray-transform"><c- g>constructor</c-></a>(<a class="n" data-link-type="idl-name" href="https://www.w3.org/TR/webxr/#xrrigidtransform-interface"><c- n>XRRigidTransform</c-></a> <a href="#dom-xrray-xrray-transform-transform"><code><c- g>transform</c-></code></a>);
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-origin"><c- g>origin</c-></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.fxtf.org/geometry-1/#dompointreadonly"><c- n>DOMPointReadOnly</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="DOMPointReadOnly" href="#dom-xrray-direction"><c- g>direction</c-></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-Float32Array"><c- b>Float32Array</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="Float32Array" href="#dom-xrray-matrix"><c- g>matrix</c-></a>;
 };
 
 </pre>
@@ -3327,10 +3373,41 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <li><a href="#ref-for-dom-xrframe-gethittestresultsfortransientinput">8. Obtaining hit test results</a> <a href="#ref-for-dom-xrframe-gethittestresultsfortransientinput①">(2)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dictdef-xrraydirectioninit">
+   <b><a href="#dictdef-xrraydirectioninit">#dictdef-xrraydirectioninit</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-xrraydirectioninit">9.1. XRRayDirectionInit</a>
+    <li><a href="#ref-for-dictdef-xrraydirectioninit①">9.2. XRRay</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrraydirectioninit-x">
+   <b><a href="#dom-xrraydirectioninit-x">#dom-xrraydirectioninit-x</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrraydirectioninit-x">9.2. XRRay</a> <a href="#ref-for-dom-xrraydirectioninit-x①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrraydirectioninit-y">
+   <b><a href="#dom-xrraydirectioninit-y">#dom-xrraydirectioninit-y</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrraydirectioninit-y">9.2. XRRay</a> <a href="#ref-for-dom-xrraydirectioninit-y①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrraydirectioninit-z">
+   <b><a href="#dom-xrraydirectioninit-z">#dom-xrraydirectioninit-z</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrraydirectioninit-z">9.2. XRRay</a> <a href="#ref-for-dom-xrraydirectioninit-z①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-xrraydirectioninit-w">
+   <b><a href="#dom-xrraydirectioninit-w">#dom-xrraydirectioninit-w</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-xrraydirectioninit-w">9.2. XRRay</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="xrray-matrix">
    <b><a href="#xrray-matrix">#xrray-matrix</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-xrray-matrix">9.1. XRRay</a> <a href="#ref-for-xrray-matrix①">(2)</a> <a href="#ref-for-xrray-matrix②">(3)</a> <a href="#ref-for-xrray-matrix③">(4)</a> <a href="#ref-for-xrray-matrix④">(5)</a> <a href="#ref-for-xrray-matrix⑤">(6)</a>
+    <li><a href="#ref-for-xrray-matrix">9.2. XRRay</a> <a href="#ref-for-xrray-matrix①">(2)</a> <a href="#ref-for-xrray-matrix②">(3)</a> <a href="#ref-for-xrray-matrix③">(4)</a> <a href="#ref-for-xrray-matrix④">(5)</a> <a href="#ref-for-xrray-matrix⑤">(6)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrray">
@@ -3340,7 +3417,7 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <li><a href="#ref-for-xrray③">3.3. XRTransientInputHitTestOptionsInit</a> <a href="#ref-for-xrray④">(2)</a> <a href="#ref-for-xrray⑤">(3)</a>
     <li><a href="#ref-for-xrray⑥">4.1. XRHitTestSource</a>
     <li><a href="#ref-for-xrray⑦">4.2. XRTransientInputHitTestSource</a>
-    <li><a href="#ref-for-xrray⑧">9.1. XRRay</a> <a href="#ref-for-xrray⑨">(2)</a> <a href="#ref-for-xrray①⓪">(3)</a> <a href="#ref-for-xrray①①">(4)</a> <a href="#ref-for-xrray①②">(5)</a> <a href="#ref-for-xrray①③">(6)</a> <a href="#ref-for-xrray①④">(7)</a> <a href="#ref-for-xrray①⑤">(8)</a> <a href="#ref-for-xrray①⑥">(9)</a> <a href="#ref-for-xrray①⑦">(10)</a>
+    <li><a href="#ref-for-xrray⑧">9.2. XRRay</a> <a href="#ref-for-xrray⑨">(2)</a> <a href="#ref-for-xrray①⓪">(3)</a> <a href="#ref-for-xrray①①">(4)</a> <a href="#ref-for-xrray①②">(5)</a> <a href="#ref-for-xrray①③">(6)</a> <a href="#ref-for-xrray①④">(7)</a> <a href="#ref-for-xrray①⑤">(8)</a> <a href="#ref-for-xrray①⑥">(9)</a> <a href="#ref-for-xrray①⑦">(10)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrray-xrray">
@@ -3348,37 +3425,38 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
    <ul>
     <li><a href="#ref-for-dom-xrray-xrray">3.2. XRHitTestOptionsInit</a>
     <li><a href="#ref-for-dom-xrray-xrray①">3.3. XRTransientInputHitTestOptionsInit</a>
-    <li><a href="#ref-for-dom-xrray-xrray②">9.1. XRRay</a>
+    <li><a href="#ref-for-dom-xrray-xrray②">9.1. XRRayDirectionInit</a>
+    <li><a href="#ref-for-dom-xrray-xrray③">9.2. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrray-xrray-transform">
    <b><a href="#dom-xrray-xrray-transform">#dom-xrray-xrray-transform</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-xrray-xrray-transform">9.1. XRRay</a>
+    <li><a href="#ref-for-dom-xrray-xrray-transform">9.2. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrray-origin">
    <b><a href="#dom-xrray-origin">#dom-xrray-origin</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-xrray-origin">9.1. XRRay</a> <a href="#ref-for-dom-xrray-origin①">(2)</a> <a href="#ref-for-dom-xrray-origin②">(3)</a> <a href="#ref-for-dom-xrray-origin③">(4)</a> <a href="#ref-for-dom-xrray-origin④">(5)</a> <a href="#ref-for-dom-xrray-origin⑤">(6)</a> <a href="#ref-for-dom-xrray-origin⑥">(7)</a> <a href="#ref-for-dom-xrray-origin⑦">(8)</a> <a href="#ref-for-dom-xrray-origin⑧">(9)</a>
+    <li><a href="#ref-for-dom-xrray-origin">9.2. XRRay</a> <a href="#ref-for-dom-xrray-origin①">(2)</a> <a href="#ref-for-dom-xrray-origin②">(3)</a> <a href="#ref-for-dom-xrray-origin③">(4)</a> <a href="#ref-for-dom-xrray-origin④">(5)</a> <a href="#ref-for-dom-xrray-origin⑤">(6)</a> <a href="#ref-for-dom-xrray-origin⑥">(7)</a> <a href="#ref-for-dom-xrray-origin⑦">(8)</a> <a href="#ref-for-dom-xrray-origin⑧">(9)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrray-direction">
    <b><a href="#dom-xrray-direction">#dom-xrray-direction</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-xrray-direction">9.1. XRRay</a> <a href="#ref-for-dom-xrray-direction①">(2)</a> <a href="#ref-for-dom-xrray-direction②">(3)</a> <a href="#ref-for-dom-xrray-direction③">(4)</a> <a href="#ref-for-dom-xrray-direction④">(5)</a> <a href="#ref-for-dom-xrray-direction⑤">(6)</a> <a href="#ref-for-dom-xrray-direction⑥">(7)</a> <a href="#ref-for-dom-xrray-direction⑦">(8)</a> <a href="#ref-for-dom-xrray-direction⑧">(9)</a> <a href="#ref-for-dom-xrray-direction⑨">(10)</a> <a href="#ref-for-dom-xrray-direction①⓪">(11)</a> <a href="#ref-for-dom-xrray-direction①①">(12)</a> <a href="#ref-for-dom-xrray-direction①②">(13)</a>
+    <li><a href="#ref-for-dom-xrray-direction">9.2. XRRay</a> <a href="#ref-for-dom-xrray-direction①">(2)</a> <a href="#ref-for-dom-xrray-direction②">(3)</a> <a href="#ref-for-dom-xrray-direction③">(4)</a> <a href="#ref-for-dom-xrray-direction④">(5)</a> <a href="#ref-for-dom-xrray-direction⑤">(6)</a> <a href="#ref-for-dom-xrray-direction⑥">(7)</a> <a href="#ref-for-dom-xrray-direction⑦">(8)</a> <a href="#ref-for-dom-xrray-direction⑧">(9)</a> <a href="#ref-for-dom-xrray-direction⑨">(10)</a> <a href="#ref-for-dom-xrray-direction①⓪">(11)</a> <a href="#ref-for-dom-xrray-direction①①">(12)</a> <a href="#ref-for-dom-xrray-direction①②">(13)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-xrray-matrix">
    <b><a href="#dom-xrray-matrix">#dom-xrray-matrix</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-xrray-matrix">9.1. XRRay</a> <a href="#ref-for-dom-xrray-matrix①">(2)</a>
+    <li><a href="#ref-for-dom-xrray-matrix">9.2. XRRay</a> <a href="#ref-for-dom-xrray-matrix①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="xrray-obtain-the-matrix">
    <b><a href="#xrray-obtain-the-matrix">#xrray-obtain-the-matrix</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-xrray-obtain-the-matrix">9.1. XRRay</a>
+    <li><a href="#ref-for-xrray-obtain-the-matrix">9.2. XRRay</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="distance-along-the-ray">
@@ -3416,6 +3494,62 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
     <li><a href="#ref-for-native-hit-test-result⑤">10.3. Native hit test result</a>
    </ul>
   </aside>
+<script>/* script-dfn-panel */
+
+document.body.addEventListener("click", function(e) {
+    var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
+    // Find the dfn element or panel, if any, that was clicked on.
+    var el = e.target;
+    var target;
+    var hitALink = false;
+    while(el.parentElement) {
+        if(el.tagName == "A") {
+            // Clicking on a link in a <dfn> shouldn't summon the panel
+            hitALink = true;
+        }
+        if(el.classList.contains("dfn-paneled")) {
+            target = "dfn";
+            break;
+        }
+        if(el.classList.contains("dfn-panel")) {
+            target = "dfn-panel";
+            break;
+        }
+        el = el.parentElement;
+    }
+    if(target != "dfn-panel") {
+        // Turn off any currently "on" or "activated" panels.
+        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
+            el.classList.remove("on");
+            el.classList.remove("activated");
+        });
+    }
+    if(target == "dfn" && !hitALink) {
+        // open the panel
+        var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
+        if(dfnPanel) {
+            dfnPanel.classList.add("on");
+            var rect = el.getBoundingClientRect();
+            dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
+            dfnPanel.style.top = window.scrollY + rect.top + "px";
+            var panelRect = dfnPanel.getBoundingClientRect();
+            var panelWidth = panelRect.right - panelRect.left;
+            if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
+                // Reposition, because the panel is overflowing
+                dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
+            }
+        } else {
+            console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
+        }
+    } else if(target == "dfn-panel") {
+        // Switch it to "activated" state, which pins it.
+        el.classList.add("activated");
+        el.style.left = null;
+        el.style.top = null;
+    }
+
+});
+</script>
 <script>/* script-var-click-highlighting */
 
     document.addEventListener("click", e=>{
@@ -3500,59 +3634,3 @@ number of requests</a> have been made for a genuine non-privacy invasive usage.<
         }
     }
     </script>
-<script>/* script-dfn-panel */
-
-document.body.addEventListener("click", function(e) {
-    var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
-    // Find the dfn element or panel, if any, that was clicked on.
-    var el = e.target;
-    var target;
-    var hitALink = false;
-    while(el.parentElement) {
-        if(el.tagName == "A") {
-            // Clicking on a link in a <dfn> shouldn't summon the panel
-            hitALink = true;
-        }
-        if(el.classList.contains("dfn-paneled")) {
-            target = "dfn";
-            break;
-        }
-        if(el.classList.contains("dfn-panel")) {
-            target = "dfn-panel";
-            break;
-        }
-        el = el.parentElement;
-    }
-    if(target != "dfn-panel") {
-        // Turn off any currently "on" or "activated" panels.
-        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
-            el.classList.remove("on");
-            el.classList.remove("activated");
-        });
-    }
-    if(target == "dfn" && !hitALink) {
-        // open the panel
-        var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
-        if(dfnPanel) {
-            dfnPanel.classList.add("on");
-            var rect = el.getBoundingClientRect();
-            dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
-            dfnPanel.style.top = window.scrollY + rect.top + "px";
-            var panelRect = dfnPanel.getBoundingClientRect();
-            var panelWidth = panelRect.right - panelRect.left;
-            if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
-                // Reposition, because the panel is overflowing
-                dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
-            }
-        } else {
-            console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
-        }
-    } else if(target == "dfn-panel") {
-        // Switch it to "activated" state, which pins it.
-        el.classList.add("activated");
-        el.style.left = null;
-        el.style.top = null;
-    }
-
-});
-</script>
