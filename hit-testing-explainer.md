@@ -196,6 +196,13 @@ function getCombinedHitTestResult(frame, inputSource, hitTestSource) {
 }
 ```
 
+## Security and Privacy Considerations
+
+This feature will help a website map the user’s physical environment with a somewhat low level of accuracy. The specification allows a UA to restrict the usage of hit test subscriptions based on an `XRRay`. Using a lot of rays would allow the site to have a more detailed view of the environment, and the UA may decide that after a certain number, the requests are superfluous.
+
+This feature is blocked by default for third-party contexts and can be controlled via a Feature Policy flag.
+
+
 ## Appendix A: Proposed partial IDL
 This is a partial IDL and is considered additive to the core IDL found in the main [explainer](https://github.com/immersive-web/webxr/blob/master/explainer.md).
 ```webidl
