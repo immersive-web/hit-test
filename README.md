@@ -25,7 +25,7 @@ repository of the [Immersive Web Working Group][webxrwg].
 
 ## Communication
 
-* [Immersive Web Working Group][wghome]
+* [Immersive Web Working Group][webxrwg]
 * [Immersive Web Community Group][webxrcg]
 * [GitHub issues list](https://github.com/immersive-web/dom-overlays/issues)
 * [`public-immersive-web` mailing list][publiclist]
@@ -69,11 +69,10 @@ For more information about this proposal, please read the [explainer](hit-testin
 [webxrwg]: https://w3.org/immersive-web
 [cgproposals]: https://github.com/immersive-web/proposals
 [webxrspec]: https://immersive-web.github.io/webxr/
-[webxrcg]: https://www.w3.org/community/webvr/
+[webxrcg]: https://www.w3.org/community/immersive-web/
 [wgcharter]: https://www.w3.org/2020/05/immersive-Web-wg-charter.html
 [webxrref]: https://immersive-web.github.io/webxr-reference/
-[wghome]: https://w3.org/immersive-web
-[publiclist]: https://lists.w3.org/Archives/Public/public-immersive-web/
+[publiclist]: https://lists.w3.org/Archives/Public/public-immersive-web-wg/
 [bikeshed]: https://github.com/tabatkins/bikeshed
 [wpt]: https://github.com/web-platform-tests/wpt
 [wptissue]: https://github.com/web-platform-tests/wpt/issues/new
