@@ -1,8 +1,8 @@
 <pre class="metadata">
 Shortname: webxr-hit-test
 Title: WebXR Hit Test Module
-Group: immersivewebcg
-Status: CG-DRAFT
+Group: immersivewebwg
+Status: ED
 Level: 1
 ED: https://immersive-web.github.io/hit-test/
 Repository: immersive-web/hit-test
