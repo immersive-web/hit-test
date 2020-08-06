@@ -266,6 +266,7 @@ The <dfn method for="XRHitTestSource">cancel()</dfn> method, when invoked on {{X
 <div class="algorithm" data-algorithm="cancel-hit-test-source">
 
 When {{XRHitTestSource/cancel()}} method is invoked, the user agent MUST <dfn>cancel a hit test source</dfn> by running the following steps:
+    1. If [=XRHitTestSource/session=]’s [=XRSession/ended=] value is <code>true</code>, throw an {{InvalidStateError}} and abort these steps.
     1. If the |hitTestSource| is not [=XRHitTestSource/active=], throw an {{InvalidStateError}} and abort these steps.
     1. Remove |hitTestSource| from [=XRHitTestSource/session=]'s [=XRSession/set of active hit test sources=].
 
@@ -315,6 +316,7 @@ The <dfn method for="XRTransientInputHitTestSource">cancel()</dfn> method, when 
 <div class="algorithm" data-algorithm="cancel-hit-test-source-transient">
 
 When {{XRTransientInputHitTestSource/cancel()}} method is invoked, the user agent MUST <dfn>cancel a hit test source for transient input</dfn> by running the following steps:
+    1. If [=XRTransientInputHitTestSource/session=]’s [=XRSession/ended=] value is <code>true</code>, throw an {{InvalidStateError}} and abort these steps.
     1. If the |hitTestSource| is not [=XRTransientInputHitTestSource/active=], throw an {{InvalidStateError}} and abort these steps.
     1. Remove |hitTestSource| from [=XRHitTestSource/session=]'s [=XRSession/set of active hit test sources for transient input=].
 
