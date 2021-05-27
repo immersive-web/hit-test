@@ -698,9 +698,22 @@ Native hit test result {#native-hit-test-result-section}
 
 <dfn lt="native hit test result|native hit test results">Native hit test results</dfn> returned from XR device should contain the position of the intersection point with user's environment. Depending on the native entity type and the information available to the XR device, the result should also contain orientation defined in such a way to allow the user agent to compute a surface normal to the user's environment at the intersection point.
 
-The information about position and orientation of the intersection point should be contained in [=native hit test result=]'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface's normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector).
+The information about position and orientation of the intersection point should be contained in [=native hit test result=]'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface's normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector). Additionally, the Z axis of the returned native origin should be set so that it points towards the origin of the ray used to perform the native hit test (i.e. the ray's origin lies on the YZ plane). The exact steps to obtain the native origin are described in [=calculate the native origin=] algorithm.
 
-Issue: Decide if we need to specify other axes of the coordinate system defined by hit test result's native origin to maintain compatibility between different implementations & differrent AR frameworks.
+<div class="algorithm" data-algorithm="calculate-native-origin">
+
+To <dfn>calculate the native origin</dfn> given [=native hit test result=] |result| and {{XRRay}} |offsetRay|, the user agent MUST run the following steps:
+    1. Let |coord| be a coordinate system defined by |offsetRay|'s {{XRRay/matrix}}. Let |X|, |Y|, and |Z| be the axes of coordinate system |coord|.
+    1. Let |normal| be the surface normal of the |result|. If the native hit test result does not return a surface normal, set |normal| to a negative gravity vector & normalize.
+    1. Let |p| be the intersection point of the |result|.
+    1. Calculate angle |alpha| between plane defined by |normal| & |Z| vectors and the plane defined by |Y| and |Z| vectors. If |normal| is equal to |Z|, set |alpha| to 0.
+    1. Rotate the coordinate system |coord| by |alpha| around the |Z| axis, yielding |coord_prime| with axes |X_prime|, |Y_prime| and |Z|.
+    1. Calculate angle |beta| between |Y_prime| and |normal|.
+    1. Rotate the coordinate system |coord_prime| by |beta| around the |X_prime| axis, yielding |coord_double_prime| with axes |X_prime|, |Y_double_prime| and |Z_prime|.
+    1. Place the coordinate system |coord_double_prime| at the intersection point |p|.
+    1. |coord_double_prime| can now be used as a native origin for the hit test result.
+
+</div>
 
 Privacy & Security Considerations {#privacy-security}
 =================================
