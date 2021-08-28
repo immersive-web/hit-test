@@ -3,6 +3,7 @@ Shortname: webxr-hit-test
 Title: WebXR Hit Test Module
 Group: immersivewebwg
 Status: ED
+TR: https://www.w3.org/TR/webxr-hit-test-1/
 Level: 1
 ED: https://immersive-web.github.io/hit-test/
 Repository: immersive-web/hit-test
