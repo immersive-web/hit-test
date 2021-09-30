@@ -7,13 +7,13 @@ TR: https://www.w3.org/TR/webxr-hit-test-1/
 Level: 1
 ED: https://immersive-web.github.io/hit-test/
 Repository: immersive-web/hit-test
-Mailing List Archives: https://lists.w3.org/Archives/Public/public-immersive-web/
+Mailing List Archives: https://lists.w3.org/Archives/Public/public-immersive-web-wg/
 
 !Participate: <a href="https://github.com/immersive-web/hit-test/issues/new">File an issue</a> (<a href="https://github.com/immersive-web/hit-test/issues">open issues</a>)
 !Participate: <a href="https://lists.w3.org/Archives/Public/public-immersive-web/">Mailing list archive</a>
 !Participate: <a href="irc://irc.w3.org:6665/">W3C's #immersive-web IRC</a>
 
-Editor: Piotr Bialecki 114482, Google http://google.com/, bialpio@google.com
+Editor: Piotr Bialecki 114482, Google https://google.com/, bialpio@google.com
 
 Abstract: Describes a method for performing hit tests against real world geometry to be used with the WebXR Device API.
 </pre>
