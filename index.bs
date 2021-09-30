@@ -10,7 +10,7 @@ Repository: immersive-web/hit-test
 Mailing List Archives: https://lists.w3.org/Archives/Public/public-immersive-web-wg/
 
 !Participate: <a href="https://github.com/immersive-web/hit-test/issues/new">File an issue</a> (<a href="https://github.com/immersive-web/hit-test/issues">open issues</a>)
-!Participate: <a href="https://lists.w3.org/Archives/Public/public-immersive-web/">Mailing list archive</a>
+!Participate: <a href="https://lists.w3.org/Archives/Public/public-immersive-web-wg/">Mailing list archive</a>
 !Participate: <a href="irc://irc.w3.org:6665/">W3C's #immersive-web IRC</a>
 
 Editor: Piotr Bialecki 114482, Google https://google.com/, bialpio@google.com
