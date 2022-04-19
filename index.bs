@@ -718,6 +718,13 @@ number of requests=] have been made for a genuine non-privacy invasive usage.
 
 </section>
 
+<h2 id="changes" class="no-num">
+Changes</h2>
+
+<h3 id="changes-from-20210831" class="no-num">
+Changes from the <a href="https://www.w3.org/TR/2021/WD-webxr-hit-test-1-20210831/">First Public Working Draft 31 August 2021</a></h3>
+
+
 Acknowledgements {#ack}
 ================
 
