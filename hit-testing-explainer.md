@@ -205,6 +205,7 @@ This feature is blocked by default for third-party contexts and can be controlle
 
 ## Appendix A: Proposed partial IDL
 This is a partial IDL and is considered additive to the core IDL found in the main [explainer](https://github.com/immersive-web/webxr/blob/master/explainer.md).
+
 ```webidl
 //
 // Session
@@ -280,4 +281,4 @@ interface XRRay {
   [SameObject] readonly attribute DOMPointReadOnly direction;
   [SameObject] readonly attribute Float32Array matrix;
 };
-
+```
