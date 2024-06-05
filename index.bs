@@ -176,7 +176,7 @@ An {{XRHitTestOptionsInit}} dictionary represents a set of configurable values t
 <script type="idl">
 dictionary XRHitTestOptionsInit {
   required XRSpace space;
-  FrozenArray<XRHitTestTrackableType> entityTypes;
+  sequence<XRHitTestTrackableType> entityTypes;
   XRRay offsetRay;
 };
 </script>
@@ -203,7 +203,7 @@ An {{XRTransientInputHitTestOptionsInit}} dictionary represents a set of configu
 <script type="idl">
 dictionary XRTransientInputHitTestOptionsInit {
   required DOMString profile;
-  FrozenArray<XRHitTestTrackableType> entityTypes;
+  sequence<XRHitTestTrackableType> entityTypes;
   XRRay offsetRay;
 };
 </script>
@@ -647,7 +647,7 @@ The <dfn>distance along the ray</dfn>, |distance|, from {{XRRay}} |ray| to any e
 
 </div>
 
-Native device concepts {#native-device-concepts} 
+Native device concepts {#native-device-concepts}
 ======================
 
 <section class="non-normative">
