@@ -507,8 +507,8 @@ Obtaining hit test results {#obtaining-hit-test-results}
 
 <script type="idl">
 partial interface XRFrame {
-  FrozenArray<XRHitTestResult> getHitTestResults(XRHitTestSource hitTestSource);
-  FrozenArray<XRTransientInputHitTestResult> getHitTestResultsForTransientInput(XRTransientInputHitTestSource hitTestSource);
+  sequence<XRHitTestResult> getHitTestResults(XRHitTestSource hitTestSource);
+  sequence<XRTransientInputHitTestResult> getHitTestResultsForTransientInput(XRTransientInputHitTestSource hitTestSource);
 };
 </script>
 
