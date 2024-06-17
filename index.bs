@@ -33,7 +33,7 @@ spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
     type: interface; text: XRSession; url: xrsession-interface
     for: XRSession;
         type: dfn; text: ended; url: ended
-        type: dfn; text: list of enabled features; url: xrsession-list-of-enabled-features
+        type: dfn; text: set of granted features; url: xrsession-set-of-granted-features
         type: dfn; text: list of frame updates; url: xrsession-list-of-frame-updates
         type: dfn; text: XR device; url: xrsession-xr-device
     type: interface; text: XRFrame; url: xrframe-interface
@@ -48,7 +48,7 @@ spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
     type: callback; text: XRFrameRequestCallback; url: callbackdef-xrframerequestcallback
     type: dfn; text: capable of supporting; url: capable-of-supporting
     type: dfn; text: feature descriptor; url: feature-descriptor
-    type: dfn; text: feature policy; url: feature-policy
+    type: dfn; text: permissions policy; url: permissions-policy
     type: dfn; text: identity transform; url: identity-transform
     type: dfn; text: inline XR device; url: inline-xr-device
     type: dfn; text: list of active XR input sources; url: list-of-active-xr-input-sources
@@ -142,7 +142,7 @@ In order for the applications to signal their interest in performing hit testing
 
 A device is [=capable of supporting=] the hit test feature if the device exposes a [=native hit test=] capability. The [=inline XR device=] MUST NOT be treated as [=capable of supporting=] the hit test feature.
 
-The hit test feature is subject to [=feature policy=] and requires <code>"xr-spatial-tracking"</code> policy to be allowed on the requesting document's origin.
+The hit test feature is subject to [=permissions policy=] and requires <code>"xr-spatial-tracking"</code> policy to be allowed on the requesting document's origin.
 
 Hit test options {#hit-test-options}
 ================
@@ -429,7 +429,7 @@ The application can <dfn>request hit test</dfn> using {{XRSession}}'s {{XRSessio
 The <dfn method for="XRSession">requestHitTestSource(|options|)</dfn> method, when invoked on an {{XRSession}} |session|, MUST run the following steps:
 
   1. Let |promise| be [=a new Promise=].
-  1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/list of enabled features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
+  1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/set of granted features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
   1. If |session|’s [=XRSession/ended=] value is <code>true</code>, throw an {{InvalidStateError}} and abort these steps.
   1. The user agent MAY [=/reject=] |promise| with {{NotAllowedError}} and abort these steps if there is a [=unreasonable number of requests=].
   1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
@@ -445,7 +445,7 @@ The <dfn method for="XRSession">requestHitTestSource(|options|)</dfn> method, wh
 The <dfn method for="XRSession">requestHitTestSourceForTransientInput(|options|)</dfn> method, when invoked on an {{XRSession}} |session|, MUST run the following steps:
 
   1. Let |promise| be [=a new Promise=].
-  1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/list of enabled features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
+  1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/set of granted features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
   1. If |session|’s [=XRSession/ended=] value is <code>true</code>, throw an {{InvalidStateError}} and abort these steps.
   1. The user agent MAY [=/reject=] |promise| with {{NotAllowedError}} and abort these steps if there is a [=unreasonable number of requests=].
   1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
@@ -699,9 +699,23 @@ Native hit test result {#native-hit-test-result-section}
 
 <dfn lt="native hit test result|native hit test results">Native hit test results</dfn> returned from XR device should contain the position of the intersection point with user's environment. Depending on the native entity type and the information available to the XR device, the result should also contain orientation defined in such a way to allow the user agent to compute a surface normal to the user's environment at the intersection point.
 
-The information about position and orientation of the intersection point should be contained in [=native hit test result=]'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface's normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is pointing up (towards negative gravity vector).
+The information about position and orientation of the intersection point should be contained in [=native hit test result=]'s native origin. Native origin defines a new coordinate system in such a way that its Y axis represents the surface's normal vector at the intersection point. If the orientation is not returned from the XR device, the user agent SHOULD set the native origin in such a way that Y axis of the coordinate system it defines is set to the normalized, negated gravity vector. Additionally, if possible, the Z axis of the returned native origin should be set so that it points towards the origin of the ray used to perform the native hit test (i.e. the ray's origin lies on the YZ plane). The exact steps to obtain the native origin are described in [=calculate the native origin=] algorithm.
 
-Issue: Decide if we need to specify other axes of the coordinate system defined by hit test result's native origin to maintain compatibility between different implementations & differrent AR frameworks.
+<div class="algorithm" data-algorithm="calculate-native-origin">
+
+To <dfn>calculate the native origin</dfn> given [=native hit test result=] |result|, {{XRRay}} |offsetRay| and a coordinate system |coordinates|, the user agent MUST run the following steps:
+    1. Let |normal| be the surface normal of the |result| expressed in coordinate system |coordinates|. If the native hit test result does not return a surface normal, set |normal| to a negative gravity vector & normalize.
+    1. Let |p| be the intersection point of the |result| expressed in coordinate system |coordinates|.
+    1. Let |origin| be |offsetRay|'s {{XRRay/origin}}.
+    1. Let |Z| be a directional vector resulting from normalizing |origin| - |p|.
+    1. If |Z| and |normal| are parallel (i.e. they are supported by parallel lines), set |Z| to <code>{ x: 0.0, y: 1.0, z: 00, w: 0.0 }</code>.
+    1. If |Z| and |normal| are parallel, set |Z| to <code>{ x: 1.0, y: 0.0, z: 0.0, w: 0.0 }</code>.
+    1. Let |X| be a directonal vector resutling from normalizing |normal| x |Z|.
+    1. Let |rotation| be a rotation that maps |X| to directional vector <code>{ x: 1.0, y: 0.0, z: 0.0, w: 0.0 }</code>, |normal| to directional vector <code>{ x: 0.0, y: 1.0, z: 0.0, w: 0.0 }</code>, and |Z| to directonal vector <code>{ x: 0.0, y: 0.0, z: 1.0, w: 0.0 }</code>.
+    1. The resulting native origin expressed relative to |coordinates| thus is a rigid transform consisting of |p| and |rotation| as its position and orientation.
+</div>
+
+Note: The above algorithm's goal is to ensure that objects placed by the application are by default facing towards the origins of the rays used for raycasting. The complexity of the algorithm is due to the edge case where surface normal of a hit test result is parallel or antiparallel to the vector defined by ray's origin and hit test result's position, in which case the mechanism to resolve the edge case leverages the Y axis (or Z axis if that is also [anti]parallel) of the space used to conduct the hit test by the virtue of referring to <code>coordinates</code> defined by that space.
 
 Privacy & Security Considerations {#privacy-security}
 =================================
