@@ -13,7 +13,8 @@ Mailing List Archives: https://lists.w3.org/Archives/Public/public-immersive-web
 !Participate: <a href="https://lists.w3.org/Archives/Public/public-immersive-web-wg/">Mailing list archive</a>
 !Participate: <a href="irc://irc.w3.org:6665/">W3C's #immersive-web IRC</a>
 
-Editor: Piotr Bialecki 114482, Google https://google.com/, bialpio@google.com
+Editor: Alex Cooper 114716, Google http://google.com/, alcooper@google.com
+Former editor: Piotr Bialecki 114482, Google https://google.com/, bialpio@google.com
 
 Abstract: Describes a method for performing hit tests against real world geometry to be used with the WebXR Device API.
 </pre>
