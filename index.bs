@@ -33,7 +33,7 @@ spec: WebXR Device API - Level 1; urlPrefix: https://www.w3.org/TR/webxr/#
         type: dfn; text: session; url: xrspace-session
     type: interface; text: XRSession; url: xrsession-interface
     for: XRSession;
-        type: dfn; text: ended; url: ended
+        type: attribute; text: ended; url: xrsession-ended
         type: dfn; text: list of enabled features; url: xrsession-list-of-enabled-features
         type: dfn; text: list of frame updates; url: xrsession-list-of-frame-updates
         type: dfn; text: XR device; url: xrsession-xr-device
@@ -431,7 +431,7 @@ The <dfn method for="XRSession">requestHitTestSource(|options|)</dfn> method, wh
 
   1. Let |promise| be [=a new Promise=].
   1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/list of enabled features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
-  1. If |session|’s [=XRSession/ended=] value is <code>true</code>, throw an {{InvalidStateError}} and abort these steps.
+  1. If |session|’s {{XRSession/ended}} value is <code>true</code>, throw an {{InvalidStateError}} and abort these steps.
   1. The user agent MAY [=/reject=] |promise| with {{NotAllowedError}} and abort these steps if there is a [=unreasonable number of requests=].
   1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
   1. [=Create a hit test source=], |hitTestSource|, with |session|, |options|' {{XRHitTestOptionsInit/space}}, |options|' [=XRHitTestOptionsInit/effective entityTypes=] and |options|' [=XRHitTestOptionsInit/effective offsetRay=].
@@ -447,7 +447,7 @@ The <dfn method for="XRSession">requestHitTestSourceForTransientInput(|options|)
 
   1. Let |promise| be [=a new Promise=].
   1. If [=hit-test=] feature descriptor is not [=list/contain|contained=] in the |session|'s [=XRSession/list of enabled features=], [=/reject=] |promise| with {{NotSupportedError}} and abort these steps.
-  1. If |session|’s [=XRSession/ended=] value is <code>true</code>, throw an {{InvalidStateError}} and abort these steps.
+  1. If |session|’s {{XRSession/ended}} value is <code>true</code>, throw an {{InvalidStateError}} and abort these steps.
   1. The user agent MAY [=/reject=] |promise| with {{NotAllowedError}} and abort these steps if there is a [=unreasonable number of requests=].
   1. Add [=compute all hit test results=] algorithm to |session|'s [=XRSession/list of frame updates=] if it is not already present there.
   1. [=Create a hit test source for transient input=], |hitTestSource|, with |session|, |options|' {{XRTransientInputHitTestOptionsInit/profile}}, |options|' [=XRHitTestOptionsInit/effective entityTypes=] and |options|' [=XRHitTestOptionsInit/effective offsetRay=].
@@ -517,7 +517,7 @@ The {{XRFrame}} is extended to contain an associated <dfn for="XRFrame">map of h
 
 The {{XRFrame}} is extended to contain an associated <dfn for="XRFrame">map of hit test sources to hit test results for transient input</dfn> that stores a mapping from {{XRTransientInputHitTestSource}} to an array of <a interface lt="XRTransientInputHitTestResult">XRTransientInputHitTestResults</a>.
 
-The application can <dfn>obtain hit test results</dfn> from an {{XRHitTestSource}} by using {{XRFrame}}'s {{XRFrame/getHitTestResults()}} method.
+The application can obtain hit test results from an {{XRHitTestSource}} by using {{XRFrame}}'s {{XRFrame/getHitTestResults()}} method.
 
 <div class="algorithm" data-algorithm="obtain-hit-test-results">
 
@@ -529,7 +529,7 @@ When the <dfn method for="XRFrame">getHitTestResults(|hitTestSource|)</dfn> meth
 
 </div>
 
-The application can <dfn>obtain hit test results for transient input</dfn> from an {{XRTransientInputHitTestSource}} by using {{XRFrame}}'s {{XRFrame/getHitTestResultsForTransientInput()}} method.
+The application can obtain hit test results for transient input from an {{XRTransientInputHitTestSource}} by using {{XRFrame}}'s {{XRFrame/getHitTestResultsForTransientInput()}} method.
 
 <div class="algorithm" data-algorithm="obtain-hit-test-results-for-transient-input">
 
