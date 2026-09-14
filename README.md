@@ -1,7 +1,5 @@
 # hit-testing Specification
 
-[![Build Status](https://travis-ci.org/immersive-web/hit-test.svg?branch=master)](https://travis-ci.org/immersive-web/hit-test)
-
 The [hit-testing](https://github.com/immersive-web/hit-test) is to expose hit-testing (raycasting) capability for WebXR
 
 The [DOM Overlays](https://immersive-web.github.io/dom-overlays/) is the 
@@ -11,12 +9,12 @@ repository of the [Immersive Web Working Group][webxrwg].
 
 1. Read the [code of conduct][CoC]
 2. See if your issue is being discussed in the [issues](https://github.com/immersive-web/dom-overlays/issues), or if your idea is being discussed in the [proposals repo][cgproposals].
-3. We will be publishing the minutes from the bi-weekly calls.
+3. We will be publishing [the minutes from the bi-weekly calls](https://github.com/immersive-web/administrivia/tree/main/meetings).
 4. You can also join the working group to participate in these discussions.
 
 ## Specifications
 
-* [Hit Test](https://immersive-web.github.io/hit-test/): Hit Test module specification for WebXR
+* [Hit Test](https://www.w3.org/TR/webxr-hit-test-1/) ([ED](https://immersive-web.github.io/hit-test/)): Hit Test module specification for WebXR
 * [Explainer](hit-testing-explainer.md)
 * [Security and Privacy Questionnaire](security-privacy-questionnaire.md)
 
@@ -38,13 +36,6 @@ See also [list of all specifications with detailed status in Working Group and C
 * [GitHub issues list](https://github.com/immersive-web/dom-overlays/issues)
 * [`public-immersive-web` mailing list][publiclist]
 
-## Maintainers
-
-To generate the spec document (`index.html`) from the `index.bs` [Bikeshed][bikeshed] document:
-
-```sh
-make
-```
 
 ## Tests
 
@@ -74,11 +65,11 @@ For more information about this proposal, please read the [explainer](hit-testin
 
 <!-- Links -->
 [CoC]: https://immersive-web.github.io/homepage/code-of-conduct.html
-[webxrwg]: https://w3.org/immersive-web
+[webxrwg]: https://www.w3.org/groups/wg/immersive-web/
 [cgproposals]: https://github.com/immersive-web/proposals
 [webxrspec]: https://immersive-web.github.io/webxr/
 [webxrcg]: https://www.w3.org/community/immersive-web/
-[wgcharter]: https://www.w3.org/2020/05/immersive-Web-wg-charter.html
+[wgcharter]: https://www.w3.org/groups/wg/immersive-web/charters/active/
 [webxrref]: https://immersive-web.github.io/webxr-reference/
 [publiclist]: https://lists.w3.org/Archives/Public/public-immersive-web-wg/
 [bikeshed]: https://github.com/tabatkins/bikeshed
